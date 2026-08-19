@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Bingo Oxford School 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde-fondo: #0c231b;
+    --verde-panel: #16362a;
+    --verde-header: #1d4d3a;
+    --verde-acento: #3fae72;
+    --verde-acento-oscuro: #2c8158;
+    --dorado: #cba135;
+    --dorado-oscuro: #9c7d29;
+    --gris-celda: #363b39;
+    --gris-celda-hover: #43483f;
+    --gris-claro: #b7bdb9;
+    --gris-oscuro: #565d59;
+    --gris-texto: #d8dcda;
+    --gris-suave: #8a938f;
+    --blanco: #f4f6f5;
+    --sombra: rgba(0,0,0,0.35);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    padding:0;
+    height:100%;
+    background: var(--verde-fondo);
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(63,174,114,0.06), transparent 40%),
+      radial-gradient(circle at 95% 100%, rgba(203,161,53,0.05), transparent 40%);
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--gris-texto);
+  }
+
+  body.host{ overflow: hidden; }
+  body.mobile{ overflow-y: auto; overflow-x: hidden; }
+
+  /* ================= HOST (proyector) ================= */
+  .page{
+    height: 100vh;
+    display:flex;
+    flex-direction: column;
+    padding: 1.1vh 1.2vw;
+    gap: 1vh;
+  }
+
+  .topbar{
+    display:flex;
+    align-items: stretch;
+    gap: clamp(10px, 1vw, 18px);
+    flex-wrap: nowrap;
+  }
+
+  .panel{
+    background: var(--verde-panel);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    box-shadow: 0 10px 26px var(--sombra);
+    padding: clamp(8px, 0.9vh, 14px) clamp(10px, 1vw, 18px);
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .brand{
+    flex: 1 1 auto;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .logo-box{
+    background: rgba(255,255,255,0.04);
+    border: 1.5px dashed var(--gris-suave);
+    border-radius: 10px;
+    color: var(--gris-suave);
+    font-size: 0.7rem;
+    text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+    line-height: 1.2;
+    padding: 4px;
+  }
+  .logo-box:hover{ border-color: var(--verde-acento); color: var(--verde-acento); }
+  .logo-box img{ width:100%; height:100%; object-fit: contain; }
+  .logo-box.principal{ width: clamp(70px, 8vh, 110px); height: clamp(70px, 8vh, 110px); font-size: 0.78rem; }
+  .logo-box.chico{ width: clamp(50px, 5.6vh, 74px); height: clamp(50px, 5.6vh, 74px); font-size: 0.68rem; }
+
+  .brand h1{
+    margin:0;
+    font-family: 'Archivo Black', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1rem, 2.1vh, 1.6rem);
+    color: var(--blanco);
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+    max-width: 15ch;
+    text-align: center;
+  }
+
+  .calls-panel{
+    flex: 1 1 auto;
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(14px, 1.6vw, 28px);
+  }
+
+  .call-current{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .bola{
+    border-radius: 50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family: 'Archivo Black', sans-serif;
+    color: #10261c;
+    box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -6px 10px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+  }
+  .bola.grande{ width: clamp(56px, 8vh, 92px); height: clamp(56px, 8vh, 92px); font-size: clamp(1.4rem, 3.4vh, 2.3rem); }
+  .bola.chica{ width: clamp(30px, 4.4vh, 48px); height: clamp(30px, 4.4vh, 48px); font-size: clamp(0.85rem, 1.8vh, 1.15rem); }
+  .bola.vacia{ background: var(--gris-celda) !important; color: var(--gris-suave); box-shadow:none; }
+
+  .bola-B{ background: var(--verde-acento); }
+  .bola-I{ background: var(--dorado); }
+  .bola-N{ background: var(--gris-claro); }
+  .bola-G{ background: var(--verde-header); color: var(--blanco) !important; }
+  .bola-O{ background: var(--gris-oscuro); color: var(--blanco) !important; }
+
+  .call-label{
+    font-size: clamp(0.6rem, 1.1vh, 0.75rem);
+    letter-spacing: 0.14em;
+    color: var(--gris-suave);
+    text-transform: uppercase;
+  }
+
+  .digital-box{
+    background: #081912;
+    border-radius: 10px;
+    padding: 6px 14px;
+    text-align:center;
+    min-width: 84px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .digital-label{
+    display:block;
+    font-size: clamp(0.55rem, 1vh, 0.68rem);
+    letter-spacing: 0.14em;
+    color: var(--gris-suave);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .digital-num{
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(1.3rem, 3vh, 2rem);
+    color: var(--verde-acento);
+  }
+
+  .history{
+    display:flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+  }
+  .history-label{
+    font-size: clamp(0.55rem, 1vh, 0.68rem);
+    letter-spacing: 0.14em;
+    color: var(--gris-suave);
+    text-transform: uppercase;
+  }
+  .history-balls{
+    display:flex;
+    gap: clamp(6px, 0.8vw, 12px);
+    align-items:center;
+    flex-wrap: nowrap;
+  }
+
+  .prize-panel{
+    align-items: center;
+    text-align:center;
+    flex: 0 0 auto;
+    min-width: clamp(150px, 15vw, 220px);
+    gap: 4px;
+  }
+  .prize-label{
+    font-size: clamp(0.6rem, 1.1vh, 0.75rem);
+    letter-spacing: 0.16em;
+    color: var(--gris-suave);
+    text-transform: uppercase;
+  }
+  .prize-value{
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(1.5rem, 3.6vh, 2.4rem);
+    color: var(--dorado);
+    border: 1.5px dashed transparent;
+    border-radius: 8px;
+    padding: 2px 10px;
+    cursor: text;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .prize-value:hover, .prize-value:focus{ border-color: var(--dorado); }
+  .prize-hint{ font-size: 0.6rem; color: var(--gris-suave); opacity: 0.7; }
+
+  .sponsors{
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+  }
+  .sponsors-label{
+    font-size: clamp(0.55rem, 1vh, 0.68rem);
+    letter-spacing: 0.14em;
+    color: var(--gris-suave);
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .sponsor-slots{ display:flex; gap: 6px; }
+
+  /* QR panel */
+  .qr-panel{
+    flex: 0 0 auto;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+  }
+  .btn-qr{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(0.68rem, 1.1vh, 0.85rem);
+    letter-spacing: 0.03em;
+    color: var(--verde-fondo);
+    background: var(--verde-acento);
+    border: none;
+    padding: clamp(6px, 0.9vh, 10px) clamp(10px, 1.2vw, 16px);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .btn-qr:hover{ opacity: 0.85; }
+  .qr-label{
+    font-size: clamp(0.55rem, 1vh, 0.68rem);
+    letter-spacing: 0.1em;
+    color: var(--gris-suave);
+    text-transform: uppercase;
+  }
+  .qr-room{
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(0.7rem, 1.4vh, 0.95rem);
+    color: var(--verde-acento);
+    letter-spacing: 0.1em;
+  }
+  .qr-aviso{
+    font-size: 0.58rem;
+    color: var(--dorado);
+    max-width: 110px;
+    line-height: 1.25;
+  }
+
+  .board-wrap{
+    flex: 1 1 auto;
+    min-height: 0;
+    background: var(--verde-panel);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px var(--sombra);
+    padding: clamp(8px, 1vh, 16px);
+    display:flex;
+  }
+
+  .board{
+    flex: 1;
+    min-height: 0;
+    display:flex;
+    flex-direction: column;
+    gap: clamp(5px, 0.8vh, 10px);
+  }
+
+  .fila{
+    flex: 1;
+    min-height: 0;
+    display:grid;
+    grid-template-columns: clamp(52px, 4.6vw, 92px) repeat(15, 1fr);
+    gap: clamp(4px, 0.5vw, 10px);
+  }
+
+  .letra-label{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius: 10px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(1.2rem, 4vh, 2.2rem);
+    color: var(--blanco);
+    letter-spacing: 0.04em;
+  }
+  .letra-label.L-B{ background: var(--verde-acento); color: #0c2118; }
+  .letra-label.L-I{ background: var(--dorado); color: #2a2205; }
+  .letra-label.L-N{ background: var(--gris-claro); color: #202422; }
+  .letra-label.L-G{ background: var(--verde-header); }
+  .letra-label.L-O{ background: var(--gris-oscuro); }
+
+  .celda{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: var(--gris-celda);
+    color: var(--gris-texto);
+    border-radius: 9px;
+    font-size: clamp(1rem, 3.4vh, 2rem);
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    border: 2px solid transparent;
+    transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    min-width: 0;
+  }
+  .celda:hover{ background: var(--gris-celda-hover); transform: translateY(-2px); }
+  .celda.marcada{
+    background: var(--verde-acento);
+    color: #0c2118;
+    border-color: var(--verde-acento-oscuro);
+    box-shadow: 0 6px 14px rgba(63,174,114,0.35), inset 0 0 0 2px rgba(255,255,255,0.15);
+    transform: scale(1.04);
+  }
+
+  .bottom-bar{
+    flex: 0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    gap: 1.4rem;
+  }
+  .contador{ font-size: clamp(0.8rem, 1.3vh, 1rem); color: var(--gris-suave); letter-spacing: 0.02em; }
+  .contador strong{ color: var(--verde-acento); font-size: 1.15em; }
+
+  .btn-limpiar{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(0.75rem, 1.2vh, 0.95rem);
+    letter-spacing: 0.04em;
+    color: var(--blanco);
+    background: transparent;
+    border: 2px solid var(--gris-suave);
+    padding: 0.5em 1.5em;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-limpiar:hover{ border-color: var(--verde-acento); color: var(--verde-acento); background: rgba(63,174,114,0.08); }
+  .btn-limpiar:active{ transform: scale(0.97); }
+
+  input[type="file"]{ display:none; }
+
+  .estado-conexion{
+    position: fixed;
+    top: 8px;
+    right: 10px;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    color: var(--gris-suave);
+    text-transform: uppercase;
+    display:flex;
+    align-items:center;
+    gap: 5px;
+    z-index: 50;
+  }
+  .punto{ width:7px; height:7px; border-radius:50%; background: var(--gris-oscuro); }
+  .punto.on{ background: var(--verde-acento); box-shadow: 0 0 6px var(--verde-acento); }
+
+  /* ================= MOBILE (celular) ================= */
+  .m-page{ display:none; }
+  body.mobile .page{ display:none; }
+  body.mobile .m-page{ display:block; }
+
+  .m-page{
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 14px 14px 40px;
+  }
+
+  .m-header{
+    text-align:center;
+    margin-bottom: 12px;
+  }
+  .m-logo-colegio{
+    display:none;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 10px;
+    padding: 4px;
+    margin: 0 auto 6px;
+  }
+  .m-header h1{
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.15rem;
+    color: var(--blanco);
+    margin: 4px 0 0;
+    letter-spacing: 0.02em;
+  }
+  .m-header .m-tag{
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: var(--verde-acento);
+    text-transform: uppercase;
+  }
+
+  .m-sponsors-card{ text-align:center; }
+  .m-sponsors-card .sponsors-label{ display:block; margin-bottom: 8px; }
+  .m-sponsor-row{
+    display:flex;
+    gap: 10px;
+    justify-content:center;
+    flex-wrap: wrap;
+  }
+  .m-sponsor-logo{
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .m-card{
+    background: var(--verde-panel);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    box-shadow: 0 10px 24px var(--sombra);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  .m-call-row{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+  }
+  .m-call-row .bola.grande{ width: 78px; height: 78px; font-size: 1.9rem; }
+  .m-call-info{ display:flex; flex-direction: column; gap: 8px; flex:1; min-width:0; }
+  .m-prev-line{ display:flex; align-items:center; gap: 8px; }
+  .m-prev-line .digital-box{ min-width: 60px; padding: 4px 10px; }
+  .m-prev-line .digital-num{ font-size: 1.1rem; }
+
+  .m-history-balls{ display:flex; gap: 8px; flex-wrap: wrap; }
+  .m-history-balls .bola.chica{ width: 34px; height: 34px; font-size: 0.85rem; }
+
+  .m-prize{ text-align:center; }
+  .m-prize .prize-label{ display:block; margin-bottom: 2px; }
+  .m-prize .prize-value-display{
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.7rem;
+    color: var(--dorado);
+  }
+
+  .m-board{
+    display:flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .m-fila{
+    display:grid;
+    grid-template-columns: 34px repeat(15, 1fr);
+    gap: 3px;
+  }
+  .m-letra{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius: 6px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.85rem;
+  }
+  .m-letra.L-B{ background: var(--verde-acento); color:#0c2118; }
+  .m-letra.L-I{ background: var(--dorado); color:#2a2205; }
+  .m-letra.L-N{ background: var(--gris-claro); color:#202422; }
+  .m-letra.L-G{ background: var(--verde-header); color:var(--blanco); }
+  .m-letra.L-O{ background: var(--gris-oscuro); color:var(--blanco); }
+
+  .m-celda{
+    aspect-ratio: 1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: var(--gris-celda);
+    color: var(--gris-texto);
+    border-radius: 6px;
+    font-size: 0.62rem;
+    font-weight: 600;
+  }
+  .m-celda.marcada{
+    background: var(--verde-acento);
+    color: #0c2118;
+  }
+
+  .m-footer-nota{
+    text-align:center;
+    font-size: 0.66rem;
+    color: var(--gris-suave);
+    margin-top: 14px;
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body class="host">
+
+  <div class="estado-conexion" id="estadoConexion">
+    <span class="punto" id="puntoConexion"></span>
+    <span id="textoConexion">Modo local</span>
+  </div>
+
+  <!-- ======================= VISTA HOST (proyector) ======================= -->
+  <div class="page" id="vistaHost">
+
+    <div class="topbar">
+      <div class="panel brand">
+        <div class="logo-box principal" id="logoColegio">LOGO<br>COLEGIO</div>
+        <h1>Bingo Oxford School 2026</h1>
+      </div>
+
+      <div class="panel calls-panel">
+        <div class="call-current">
+          <div class="bola grande vacia" id="bolaActual">-</div>
+          <span class="call-label">Llamada&nbsp;actual</span>
+        </div>
+
+        <div class="digital-box">
+          <span class="digital-label">Anterior</span>
+          <span class="digital-num" id="numAnterior">--</span>
+        </div>
+
+        <div class="history">
+          <span class="history-label">Últimas 5 llamadas</span>
+          <div class="history-balls" id="historyBalls"></div>
+        </div>
+      </div>
+
+      <div class="panel prize-panel">
+        <span class="prize-label">Premio</span>
+        <div class="prize-value" contenteditable="true" id="premioValor" spellcheck="false">$200.000</div>
+        <span class="prize-hint">clic para editar</span>
+      </div>
+
+      <div class="panel qr-panel">
+        <span class="qr-label">Ver en el celular</span>
+        <button class="btn-qr" id="btnImprimirQR" type="button">Imprimir QR</button>
+        <span class="qr-room" id="qrRoomTexto">Sala ----</span>
+      </div>
+
+      <div class="panel sponsors">
+        <span class="sponsors-label">Auspiciadores</span>
+        <div class="sponsor-slots" id="sponsorSlots">
+          <div class="logo-box chico" data-slot="1">+</div>
+          <div class="logo-box chico" data-slot="2">+</div>
+          <div class="logo-box chico" data-slot="3">+</div>
+          <div class="logo-box chico" data-slot="4">+</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="bottom-bar">
+      <span class="contador"><strong id="contadorNum">0</strong> números marcados</span>
+      <button class="btn-limpiar" id="btnLimpiar">Limpiar selecciones</button>
+    </div>
+
+  </div>
+
+  <!-- ======================= VISTA MOBILE (celular) ======================= -->
+  <div class="m-page" id="vistaMobile">
+    <div class="m-header">
+      <img id="mLogoColegio" class="m-logo-colegio" alt="Logo colegio">
+      <div class="m-tag">Bingo en vivo</div>
+      <h1>Bingo Oxford School 2026</h1>
+    </div>
+
+    <div class="m-card m-call-row">
+      <div class="bola grande vacia" id="mBolaActual">-</div>
+      <div class="m-call-info">
+        <div class="m-prev-line">
+          <div class="digital-box">
+            <span class="digital-label">Anterior</span>
+            <span class="digital-num" id="mNumAnterior">--</span>
+          </div>
+        </div>
+        <div>
+          <span class="history-label">Últimas llamadas</span>
+          <div class="m-history-balls" id="mHistoryBalls"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-card m-prize">
+      <span class="prize-label">Premio de este bingo</span>
+      <div class="prize-value-display" id="mPremioValor">$200.000</div>
+    </div>
+
+    <div class="m-card m-sponsors-card" id="mSponsorsCard" style="display:none;">
+      <span class="sponsors-label">Auspiciadores</span>
+      <div class="m-sponsor-row" id="mSponsorRow"></div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-board" id="mBoard"></div>
+    </div>
+
+    <p class="m-footer-nota">Esta pantalla se actualiza sola a medida que se cantan los números.<br>No necesitas recargar ni marcar nada aquí.</p>
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+  /* =========================================================================
+     CONFIGURACIÓN FIREBASE
+     ---------------------------------------------------------------------
+     Para que el QR y la vista móvil funcionen EN TIEMPO REAL entre
+     dispositivos, pega aquí los datos de tu proyecto gratuito de Firebase:
+
+     1. Ve a https://console.firebase.google.com -> crear proyecto (gratis).
+     2. Dentro del proyecto: Build -> Realtime Database -> Crear base de datos
+        -> elige modo de prueba (test mode) para partir rápido.
+     3. Ve a Configuración del proyecto -> tus apps -> Web (</>) -> copia el
+        objeto de configuración y pégalo abajo, reemplazando el de ejemplo.
+     4. Sube este archivo a un hosting real (Firebase Hosting, GitHub Pages,
+        Netlify) o sírvelo desde tu WiFi local, ya que un archivo abierto con
+        doble clic (file://) no es alcanzable desde otros celulares.
+     ========================================================================= */
+  const firebaseConfig = {
+    apiKey: "AIzaSyCqzLZ2lYvjkJi8zKFdId5eknfm5yA6xKA",
+    authDomain: "bingo-oxford-school.firebaseapp.com",
+    databaseURL: "https://bingo-oxford-school-default-rtdb.firebaseio.com",
+    projectId: "bingo-oxford-school",
+    storageBucket: "bingo-oxford-school.firebasestorage.app",
+    messagingSenderId: "465865636119",
+    appId: "1:465865636119:web:d2261f0090b3e5b9cd1f52"
+  };
+
+  const firebaseConfigurado = firebaseConfig.apiKey !== "TU_API_KEY";
+  let dbRef = null;
+
+  if(firebaseConfigurado){
+    try{
+      firebase.initializeApp(firebaseConfig);
+      window.__fbDb = firebase.database();
+    } catch(e){ console.warn('Firebase no se pudo iniciar:', e); }
+  }
+
+  const rangos = [
+    { letra: 'B', inicio: 1,  fin: 15 },
+    { letra: 'I', inicio: 16, fin: 30 },
+    { letra: 'N', inicio: 31, fin: 45 },
+    { letra: 'G', inicio: 46, fin: 60 },
+    { letra: 'O', inicio: 61, fin: 75 }
+  ];
+
+  function letraDeNumero(n){
+    return rangos.find(r => n >= r.inicio && n <= r.fin).letra;
+  }
+
+  function crearBola(n, clase){
+    const b = document.createElement('div');
+    b.className = 'bola ' + clase + ' bola-' + letraDeNumero(n);
+    b.textContent = n;
+    return b;
+  }
+
+  // ---------------------------------------------------------------------
+  // Determinar rol: host (proyector) o mobile (celular via QR)
+  // ---------------------------------------------------------------------
+  const params = new URLSearchParams(location.search);
+  let room = params.get('sala');
+  const esMobile = params.get('vista') === 'movil';
+
+  if(!room){
+    room = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const nuevaUrl = new URL(location.href);
+    nuevaUrl.searchParams.set('sala', room);
+    history.replaceState(null, '', nuevaUrl.toString());
+  }
+
+  document.body.className = esMobile ? 'mobile' : 'host';
+
+  function marcarConexion(activa, texto){
+    const punto = document.getElementById('puntoConexion');
+    const textoEl = document.getElementById('textoConexion');
+    if(!punto) return;
+    punto.classList.toggle('on', activa);
+    textoEl.textContent = texto;
+  }
+
+  // =======================================================================
+  // VISTA HOST
+  // =======================================================================
+  if(!esMobile){
+    const board = document.getElementById('board');
+    const contadorEl = document.getElementById('contadorNum');
+    const bolaActual = document.getElementById('bolaActual');
+    const numAnterior = document.getElementById('numAnterior');
+    const historyBalls = document.getElementById('historyBalls');
+    const premioValor = document.getElementById('premioValor');
+
+    let marcados = 0;
+    let historial = [];
+
+    rangos.forEach(({letra, inicio, fin}) => {
+      const fila = document.createElement('div');
+      fila.className = 'fila';
+
+      const label = document.createElement('div');
+      label.className = 'letra-label L-' + letra;
+      label.textContent = letra;
+      fila.appendChild(label);
+
+      for(let n = inicio; n <= fin; n++){
+        const celda = document.createElement('div');
+        celda.className = 'celda';
+        celda.textContent = n;
+        celda.dataset.valor = n;
+
+        celda.addEventListener('click', () => {
+          const yaMarcada = celda.classList.toggle('marcada');
+          marcados += yaMarcada ? 1 : -1;
+          contadorEl.textContent = marcados;
+
+          if(yaMarcada){
+            historial.push(n);
+          } else {
+            const idx = historial.indexOf(n);
+            if(idx !== -1) historial.splice(idx, 1);
+          }
+          actualizarLlamadas();
+          enviarEstado();
+        });
+
+        fila.appendChild(celda);
+      }
+      board.appendChild(fila);
+    });
+
+    function actualizarLlamadas(){
+      const total = historial.length;
+
+      bolaActual.innerHTML = '';
+      if(total > 0){
+        const actual = historial[total - 1];
+        bolaActual.className = 'bola grande bola-' + letraDeNumero(actual);
+        bolaActual.textContent = actual;
+      } else {
+        bolaActual.className = 'bola grande vacia';
+        bolaActual.textContent = '-';
+      }
+
+      numAnterior.textContent = total > 1 ? historial[total - 2] : '--';
+
+      historyBalls.innerHTML = '';
+      const previas = historial.slice(0, Math.max(total - 1, 0)).slice(-5).reverse();
+      previas.forEach(n => historyBalls.appendChild(crearBola(n, 'chica')));
+    }
+
+    document.getElementById('btnLimpiar').addEventListener('click', () => {
+      document.querySelectorAll('.celda.marcada').forEach(c => c.classList.remove('marcada'));
+      marcados = 0;
+      contadorEl.textContent = marcados;
+      historial = [];
+      actualizarLlamadas();
+      enviarEstado();
+    });
+
+    premioValor.addEventListener('input', () => enviarEstado());
+
+    // ---- carga de logos (colegio y auspiciadores), con sincronización ----
+    const logosState = { colegio: null, auspiciadores: [null, null, null, null] };
+
+    function procesarImagenLogo(file, callback){
+      const lector = new FileReader();
+      lector.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 240;
+          let w = img.width, h = img.height;
+          if(w > maxDim || h > maxDim){
+            if(w > h){ h = Math.round(h * maxDim / w); w = maxDim; }
+            else { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          callback(canvas.toDataURL('image/png'));
+        };
+        img.src = ev.target.result;
+      };
+      lector.readAsDataURL(file);
+    }
+
+    function habilitarSubidaLogo(el, key){
+      el.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if(!file) return;
+          procesarImagenLogo(file, (dataUrl) => {
+            el.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            el.appendChild(img);
+
+            if(key === 'colegio'){
+              logosState.colegio = dataUrl;
+            } else {
+              logosState.auspiciadores[key] = dataUrl;
+            }
+            enviarEstado();
+          });
+        });
+        document.body.appendChild(input);
+        input.click();
+        input.remove();
+      });
+    }
+    habilitarSubidaLogo(document.getElementById('logoColegio'), 'colegio');
+    document.querySelectorAll('#sponsorSlots .logo-box').forEach((el, idx) => habilitarSubidaLogo(el, idx));
+
+    // ---- abrir página imprimible del QR, ya enlazada a esta sala ----
+    document.getElementById('qrRoomTexto').textContent = 'Sala ' + room;
+    document.getElementById('btnImprimirQR').addEventListener('click', () => {
+      const urlQr = new URL('qr-imprimir.html', location.href);
+      urlQr.searchParams.set('sala', room);
+      window.open(urlQr.toString(), '_blank');
+    });
+
+    // ---- sincronización con Firebase ----
+    let envioPendiente = null;
+    function enviarEstado(){
+      if(!firebaseConfigurado || !window.__fbDb) return;
+      clearTimeout(envioPendiente);
+      envioPendiente = setTimeout(() => {
+        window.__fbDb.ref('salasBingo/' + room).set({
+          historial: historial,
+          premio: premioValor.textContent.trim(),
+          logos: logosState,
+          actualizado: Date.now()
+        }).then(() => marcarConexion(true, 'Sincronizado'))
+          .catch(() => marcarConexion(false, 'Sin conexión'));
+      }, 250);
+    }
+
+    if(firebaseConfigurado){
+      marcarConexion(true, 'Sala ' + room);
+      enviarEstado();
+    } else {
+      marcarConexion(false, 'Configura Firebase');
+    }
+  }
+
+  // =======================================================================
+  // VISTA MOBILE
+  // =======================================================================
+  if(esMobile){
+    const mBoard = document.getElementById('mBoard');
+    const mBolaActual = document.getElementById('mBolaActual');
+    const mNumAnterior = document.getElementById('mNumAnterior');
+    const mHistoryBalls = document.getElementById('mHistoryBalls');
+    const mPremioValor = document.getElementById('mPremioValor');
+    const mLogoColegio = document.getElementById('mLogoColegio');
+    const mSponsorsCard = document.getElementById('mSponsorsCard');
+    const mSponsorRow = document.getElementById('mSponsorRow');
+
+    const celdasMobile = {};
+
+    rangos.forEach(({letra, inicio, fin}) => {
+      const fila = document.createElement('div');
+      fila.className = 'm-fila';
+
+      const label = document.createElement('div');
+      label.className = 'm-letra L-' + letra;
+      label.textContent = letra;
+      fila.appendChild(label);
+
+      for(let n = inicio; n <= fin; n++){
+        const celda = document.createElement('div');
+        celda.className = 'm-celda';
+        celda.textContent = n;
+        fila.appendChild(celda);
+        celdasMobile[n] = celda;
+      }
+      mBoard.appendChild(fila);
+    });
+
+    function renderEstado(estado){
+      const historial = (estado && estado.historial) || [];
+      const premio = (estado && estado.premio) || '$200.000';
+      const total = historial.length;
+
+      Object.keys(celdasMobile).forEach(n => celdasMobile[n].classList.remove('marcada'));
+      historial.forEach(n => { if(celdasMobile[n]) celdasMobile[n].classList.add('marcada'); });
+
+      if(total > 0){
+        const actual = historial[total - 1];
+        mBolaActual.className = 'bola grande bola-' + letraDeNumero(actual);
+        mBolaActual.textContent = actual;
+      } else {
+        mBolaActual.className = 'bola grande vacia';
+        mBolaActual.textContent = '-';
+      }
+
+      mNumAnterior.textContent = total > 1 ? historial[total - 2] : '--';
+
+      mHistoryBalls.innerHTML = '';
+      const previas = historial.slice(0, Math.max(total - 1, 0)).slice(-5).reverse();
+      previas.forEach(n => mHistoryBalls.appendChild(crearBola(n, 'chica')));
+
+      mPremioValor.textContent = premio;
+
+      const logos = (estado && estado.logos) || {};
+      if(logos.colegio){
+        mLogoColegio.src = logos.colegio;
+        mLogoColegio.style.display = 'block';
+      } else {
+        mLogoColegio.style.display = 'none';
+      }
+
+      const auspiciadores = (logos.auspiciadores || []).filter(Boolean);
+      if(auspiciadores.length){
+        mSponsorsCard.style.display = 'block';
+        mSponsorRow.innerHTML = '';
+        auspiciadores.forEach(src => {
+          const img = document.createElement('img');
+          img.className = 'm-sponsor-logo';
+          img.src = src;
+          mSponsorRow.appendChild(img);
+        });
+      } else {
+        mSponsorsCard.style.display = 'none';
+      }
+    }
+
+    if(firebaseConfigurado && window.__fbDb){
+      marcarConexion(true, 'Conectado');
+      window.__fbDb.ref('salasBingo/' + room).on('value', (snap) => {
+        renderEstado(snap.val());
+        marcarConexion(true, 'En vivo');
+      }, () => marcarConexion(false, 'Sin conexión'));
+    } else {
+      marcarConexion(false, 'Configura Firebase');
+      renderEstado(null);
+    }
+  }
+</script>
+</body>
+</html>
