@@ -63,7 +63,13 @@
         <span id="ticker-text" class="ticker-text"></span>
       </div>
     </div>
-    <div class="topbar-right"></div>
+    <div class="topbar-right">
+      <div class="month-switcher">
+        <button type="button" id="btn-prev-month-top" class="month-switcher-arrow" title="Mes anterior">‹</button>
+        <span id="month-switcher-label" class="month-switcher-label"></span>
+        <button type="button" id="btn-next-month-top" class="month-switcher-arrow" title="Mes siguiente">›</button>
+      </div>
+    </div>
   </header>
 
   <div class="drawer-overlay" id="drawer-overlay" style="display:none"></div>
@@ -353,6 +359,15 @@
         <input type="datetime-local" id="event-end" />
         <button type="submit" class="btn-primary">Agregar</button>
       </form>
+
+      <h3 class="section-title">Calendario</h3>
+      <div class="calendar-nav">
+        <button type="button" id="btn-cal-prev" class="btn-ghost timeline-arrow">‹</button>
+        <h3 id="calendar-month-label"></h3>
+        <button type="button" id="btn-cal-next" class="btn-ghost timeline-arrow">›</button>
+      </div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+      <div id="calendar-day-events"></div>
 
       <h3 class="section-title">Próximas actividades</h3>
       <div id="events-list"></div>

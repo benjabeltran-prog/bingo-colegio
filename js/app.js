@@ -312,6 +312,8 @@ async function createMonth(year, month) {
 async function selectMonth(id) {
   currentMonth = months.find((m) => m.id === id) || (await fetchMonthById(id));
   document.getElementById("month-select").value = id;
+  const label = document.getElementById("month-switcher-label");
+  if (label) label.textContent = `${MONTH_NAMES[currentMonth.month - 1].slice(0, 3)} ${currentMonth.year}`;
   await refreshAll();
 }
 
@@ -331,6 +333,8 @@ function navigateMonth(delta) {
 
 document.getElementById("btn-prev-month").addEventListener("click", () => navigateMonth(-1));
 document.getElementById("btn-next-month").addEventListener("click", () => navigateMonth(1));
+document.getElementById("btn-prev-month-top").addEventListener("click", () => navigateMonth(-1));
+document.getElementById("btn-next-month-top").addEventListener("click", () => navigateMonth(1));
 
 function renderTimeline(summariesByMonthId) {
   const strip = document.getElementById("timeline-strip");
@@ -1555,10 +1559,19 @@ async function loadEvents() {
   const { data } = await supabase
     .from("household_events").select("*").eq("household_id", currentHousehold.id)
     .order("start_at", { ascending: true });
-  const events = data || [];
+  allHouseholdEvents = data || [];
 
   const el = document.getElementById("events-list");
-  el.innerHTML = events.length ? events.map((ev) => `
+  el.innerHTML = allHouseholdEvents.length
+    ? allHouseholdEvents.map((ev) => renderEventCard(ev)).join("")
+    : `<p class="muted">No hay actividades agendadas.</p>`;
+  attachEventDeleteHandlers(el);
+
+  renderCalendarGrid();
+}
+
+function renderEventCard(ev) {
+  return `
     <div class="event-card">
       <div class="event-info">
         <div class="event-title">${escapeHtml(ev.title)}</div>
@@ -1570,15 +1583,83 @@ async function loadEvents() {
         <a class="event-gcal-link" href="${googleCalendarLink(ev)}" target="_blank" rel="noopener">+ Google Calendar</a>
         <button class="btn-danger" data-del-event="${ev.id}">${icon("trash", 14)}</button>
       </div>
-    </div>`).join("") : `<p class="muted">No hay actividades agendadas.</p>`;
+    </div>`;
+}
 
-  document.querySelectorAll("[data-del-event]").forEach((btn) => {
+function attachEventDeleteHandlers(container) {
+  container.querySelectorAll("[data-del-event]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       await supabase.from("household_events").delete().eq("id", btn.dataset.delEvent);
       await loadEvents();
     });
   });
 }
+
+// ---------------- CALENDARIO VISUAL (cuadrícula mensual) ----------------
+let allHouseholdEvents = [];
+let calendarViewDate = new Date();
+
+function renderCalendarGrid() {
+  const grid = document.getElementById("calendar-grid");
+  if (!grid) return;
+
+  const year = calendarViewDate.getFullYear();
+  const month = calendarViewDate.getMonth(); // 0-indexado
+  document.getElementById("calendar-month-label").textContent = `${MONTH_NAMES[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1);
+  const startWeekday = (firstDay.getDay() + 6) % 7; // lunes = 0
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const weekdayLabels = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
+  let html = weekdayLabels.map((w) => `<div class="calendar-weekday">${w}</div>`).join("");
+  for (let i = 0; i < startWeekday; i++) html += `<div class="calendar-day empty"></div>`;
+
+  const todayStr = new Date().toDateString();
+  for (let day = 1; day <= daysInMonth; day++) {
+    const cellDate = new Date(year, month, day);
+    const isToday = cellDate.toDateString() === todayStr;
+    const dayEvents = allHouseholdEvents.filter((ev) => {
+      const d = new Date(ev.start_at);
+      return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+    });
+    html += `
+      <div class="calendar-day ${isToday ? "today" : ""}" data-cal-day="${day}">
+        <div class="calendar-day-num">${day}</div>
+        <div class="calendar-day-dots">${dayEvents.slice(0, 4).map(() => `<span class="calendar-dot"></span>`).join("")}</div>
+      </div>`;
+  }
+  grid.innerHTML = html;
+
+  grid.querySelectorAll("[data-cal-day]").forEach((cell) => {
+    cell.addEventListener("click", () => {
+      grid.querySelectorAll(".calendar-day").forEach((c) => c.classList.remove("selected"));
+      cell.classList.add("selected");
+      renderDayEvents(year, month, Number(cell.dataset.calDay));
+    });
+  });
+}
+
+function renderDayEvents(year, month, day) {
+  const dayEvents = allHouseholdEvents.filter((ev) => {
+    const d = new Date(ev.start_at);
+    return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+  });
+  const el = document.getElementById("calendar-day-events");
+  el.innerHTML = dayEvents.length
+    ? dayEvents.map((ev) => renderEventCard(ev)).join("")
+    : `<p class="muted">Sin actividades ese día.</p>`;
+  attachEventDeleteHandlers(el);
+}
+
+document.getElementById("btn-cal-prev").addEventListener("click", () => {
+  calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+  renderCalendarGrid();
+});
+document.getElementById("btn-cal-next").addEventListener("click", () => {
+  calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+  renderCalendarGrid();
+});
 
 // ---------------- INIT ----------------
 initAuthTabs();
