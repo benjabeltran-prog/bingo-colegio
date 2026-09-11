@@ -444,6 +444,18 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px r
   .chat-widget { bottom: calc(78px + env(safe-area-inset-bottom)); right: 16px; }
   .chat-popup { width: calc(100vw - 32px); }
 
+  /* El timeline de meses queda pegado justo debajo de la barra superior,
+     en una posición fija y predecible (sin depender del nav de abajo) */
+  .timeline-nav {
+    position: sticky;
+    top: 58px;
+    z-index: 8;
+    background: var(--bg);
+    padding-top: 10px;
+    padding-bottom: 6px;
+    margin-bottom: 0;
+  }
+
   /* Evita que iOS haga zoom automático al enfocar campos (necesita >=16px) */
   input, select, textarea { font-size: 16px !important; }
 }
