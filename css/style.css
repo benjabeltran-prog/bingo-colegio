@@ -391,12 +391,14 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px r
   /* El sidebar se convierte en una barra de navegación inferior fija,
      como en una app nativa (iOS/Android tab bar) */
   .sidebar {
-    position: fixed;
-    top: auto;
-    bottom: 0;
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
     left: 0;
     right: 0;
     width: 100%;
+    height: calc(56px + env(safe-area-inset-bottom));
+    max-height: calc(56px + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -408,6 +410,7 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px r
     border-top: 1px solid var(--border);
     padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
     overflow-x: auto;
+    overflow-y: hidden;
     z-index: 150;
     box-shadow: 0 -4px 16px rgba(0,0,0,0.3);
   }
