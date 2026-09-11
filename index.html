@@ -2,9 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0d1117" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Finanzas" />
 <title>Finanzas del Hogar</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="favicon.svg" />
+<link rel="manifest" href="manifest.json" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -48,41 +55,74 @@
 
   <header class="topbar">
     <div class="topbar-left">
-      <span class="logo"><img src="favicon.svg" class="brand-mark brand-mark-sm" alt="" />Finanzas del Hogar</span>
-      <select id="household-select"></select>
-      <select id="month-select"></select>
+      <button id="btn-hamburger" class="hamburger-btn" aria-label="Menú"></button>
+      <img src="favicon.svg" class="brand-mark brand-mark-sm" alt="" />
     </div>
-    <div class="topbar-right">
-      <div class="menu-wrap">
-        <button id="btn-actions-menu" class="btn-ghost menu-trigger">Acciones <span class="menu-caret">▾</span></button>
-        <div class="dropdown-menu" id="actions-dropdown">
-          <button id="btn-new-month" class="dropdown-item">+ Nuevo mes</button>
-          <button id="btn-delete-month" class="dropdown-item dropdown-item-danger" title="Eliminar el mes seleccionado">Eliminar mes actual</button>
-          <div class="dropdown-divider"></div>
-          <button id="btn-household-manage" class="dropdown-item">Gestionar hogares</button>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-user-email" id="user-email"></div>
-          <button id="btn-logout" class="dropdown-item">Cerrar sesión</button>
-        </div>
+    <div class="topbar-center">
+      <div class="topbar-ticker">
+        <span id="ticker-text" class="ticker-text"></span>
       </div>
     </div>
+    <div class="topbar-right"></div>
   </header>
+
+  <div class="drawer-overlay" id="drawer-overlay" style="display:none"></div>
+  <nav class="drawer" id="drawer">
+    <div class="drawer-header">
+      <span class="logo"><img src="favicon.svg" class="brand-mark brand-mark-sm" alt="" />Finanzas del Hogar</span>
+      <button type="button" id="drawer-close" class="chat-popup-close">✕</button>
+    </div>
+
+    <div class="drawer-section">
+      <label class="drawer-label">Hogar</label>
+      <select id="household-select"></select>
+    </div>
+
+    <div class="drawer-section">
+      <label class="drawer-label">Mes</label>
+      <select id="month-select"></select>
+    </div>
+
+    <div class="dropdown-divider"></div>
+
+    <div class="drawer-section">
+      <button id="btn-new-month" class="dropdown-item">+ Nuevo mes</button>
+      <button id="btn-delete-month" class="dropdown-item dropdown-item-danger" title="Eliminar el mes seleccionado">Eliminar mes actual</button>
+    </div>
+
+    <div class="dropdown-divider"></div>
+
+    <div class="drawer-section">
+      <button id="btn-household-manage" class="dropdown-item">Gestionar hogares</button>
+    </div>
+
+    <div class="dropdown-divider"></div>
+
+    <div class="drawer-section">
+      <div class="dropdown-user-email" id="user-email"></div>
+      <button id="btn-logout" class="dropdown-item">Cerrar sesión</button>
+    </div>
+  </nav>
 
   <div class="app-body">
     <nav class="sidebar">
-      <button class="side-tab active" data-tab="dashboard">Dashboard</button>
+      <button class="side-tab active" data-tab="dashboard" data-icon="dashboard">Dashboard</button>
 
       <div class="side-group-label">Registrar</div>
-      <button class="side-tab" data-tab="ingresos">Ingresos</button>
-      <button class="side-tab" data-tab="fijos">Gastos Fijos</button>
-      <button class="side-tab" data-tab="extra">Gastos Extra</button>
-      <button class="side-tab" data-tab="tarjeta">Tarjeta de Crédito</button>
+      <button class="side-tab" data-tab="ingresos" data-icon="ingresos">Ingresos</button>
+      <button class="side-tab" data-tab="fijos" data-icon="fijos">Gastos Fijos</button>
+      <button class="side-tab" data-tab="extra" data-icon="extra">Gastos Extra</button>
+      <button class="side-tab" data-tab="tarjeta" data-icon="tarjeta">Tarjeta de Crédito</button>
 
       <div class="side-group-label">Patrimonio</div>
-      <button class="side-tab" data-tab="ahorros">Ahorros</button>
+      <button class="side-tab" data-tab="ahorros" data-icon="ahorros">Ahorros</button>
 
       <div class="side-group-label">Reportes</div>
-      <button class="side-tab" data-tab="historial">Historial</button>
+      <button class="side-tab" data-tab="historial" data-icon="historial">Historial</button>
+
+      <div class="side-group-label">Hogar</div>
+      <button class="side-tab" data-tab="compras" data-icon="compras">Lista de Compras</button>
+      <button class="side-tab" data-tab="planificacion" data-icon="planificacion">Planificación</button>
     </nav>
 
     <main class="content">
@@ -94,6 +134,8 @@
         <div class="timeline-strip" id="timeline-strip"></div>
         <button id="btn-next-month" class="btn-ghost timeline-arrow" title="Mes siguiente">›</button>
       </div>
+
+      <div class="narrative-box" id="monthly-narrative"></div>
 
       <h3 class="section-title">Este mes</h3>
       <div class="cards-grid" id="dashboard-cards"></div>
@@ -275,7 +317,64 @@
       <div class="cards-grid" id="report-cards" style="display:none"></div>
     </section>
 
+    <!-- LISTA DE COMPRAS -->
+    <section id="tab-compras" class="tab-panel">
+      <h2>Lista de compras</h2>
+      <p class="muted">Todo lo que agregues acá lo ve cualquiera del hogar. Marca "Recurrente" para los productos que siempre repites (ej: leche, pan) — al comprarlos, vuelven solos a la lista para la próxima vez.</p>
+
+      <form id="form-shopping-item" class="inline-form">
+        <input type="text" id="shopping-item-name" placeholder="Ej: Leche, Detergente, Pilas" required style="flex:1" />
+        <label class="checkbox-label">
+          <input type="checkbox" id="shopping-item-recurring" />
+          Recurrente
+        </label>
+        <button type="submit" class="btn-primary">Agregar</button>
+      </form>
+
+      <h3 class="section-title">Por comprar</h3>
+      <div id="shopping-list-pending"></div>
+
+      <h3 class="section-title">Comprado recientemente</h3>
+      <div class="inline-form">
+        <button id="btn-clear-purchased" class="btn-ghost">Vaciar comprados</button>
+      </div>
+      <div id="shopping-list-purchased"></div>
+    </section>
+
+    <!-- PLANIFICACIÓN DEL HOGAR -->
+    <section id="tab-planificacion" class="tab-panel">
+      <h2>Planificación del hogar</h2>
+      <p class="muted">Actividades del hogar visibles para todos los miembros. Cada una se puede agregar con un clic al Google Calendar personal de quien la vea.</p>
+
+      <form id="form-event" class="inline-form">
+        <input type="text" id="event-title" placeholder="Actividad (ej: Reunión apoderados)" required style="flex:1 1 100%" />
+        <input type="text" id="event-description" placeholder="Descripción (opcional)" style="flex:1 1 100%" />
+        <input type="datetime-local" id="event-start" required />
+        <input type="datetime-local" id="event-end" />
+        <button type="submit" class="btn-primary">Agregar</button>
+      </form>
+
+      <h3 class="section-title">Próximas actividades</h3>
+      <div id="events-list"></div>
+    </section>
+
     </main>
+  </div>
+
+  <!-- CHAT IA — globo flotante, visible en cualquier pestaña -->
+  <div class="chat-widget" id="chat-widget">
+    <div class="chat-popup" id="chat-popup" style="display:none">
+      <div class="chat-popup-header">
+        <span>Chat IA</span>
+        <button type="button" id="chat-popup-close" class="chat-popup-close">✕</button>
+      </div>
+      <div class="chat-log" id="chat-log"></div>
+      <form id="form-chat" class="chat-popup-form">
+        <input type="text" id="chat-input" placeholder="Pregúntame sobre tus finanzas..." required />
+        <button type="submit" class="btn-primary">Enviar</button>
+      </form>
+    </div>
+    <button type="button" class="chat-bubble" id="chat-bubble-toggle" title="Chat IA"></button>
   </div>
 </div>
 

@@ -11,6 +11,44 @@ let savingsChart = null;
 let ccCategoryChart = null;
 
 const MONTH_NAMES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+// ============================================================
+// ÍCONOS (trazo, un solo color — sin emojis)
+// ============================================================
+const ICONS = {
+  dashboard: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  ingresos: '<polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/>',
+  fijos: '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+  extra: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
+  tarjeta: '<rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
+  ahorros: '<path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-1h4v1a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4c1-.5 1.7-1 2-2h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2c0-1-.5-1.5-1-2h0V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/>',
+  historial: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  sparkles: '<path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/>',
+  trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+  "Compras online": '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+  Supermercado: '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
+  Combustible: '<line x1="3" y1="22" x2="15" y2="22"/><line x1="4" y1="9" x2="14" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.41L18 5"/>',
+  Suscripciones: '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+  Restaurantes: '<path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  Salud: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/>',
+  Transporte: '<path d="M5 17h14M5 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm14 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5 17V9l2-5h10l2 5v8"/>',
+  Vestuario: '<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23Z"/>',
+  Entretenimiento: '<rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>',
+  Servicios: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  "Sin categoría": '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  compras: '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
+  planificacion: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+};
+
+function icon(name, size = 18) {
+  const path = ICONS[name] || ICONS["Sin categoría"];
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="icon-inline">${path}</svg>`;
+}
+
+document.querySelectorAll(".side-tab[data-icon]").forEach((btn) => {
+  const name = btn.dataset.icon;
+  btn.innerHTML = `${icon(name, 17)}<span>${btn.textContent.trim()}</span>`;
+});
 const fmt = (n) => "$" + Math.round(n || 0).toLocaleString("es-CL");
 
 // ============================================================
@@ -81,22 +119,26 @@ document.querySelectorAll(".sidebar .side-tab").forEach((btn) => {
 });
 
 // ============================================================
-// MENÚ DESPLEGABLE DE ACCIONES
+// MENÚ HAMBURGUESA (drawer lateral)
 // ============================================================
-const actionsMenuBtn = document.getElementById("btn-actions-menu");
-const actionsDropdown = document.getElementById("actions-dropdown");
+const hamburgerBtn = document.getElementById("btn-hamburger");
+const drawer = document.getElementById("drawer");
+const drawerOverlay = document.getElementById("drawer-overlay");
 
-actionsMenuBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  actionsDropdown.classList.toggle("open");
-});
-document.addEventListener("click", (e) => {
-  if (!actionsDropdown.contains(e.target) && e.target !== actionsMenuBtn) {
-    actionsDropdown.classList.remove("open");
-  }
-});
-actionsDropdown.querySelectorAll(".dropdown-item").forEach((item) => {
-  item.addEventListener("click", () => actionsDropdown.classList.remove("open"));
+function openDrawer() {
+  drawer.classList.add("open");
+  drawerOverlay.style.display = "block";
+}
+function closeDrawer() {
+  drawer.classList.remove("open");
+  drawerOverlay.style.display = "none";
+}
+
+hamburgerBtn.addEventListener("click", openDrawer);
+drawerOverlay.addEventListener("click", closeDrawer);
+document.getElementById("drawer-close").addEventListener("click", closeDrawer);
+drawer.querySelectorAll(".dropdown-item").forEach((item) => {
+  item.addEventListener("click", closeDrawer);
 });
 
 // ============================================================
@@ -140,6 +182,8 @@ async function selectHousehold(id) {
   document.getElementById("household-select").value = id;
   document.getElementById("current-join-code").textContent = currentHousehold.join_code;
   await loadMonths();
+  await loadShoppingList();
+  await loadEvents();
 }
 
 // ---------------- MODAL DE HOGARES ----------------
@@ -316,11 +360,67 @@ async function fetchMonthById(id) {
 // ============================================================
 async function refreshAll() {
   if (!currentMonth) return;
+  await loadMerchantRules();
   await Promise.all([
     loadIncomes(), loadFixedExpenses(), loadExtraExpenses(), loadCreditCardTransactions(), loadAccounts(), loadCategoryBreakdown(),
   ]);
   await loadDashboard();
   await loadHistory();
+  await loadMonthlySummaryNarrative();
+  await updateTickerMessages();
+}
+
+// ============================================================
+// TICKER DE LA BARRA SUPERIOR
+// ============================================================
+let tickerMessages = [];
+let tickerIndex = 0;
+let tickerInterval = null;
+
+function formatDateLong(d) {
+  const s = d.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+async function updateTickerMessages() {
+  const messages = [];
+  if (currentHousehold) messages.push(`Este es el hogar ${currentHousehold.name}`);
+  if (currentMonth) messages.push(`El mes seleccionado es ${MONTH_NAMES[currentMonth.month - 1]} ${currentMonth.year}`);
+  messages.push(`Hoy es ${formatDateLong(new Date())}`);
+
+  if (currentMonth) {
+    const { data: summary } = await supabase
+      .from("v_month_summary").select("*").eq("month_id", currentMonth.id).single();
+    if (summary) {
+      messages.push(`Ingresos de este mes: ${fmt(summary.total_ingresos)}`);
+      messages.push(`Ahorro de este mes: ${fmt(summary.ahorro)}`);
+      messages.push(`Gasto en tarjeta este mes: ${fmt(summary.total_tarjeta)}`);
+    }
+  }
+
+  tickerMessages = messages;
+  tickerIndex = 0;
+  renderTickerMessage();
+  startTicker();
+}
+
+function renderTickerMessage() {
+  const el = document.getElementById("ticker-text");
+  if (!el || tickerMessages.length === 0) return;
+  el.classList.add("fade-out");
+  setTimeout(() => {
+    el.textContent = tickerMessages[tickerIndex];
+    el.classList.remove("fade-out");
+  }, 250);
+}
+
+function startTicker() {
+  if (tickerInterval) clearInterval(tickerInterval);
+  tickerInterval = setInterval(() => {
+    if (tickerMessages.length === 0) return;
+    tickerIndex = (tickerIndex + 1) % tickerMessages.length;
+    renderTickerMessage();
+  }, 4000);
 }
 
 // ============================================================
@@ -350,7 +450,7 @@ async function loadIncomes() {
   tbody.innerHTML = (data || []).map((r) => `
     <tr>
       <td>${r.person_name}</td><td>${r.description || ""}</td><td>${fmt(r.amount)}</td>
-      <td><button class="btn-danger" data-del-income="${r.id}">✕</button></td>
+      <td><button class="btn-danger" data-del-income="${r.id}">${icon("trash", 14)}</button></td>
     </tr>`).join("");
   document.getElementById("total-incomes").textContent = fmt((data || []).reduce((s, r) => s + Number(r.amount), 0));
 
@@ -386,7 +486,7 @@ async function loadFixedExpenses() {
   tbody.innerHTML = (data || []).map((r) => `
     <tr>
       <td>${capitalize(r.category)}</td><td>${r.name}</td><td>${fmt(r.amount)}</td>
-      <td><button class="btn-danger" data-del-fixed="${r.id}">✕</button></td>
+      <td><button class="btn-danger" data-del-fixed="${r.id}">${icon("trash", 14)}</button></td>
     </tr>`).join("");
   document.getElementById("total-fixed").textContent = fmt((data || []).reduce((s, r) => s + Number(r.amount), 0));
 
@@ -457,7 +557,7 @@ async function loadExtraExpenses() {
   tbody.innerHTML = (data || []).map((r) => `
     <tr>
       <td>${r.name}</td><td>${r.expense_date || "-"}</td><td>${fmt(r.amount)}</td>
-      <td><button class="btn-danger" data-del-extra="${r.id}">✕</button></td>
+      <td><button class="btn-danger" data-del-extra="${r.id}">${icon("trash", 14)}</button></td>
     </tr>`).join("");
   document.getElementById("total-extra").textContent = fmt((data || []).reduce((s, r) => s + Number(r.amount), 0));
 
@@ -473,6 +573,19 @@ async function loadExtraExpenses() {
 // TARJETA DE CRÉDITO
 // ============================================================
 let pendingParsedTransactions = [];
+let merchantRules = [];
+
+async function loadMerchantRules() {
+  const { data } = await supabase
+    .from("merchant_category_rules").select("*").eq("household_id", currentHousehold.id);
+  merchantRules = data || [];
+}
+
+function applyLearnedCategory(description) {
+  const lower = description.toLowerCase();
+  const rule = merchantRules.find((r) => lower.includes(r.merchant_pattern));
+  return rule ? rule.category : null;
+}
 
 document.getElementById("pdf-input").addEventListener("change", async (e) => {
   const file = e.target.files[0];
@@ -481,6 +594,10 @@ document.getElementById("pdf-input").addEventListener("change", async (e) => {
 
   try {
     const { transactions, suggestedTotal } = await parseSantanderStatement(file);
+    transactions.forEach((t) => {
+      const learned = applyLearnedCategory(t.description);
+      if (learned) t.category = learned;
+    });
     pendingParsedTransactions = transactions;
     renderPdfPreview(transactions, suggestedTotal);
     document.getElementById("pdf-status").textContent =
@@ -502,7 +619,7 @@ function renderPdfPreview(transactions, suggestedTotal) {
       <td><input type="text" data-field="installment_info" data-i="${i}" value="${t.installment_info || ""}" style="width:60px" /></td>
       <td><input type="number" data-field="amount" data-i="${i}" value="${t.amount}" style="width:100px" /></td>
       <td><input type="text" data-field="category" data-i="${i}" value="${t.category}" style="width:110px" /></td>
-      <td><button class="btn-danger" data-remove-preview="${i}">✕</button></td>
+      <td><button class="btn-danger" data-remove-preview="${i}">${icon("trash", 14)}</button></td>
     </tr>`).join("");
 
   tbody.querySelectorAll("input").forEach((input) => {
@@ -570,9 +687,38 @@ async function loadCreditCardTransactions() {
 
   const { data: txs } = await supabase
     .from("credit_card_transactions").select("*").in("statement_id", statementIds).order("transaction_date");
+
+  const categoryOptions = Object.keys(CATEGORY_COLORS);
   tbody.innerHTML = (txs || []).map((t) => `
-    <tr><td>${t.transaction_date || "-"}</td><td>${t.description}</td><td>${t.installment_info || "-"}</td><td>${fmt(t.amount)}</td><td>${t.category}</td></tr>
-  `).join("");
+    <tr>
+      <td>${t.transaction_date || "-"}</td>
+      <td>${t.description}</td>
+      <td>${t.installment_info || "-"}</td>
+      <td>${fmt(t.amount)}</td>
+      <td>
+        <select class="category-select" data-cc-id="${t.id}" data-cc-desc="${escapeHtml(t.description)}">
+          ${categoryOptions.map((c) => `<option value="${c}" ${c === t.category ? "selected" : ""}>${c}</option>`).join("")}
+        </select>
+      </td>
+    </tr>`).join("");
+
+  tbody.querySelectorAll("[data-cc-id]").forEach((sel) => {
+    sel.addEventListener("change", async () => {
+      const id = sel.dataset.ccId;
+      const desc = sel.dataset.ccDesc;
+      const newCategory = sel.value;
+
+      await supabase.from("credit_card_transactions").update({ category: newCategory }).eq("id", id);
+
+      // Aprender: la próxima vez que este comercio aparezca en una cartola, ya vendrá clasificado así.
+      await supabase.from("merchant_category_rules").upsert(
+        { household_id: currentHousehold.id, merchant_pattern: desc.toLowerCase(), category: newCategory },
+        { onConflict: "household_id,merchant_pattern" }
+      );
+      await loadMerchantRules();
+      await loadCategoryBreakdown();
+    });
+  });
 }
 
 // ============================================================
@@ -931,7 +1077,7 @@ async function loadAccounts() {
           <td>${ACCOUNT_TYPE_LABELS[a.account_type] || a.account_type}</td>
           <td>${rate}</td>
           <td><strong>${val}</strong> <span class="muted" style="font-size:0.75em">(automático)</span></td>
-          <td><button class="btn-danger" data-del-account="${a.id}">✕</button></td>
+          <td><button class="btn-danger" data-del-account="${a.id}">${icon("trash", 14)}</button></td>
         </tr>`;
     }
 
@@ -945,7 +1091,7 @@ async function loadAccounts() {
                  class="balance-input" value="${existing ? existing.balance : ""}" placeholder="Saldo" />
           <button class="btn-ghost" data-save-balance="${a.id}" style="padding:4px 10px;font-size:0.85em">Guardar</button>
         </td>
-        <td><button class="btn-danger" data-del-account="${a.id}">✕</button></td>
+        <td><button class="btn-danger" data-del-account="${a.id}">${icon("trash", 14)}</button></td>
       </tr>`;
   }).join("");
 
@@ -1079,6 +1225,7 @@ async function loadCategoryBreakdown() {
     rankEl.innerHTML = sorted.length
       ? sorted.map(([cat, amt]) => `
         <div class="category-row">
+          <div class="cat-name" style="color:${CATEGORY_COLORS[cat] || "#4f8cff"}">${icon(cat, 16)}</div>
           <div class="cat-name">${cat}</div>
           <div class="bar-wrap"><div class="bar" style="width:${maxVal ? (amt / maxVal) * 100 : 0}%; background:${CATEGORY_COLORS[cat] || "#4f8cff"}"></div></div>
           <div class="cat-amount">${fmt(amt)}</div>
@@ -1117,6 +1264,320 @@ async function loadCategoryBreakdown() {
       });
     }
   }
+}
+
+// ============================================================
+// RESUMEN NARRADO DEL MES
+// ============================================================
+async function loadMonthlySummaryNarrative() {
+  const el = document.getElementById("monthly-narrative");
+  if (!el) return;
+
+  const { data: summaries } = await supabase
+    .from("v_month_summary").select("*").eq("household_id", currentHousehold.id)
+    .order("year").order("month");
+  if (!summaries || summaries.length === 0) { el.innerHTML = ""; return; }
+
+  const idx = summaries.findIndex((s) => s.month_id === currentMonth.id);
+  if (idx === -1) { el.innerHTML = ""; return; }
+  const current = summaries[idx];
+  const prev = idx > 0 ? summaries[idx - 1] : null;
+  const others = summaries.filter((s) => s.month_id !== currentMonth.id);
+  const avgTarjeta = others.length ? others.reduce((s, r) => s + Number(r.total_tarjeta), 0) / others.length : null;
+
+  const { data: statements } = await supabase
+    .from("credit_card_statements").select("id").eq("month_id", currentMonth.id);
+  const statementIds = (statements || []).map((s) => s.id);
+  let topCategory = null, topAmount = 0;
+  if (statementIds.length) {
+    const { data: txs } = await supabase
+      .from("credit_card_transactions").select("category, amount").in("statement_id", statementIds);
+    const totals = {};
+    (txs || []).forEach((t) => {
+      const cat = t.category || "Sin categoría";
+      totals[cat] = (totals[cat] || 0) + Number(t.amount);
+    });
+    const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+    if (sorted.length) { topCategory = sorted[0][0]; topAmount = sorted[0][1]; }
+  }
+
+  const ahorro = Number(current.ahorro);
+  const parts = [];
+
+  parts.push(ahorro >= 0
+    ? `Este mes ahorraste ${fmt(ahorro)}.`
+    : `Este mes gastaste ${fmt(Math.abs(ahorro))} más de lo que ingresó.`);
+
+  if (prev) {
+    const diff = ahorro - Number(prev.ahorro);
+    const prevLabel = `${MONTH_NAMES[prev.month - 1]}`;
+    if (diff > 0) parts.push(`Eso es ${fmt(diff)} más que en ${prevLabel}.`);
+    else if (diff < 0) parts.push(`Eso es ${fmt(Math.abs(diff))} menos que en ${prevLabel}.`);
+  }
+
+  if (avgTarjeta !== null && avgTarjeta > 0) {
+    const diffPct = Math.round(((Number(current.total_tarjeta) - avgTarjeta) / avgTarjeta) * 100);
+    if (Math.abs(diffPct) >= 5) {
+      parts.push(`Gastaste ${Math.abs(diffPct)}% ${diffPct > 0 ? "más" : "menos"} en tarjeta que tu promedio histórico.`);
+    }
+  }
+
+  if (topCategory) {
+    parts.push(`Tu mayor gasto de tarjeta fue en ${topCategory} (${fmt(topAmount)}).`);
+  }
+
+  el.innerHTML = `<p>${icon("sparkles", 16)} ${parts.join(" ")}</p>`;
+}
+
+// ============================================================
+// CHAT CON IA
+// ============================================================
+let chatMessages = [];
+
+document.getElementById("chat-bubble-toggle").innerHTML = icon("sparkles", 24);
+
+document.getElementById("chat-bubble-toggle").addEventListener("click", () => {
+  const popup = document.getElementById("chat-popup");
+  const isOpen = popup.style.display === "flex";
+  popup.style.display = isOpen ? "none" : "flex";
+  if (!isOpen && chatMessages.length === 0) {
+    chatMessages.push({ role: "assistant", text: "Hola, pregúntame sobre las finanzas de este hogar (ej: '¿cuánto gasté en restaurantes este mes?')." });
+    renderChat();
+  }
+});
+document.getElementById("chat-popup-close").addEventListener("click", () => {
+  document.getElementById("chat-popup").style.display = "none";
+});
+
+function renderChat() {
+  const log = document.getElementById("chat-log");
+  if (!log) return;
+  log.innerHTML = chatMessages.map((m) => `
+    <div class="chat-msg chat-msg-${m.role} ${m.pending ? "pending" : ""}">${escapeHtml(m.text)}</div>
+  `).join("");
+  log.scrollTop = log.scrollHeight;
+}
+
+async function buildChatContext() {
+  const { data: summaries } = await supabase
+    .from("v_month_summary").select("*").eq("household_id", currentHousehold.id)
+    .order("year").order("month");
+
+  const { data: statements } = await supabase
+    .from("credit_card_statements").select("id").eq("month_id", currentMonth.id);
+  const statementIds = (statements || []).map((s) => s.id);
+  const categoryTotals = {};
+  if (statementIds.length) {
+    const { data: txs } = await supabase
+      .from("credit_card_transactions").select("category, amount").in("statement_id", statementIds);
+    (txs || []).forEach((t) => {
+      const cat = t.category || "Sin categoría";
+      categoryTotals[cat] = (categoryTotals[cat] || 0) + Number(t.amount);
+    });
+  }
+
+  const { data: patrimonioRow } = await supabase
+    .from("v_month_patrimonio").select("total_patrimonio").eq("month_id", currentMonth.id).single();
+
+  return {
+    mes_seleccionado: `${MONTH_NAMES[currentMonth.month - 1]} ${currentMonth.year}`,
+    resumen_por_mes: (summaries || []).map((s) => ({
+      mes: `${MONTH_NAMES[s.month - 1]} ${s.year}`,
+      ingresos: Number(s.total_ingresos),
+      gastos_fijos: Number(s.total_gastos_fijos),
+      gastos_extra: Number(s.total_gastos_extra),
+      tarjeta: Number(s.total_tarjeta),
+      ahorro: Number(s.ahorro),
+    })),
+    gasto_por_categoria_mes_seleccionado: categoryTotals,
+    patrimonio_cuentas_mes_seleccionado: patrimonioRow ? Number(patrimonioRow.total_patrimonio) : null,
+  };
+}
+
+document.getElementById("form-chat").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const input = document.getElementById("chat-input");
+  const question = input.value.trim();
+  if (!question) return;
+  input.value = "";
+
+  chatMessages.push({ role: "user", text: question });
+  renderChat();
+  chatMessages.push({ role: "assistant", text: "Pensando…", pending: true });
+  renderChat();
+
+  try {
+    const context = await buildChatContext();
+    const { data, error } = await supabase.functions.invoke("ai-chat", {
+      body: { question, context },
+    });
+
+    chatMessages.pop();
+    if (error) {
+      chatMessages.push({ role: "assistant", text: "Hubo un error consultando la IA: " + error.message });
+    } else if (data && data.error) {
+      chatMessages.push({ role: "assistant", text: "Error: " + data.error });
+    } else {
+      chatMessages.push({ role: "assistant", text: (data && data.answer) || "No hubo respuesta." });
+    }
+  } catch (err) {
+    chatMessages.pop();
+    chatMessages.push({ role: "assistant", text: "Error de conexión: " + err.message });
+  }
+  renderChat();
+});
+
+// ============================================================
+// LISTA DE COMPRAS
+// ============================================================
+document.getElementById("form-shopping-item").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("shopping-item-name").value.trim();
+  const is_recurring = document.getElementById("shopping-item-recurring").checked;
+  if (!name) return;
+
+  const { error } = await supabase.from("shopping_list_items").insert({
+    household_id: currentHousehold.id, name, is_recurring,
+  });
+  if (error) { alert("Error agregando ítem: " + error.message); return; }
+  e.target.reset();
+  await loadShoppingList();
+});
+
+document.getElementById("btn-clear-purchased").addEventListener("click", async () => {
+  if (!confirm("¿Borrar todos los ítems comprados de la lista?")) return;
+  await supabase.from("shopping_list_items")
+    .delete().eq("household_id", currentHousehold.id).eq("is_purchased", true);
+  await loadShoppingList();
+});
+
+async function loadShoppingList() {
+  const { data } = await supabase
+    .from("shopping_list_items").select("*").eq("household_id", currentHousehold.id)
+    .order("created_at");
+  const items = data || [];
+
+  const pending = items.filter((i) => !i.is_purchased);
+  const purchased = items.filter((i) => i.is_purchased);
+
+  const renderItem = (item) => `
+    <div class="shopping-item ${item.is_purchased ? "purchased" : ""}">
+      <input type="checkbox" data-shopping-id="${item.id}" data-recurring="${item.is_recurring}" ${item.is_purchased ? "checked" : ""} />
+      <span class="shopping-name">${escapeHtml(item.name)}</span>
+      ${item.is_recurring ? '<span class="recurring-badge">Recurrente</span>' : ""}
+      <button class="btn-danger" data-del-shopping="${item.id}">${icon("trash", 14)}</button>
+    </div>`;
+
+  document.getElementById("shopping-list-pending").innerHTML = pending.length
+    ? pending.map(renderItem).join("")
+    : `<p class="muted">No hay nada pendiente por comprar.</p>`;
+
+  document.getElementById("shopping-list-purchased").innerHTML = purchased.length
+    ? purchased.map(renderItem).join("")
+    : `<p class="muted">Nada comprado todavía.</p>`;
+
+  document.querySelectorAll("[data-shopping-id]").forEach((cb) => {
+    cb.addEventListener("change", async () => {
+      const id = cb.dataset.shoppingId;
+      const isRecurring = cb.dataset.recurring === "true";
+      const nowPurchased = cb.checked;
+
+      await supabase.from("shopping_list_items").update({
+        is_purchased: nowPurchased, purchased_at: nowPurchased ? new Date().toISOString() : null,
+      }).eq("id", id);
+
+      // Si es recurrente y se acaba de marcar como comprado, vuelve solo a la lista
+      if (nowPurchased && isRecurring) {
+        const { data: item } = await supabase.from("shopping_list_items").select("name").eq("id", id).single();
+        if (item) {
+          await supabase.from("shopping_list_items").insert({
+            household_id: currentHousehold.id, name: item.name, is_recurring: true,
+          });
+        }
+      }
+      await loadShoppingList();
+    });
+  });
+
+  document.querySelectorAll("[data-del-shopping]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await supabase.from("shopping_list_items").delete().eq("id", btn.dataset.delShopping);
+      await loadShoppingList();
+    });
+  });
+}
+
+// ============================================================
+// PLANIFICACIÓN DEL HOGAR (actividades / eventos)
+// ============================================================
+document.getElementById("form-event").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const title = document.getElementById("event-title").value.trim();
+  const description = document.getElementById("event-description").value.trim();
+  const startRaw = document.getElementById("event-start").value;
+  const endRaw = document.getElementById("event-end").value;
+  if (!title || !startRaw) return;
+
+  const { error } = await supabase.from("household_events").insert({
+    household_id: currentHousehold.id,
+    title,
+    description: description || null,
+    start_at: new Date(startRaw).toISOString(),
+    end_at: endRaw ? new Date(endRaw).toISOString() : null,
+    created_by: currentUser.id,
+    created_by_email: currentUser.email,
+  });
+  if (error) { alert("Error agregando actividad: " + error.message); return; }
+  e.target.reset();
+  await loadEvents();
+});
+
+function formatEventDateTime(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleString("es-CL", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+function googleCalendarLink(ev) {
+  const fmtGCal = (iso) => iso.replace(/[-:]/g, "").split(".")[0] + "Z";
+  const start = fmtGCal(ev.start_at);
+  const end = ev.end_at ? fmtGCal(ev.end_at) : fmtGCal(new Date(new Date(ev.start_at).getTime() + 60 * 60 * 1000).toISOString());
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: ev.title,
+    dates: `${start}/${end}`,
+    details: ev.description || "",
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+async function loadEvents() {
+  const { data } = await supabase
+    .from("household_events").select("*").eq("household_id", currentHousehold.id)
+    .order("start_at", { ascending: true });
+  const events = data || [];
+
+  const el = document.getElementById("events-list");
+  el.innerHTML = events.length ? events.map((ev) => `
+    <div class="event-card">
+      <div class="event-info">
+        <div class="event-title">${escapeHtml(ev.title)}</div>
+        <div class="event-time">${formatEventDateTime(ev.start_at)}${ev.end_at ? " – " + formatEventDateTime(ev.end_at) : ""}</div>
+        ${ev.description ? `<div class="event-desc">${escapeHtml(ev.description)}</div>` : ""}
+        ${ev.created_by_email ? `<div class="event-desc">Agregado por ${escapeHtml(ev.created_by_email)}</div>` : ""}
+      </div>
+      <div class="event-actions">
+        <a class="event-gcal-link" href="${googleCalendarLink(ev)}" target="_blank" rel="noopener">+ Google Calendar</a>
+        <button class="btn-danger" data-del-event="${ev.id}">${icon("trash", 14)}</button>
+      </div>
+    </div>`).join("") : `<p class="muted">No hay actividades agendadas.</p>`;
+
+  document.querySelectorAll("[data-del-event]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await supabase.from("household_events").delete().eq("id", btn.dataset.delEvent);
+      await loadEvents();
+    });
+  });
 }
 
 // ---------------- INIT ----------------
