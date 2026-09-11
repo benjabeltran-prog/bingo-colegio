@@ -388,52 +388,52 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px r
 @media (max-width: 860px) {
   .app-body { flex-direction: column; }
 
-  /* El sidebar se convierte en una barra de navegación inferior fija,
-     como en una app nativa (iOS/Android tab bar) */
+  /* El sidebar pasa a ser una fila horizontal fija, pegada justo debajo
+     del topbar (en vez de barra lateral o barra flotante abajo) */
   .sidebar {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
+    position: sticky !important;
+    top: 60px !important;
+    bottom: auto !important;
     left: 0;
     right: 0;
     width: 100%;
-    height: calc(56px + env(safe-area-inset-bottom));
-    max-height: calc(56px + env(safe-area-inset-bottom));
+    height: 54px;
+    max-height: 54px;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: stretch;
     gap: 2px;
     min-height: auto;
     background: var(--panel);
     border-right: none;
-    border-top: 1px solid var(--border);
-    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    border-bottom: 1px solid var(--border);
+    padding: 6px 8px;
     overflow-x: auto;
     overflow-y: hidden;
-    z-index: 150;
-    box-shadow: 0 -4px 16px rgba(0,0,0,0.3);
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
   .side-group-label { display: none; }
   .side-tab {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 2px;
     width: auto;
-    flex: 1 0 auto;
-    min-width: 62px;
+    flex: 0 0 auto;
+    min-width: 58px;
     border-left: none;
-    border-radius: 10px;
-    padding: 7px 4px;
-    font-size: 0.65em;
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 0.6em;
     text-align: center;
     margin-bottom: 0;
   }
   .side-tab span { white-space: nowrap; }
   .side-tab.active { border-left: none; background: rgba(79,140,255,0.16); }
 
-  .content { max-width: 100%; padding: 18px 16px calc(88px + env(safe-area-inset-bottom)); }
+  .content { max-width: 100%; padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
 
   .topbar { padding: 10px 14px; gap: 8px; }
   .topbar-left, .topbar-right { gap: 8px; }
@@ -441,15 +441,15 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px r
   .ticker-text { font-size: 0.75em; }
   .month-switcher-label { min-width: 0; font-size: 0.75em; }
 
-  .chat-widget { bottom: calc(78px + env(safe-area-inset-bottom)); right: 16px; }
+  .chat-widget { bottom: calc(16px + env(safe-area-inset-bottom)); right: 16px; }
   .chat-popup { width: calc(100vw - 32px); }
 
-  /* El timeline de meses queda pegado justo debajo de la barra superior,
-     en una posición fija y predecible (sin depender del nav de abajo) */
+  /* El timeline de meses queda pegado justo debajo del sidebar,
+     como tercer nivel fijo (topbar > sidebar > timeline) */
   .timeline-nav {
     position: sticky;
-    top: 58px;
-    z-index: 8;
+    top: 114px;
+    z-index: 15;
     background: var(--bg);
     padding-top: 10px;
     padding-bottom: 6px;
