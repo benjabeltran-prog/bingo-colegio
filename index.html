@@ -251,7 +251,9 @@
     align-items: center;
     text-align: center;
     gap: 4px;
+    display: none;
   }
+  .qr-panel.visible{ display: flex; }
   .btn-qr{
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
@@ -578,7 +580,7 @@
         <span class="prize-hint">clic para editar</span>
       </div>
 
-      <div class="panel qr-panel">
+      <div class="panel qr-panel" id="qrPanel">
         <span class="qr-label">Ver en el celular</span>
         <button class="btn-qr" id="btnImprimirQR" type="button">Imprimir QR</button>
         <button class="btn-qr btn-qr-secundario" id="btnCopiarHost" type="button">Copiar enlace de host</button>
@@ -929,6 +931,21 @@
       }).catch(() => {
         prompt('Copia este enlace manualmente (no lo compartas con los jugadores):', urlHost.toString());
       });
+    });
+
+    // ---- el panel de "Imprimir QR" / "Copiar enlace de host" está
+    // oculto por defecto para no ocupar espacio en el proyector (ya
+    // que normalmente se usa una sola vez). Se puede volver a mostrar
+    // presionando la tecla Q (solo en el proyector). ----
+    document.getElementById('qrPanel').classList.remove('visible');
+    document.addEventListener('keydown', (e) => {
+      if(e.key.toLowerCase() === 'q' && !e.ctrlKey && !e.metaKey && !e.altKey){
+        const activo = document.activeElement;
+        const escribiendo = activo && (activo.tagName === 'INPUT' || activo.tagName === 'TEXTAREA' || activo.isContentEditable);
+        if(!escribiendo){
+          document.getElementById('qrPanel').classList.toggle('visible');
+        }
+      }
     });
 
     // ---- sincronización con Firebase ----
