@@ -266,6 +266,13 @@
     transition: opacity 0.15s ease;
   }
   .btn-qr:hover{ opacity: 0.85; }
+  .btn-qr-secundario{
+    background: transparent;
+    color: var(--gris-suave);
+    border: 1.5px solid var(--gris-suave);
+    margin-top: 4px;
+  }
+  .btn-qr-secundario:hover{ color: var(--verde-acento); border-color: var(--verde-acento); opacity: 1; }
   .qr-label{
     font-size: clamp(0.55rem, 1vh, 0.68rem);
     letter-spacing: 0.1em;
@@ -574,6 +581,7 @@
       <div class="panel qr-panel">
         <span class="qr-label">Ver en el celular</span>
         <button class="btn-qr" id="btnImprimirQR" type="button">Imprimir QR</button>
+        <button class="btn-qr btn-qr-secundario" id="btnCopiarHost" type="button">Copiar enlace de host</button>
         <span class="qr-room" id="qrRoomTexto">Sala ----</span>
       </div>
 
@@ -706,9 +714,47 @@
   // puedes forzarla agregando ?sala=OTRONOMBRE en la URL.
   const SALA_FIJA = 'BINGO2026';
 
+  // -----------------------------------------------------------------
+  // SEGURIDAD: por defecto SIEMPRE se muestra la vista de espectador
+  // (celular, solo lectura). Para entrar como panel de control
+  // (proyector, con la capacidad de marcar números) se necesita UNO
+  // de estos dos:
+  //   a) un enlace con el token secreto: ?admin=TOKEN_SECRETO
+  //   b) ingresar el PIN cuando se pregunte
+  // Así, si alguien borra parte de la URL (ej. "&vista=movil"), NO
+  // queda con acceso de host por accidente — cae a espectador.
+  //
+  // Cambia estos dos valores por los tuyos antes del evento:
+  const TOKEN_SECRETO_HOST = 'oxford2026admin';
+  const PIN_HOST = '2026';
+  // -----------------------------------------------------------------
+
   const params = new URLSearchParams(location.search);
   let room = params.get('sala') || SALA_FIJA;
-  const esMobile = params.get('vista') === 'movil';
+
+  const esVistaMovilExplicita = params.get('vista') === 'movil';
+  const tieneTokenValido = params.get('admin') === TOKEN_SECRETO_HOST;
+
+  let esHost = false;
+
+  if(tieneTokenValido){
+    esHost = true;
+  } else if(!esVistaMovilExplicita){
+    // Caso ambiguo: no vino ni ?vista=movil ni el token de admin
+    // (por ejemplo, alguien borró parte de la URL). Antes de dar
+    // acceso de host, pedimos el PIN.
+    if(sessionStorage.getItem('bingoHostPin') === PIN_HOST){
+      esHost = true;
+    } else {
+      const intento = prompt('Panel de administración del bingo.\nIngresa el PIN para continuar (o cancela para ver solo en modo espectador):');
+      if(intento === PIN_HOST){
+        sessionStorage.setItem('bingoHostPin', PIN_HOST);
+        esHost = true;
+      }
+    }
+  }
+
+  const esMobile = !esHost;
 
   if(!params.get('sala')){
     const nuevaUrl = new URL(location.href);
@@ -869,6 +915,20 @@
       const urlQr = new URL('qr-imprimir.html', location.href);
       urlQr.searchParams.set('sala', room);
       window.open(urlQr.toString(), '_blank');
+    });
+
+    // ---- copiar enlace directo de host (con token), para guardarlo
+    // como favorito y no tener que escribir el PIN cada vez ----
+    document.getElementById('btnCopiarHost').addEventListener('click', () => {
+      const urlHost = new URL(location.href);
+      urlHost.searchParams.set('sala', room);
+      urlHost.searchParams.set('admin', TOKEN_SECRETO_HOST);
+      urlHost.searchParams.delete('vista');
+      navigator.clipboard.writeText(urlHost.toString()).then(() => {
+        alert('Enlace de host copiado. Guárdalo como favorito en este computador — con él no te pedirá el PIN.\n\nNo lo compartas con los jugadores.');
+      }).catch(() => {
+        prompt('Copia este enlace manualmente (no lo compartas con los jugadores):', urlHost.toString());
+      });
     });
 
     // ---- sincronización con Firebase ----
