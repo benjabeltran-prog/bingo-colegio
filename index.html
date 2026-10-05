@@ -583,7 +583,6 @@
       <div class="panel qr-panel" id="qrPanel">
         <span class="qr-label">Ver en el celular</span>
         <button class="btn-qr" id="btnImprimirQR" type="button">Imprimir QR</button>
-        <button class="btn-qr btn-qr-secundario" id="btnCopiarHost" type="button">Copiar enlace de host</button>
         <span class="qr-room" id="qrRoomTexto">Sala ----</span>
       </div>
 
@@ -652,6 +651,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
   /* =========================================================================
      CONFIGURACIÓN FIREBASE
@@ -661,7 +661,7 @@
 
      1. Ve a https://console.firebase.google.com -> crear proyecto (gratis).
      2. Dentro del proyecto: Build -> Realtime Database -> Crear base de datos
-        -> elige modo de prueba (test mode) para partir rápido.
+        -> luego publica las reglas de seguridad indicadas en las instrucciones.
      3. Ve a Configuración del proyecto -> tus apps -> Web (</>) -> copia el
         objeto de configuración y pégalo abajo, reemplazando el de ejemplo.
      4. Sube este archivo a un hosting real (Firebase Hosting, GitHub Pages,
@@ -685,6 +685,7 @@
     try{
       firebase.initializeApp(firebaseConfig);
       window.__fbDb = firebase.database();
+      window.__fbAuth = firebase.auth();
     } catch(e){ console.warn('Firebase no se pudo iniciar:', e); }
   }
 
@@ -717,45 +718,54 @@
   const SALA_FIJA = 'BINGO2026';
 
   // -----------------------------------------------------------------
-  // SEGURIDAD: por defecto SIEMPRE se muestra la vista de espectador
-  // (celular, solo lectura). Para entrar como panel de control
-  // (proyector, con la capacidad de marcar números) se necesita UNO
-  // de estos dos:
-  //   a) un enlace con el token secreto: ?admin=TOKEN_SECRETO
-  //   b) ingresar el PIN cuando se pregunte
-  // Así, si alguien borra parte de la URL (ej. "&vista=movil"), NO
-  // queda con acceso de host por accidente — cae a espectador.
-  //
-  // Cambia estos dos valores por los tuyos antes del evento:
-  const TOKEN_SECRETO_HOST = 'oxford2026admin';
-  const PIN_HOST = 'CDP2026';
+  // SEGURIDAD REAL (Firebase Authentication)
+  // Por defecto todos ven la vista de espectador (solo lectura).
+  // Para controlar el tablero hay que iniciar sesión con la cuenta de
+  // administrador creada en Firebase. Además, las reglas de la base de
+  // datos solo aceptan escrituras de esa cuenta: aunque alguien edite
+  // la URL o el código de la página, NO puede alterar el sorteo.
   // -----------------------------------------------------------------
+  const EMAIL_HOST = 'host@bingo-oxford-school.app';
 
   const params = new URLSearchParams(location.search);
   let room = params.get('sala') || SALA_FIJA;
-
   const esVistaMovilExplicita = params.get('vista') === 'movil';
-  const tieneTokenValido = params.get('admin') === TOKEN_SECRETO_HOST;
 
-  let esHost = false;
+  function esperarUsuarioActual(){
+    return new Promise(resolve => {
+      let cancelar = null;
+      cancelar = window.__fbAuth.onAuthStateChanged(u => {
+        if(cancelar) cancelar();
+        resolve(u);
+      });
+    });
+  }
 
-  if(tieneTokenValido){
-    esHost = true;
-  } else if(!esVistaMovilExplicita){
-    // Caso ambiguo: no vino ni ?vista=movil ni el token de admin
-    // (por ejemplo, alguien borró parte de la URL). Antes de dar
-    // acceso de host, pedimos el PIN.
-    if(sessionStorage.getItem('bingoHostPin') === PIN_HOST){
-      esHost = true;
-    } else {
-      const intento = prompt('Panel de administración del bingo.\nIngresa el PIN para continuar (o cancela para ver solo en modo espectador):');
-      if(intento === PIN_HOST){
-        sessionStorage.setItem('bingoHostPin', PIN_HOST);
-        esHost = true;
-      }
+  async function decidirRol(){
+    if(esVistaMovilExplicita) return false;
+    if(!firebaseConfigurado || !window.__fbAuth) return true; // modo local sin Firebase
+    const usuario = await esperarUsuarioActual();
+    if(usuario && usuario.email === EMAIL_HOST) return true;
+    const clave = prompt('Panel de administración del bingo.\nIngresa la contraseña de administrador (o cancela para ver solo en modo espectador):');
+    if(!clave) return false;
+    try{
+      await window.__fbAuth.signInWithEmailAndPassword(EMAIL_HOST, clave);
+      return true;
+    } catch(e){
+      alert('Contraseña incorrecta. Se mostrará la vista de espectador.');
+      return false;
     }
   }
 
+  function marcarConexion(activa, texto){
+    const punto = document.getElementById('puntoConexion');
+    const textoEl = document.getElementById('textoConexion');
+    if(!punto) return;
+    punto.classList.toggle('on', activa);
+    textoEl.textContent = texto;
+  }
+
+  function arrancar(esHost){
   const esMobile = !esHost;
 
   if(!params.get('sala')){
@@ -765,14 +775,6 @@
   }
 
   document.body.className = esMobile ? 'mobile' : 'host';
-
-  function marcarConexion(activa, texto){
-    const punto = document.getElementById('puntoConexion');
-    const textoEl = document.getElementById('textoConexion');
-    if(!punto) return;
-    punto.classList.toggle('on', activa);
-    textoEl.textContent = texto;
-  }
 
   // =======================================================================
   // VISTA HOST
@@ -917,20 +919,6 @@
       const urlQr = new URL('qr-imprimir.html', location.href);
       urlQr.searchParams.set('sala', room);
       window.open(urlQr.toString(), '_blank');
-    });
-
-    // ---- copiar enlace directo de host (con token), para guardarlo
-    // como favorito y no tener que escribir el PIN cada vez ----
-    document.getElementById('btnCopiarHost').addEventListener('click', () => {
-      const urlHost = new URL(location.href);
-      urlHost.searchParams.set('sala', room);
-      urlHost.searchParams.set('admin', TOKEN_SECRETO_HOST);
-      urlHost.searchParams.delete('vista');
-      navigator.clipboard.writeText(urlHost.toString()).then(() => {
-        alert('Enlace de host copiado. Guárdalo como favorito en este computador — con él no te pedirá el PIN.\n\nNo lo compartas con los jugadores.');
-      }).catch(() => {
-        prompt('Copia este enlace manualmente (no lo compartas con los jugadores):', urlHost.toString());
-      });
     });
 
     // ---- el panel de "Imprimir QR" / "Copiar enlace de host" está
@@ -1087,6 +1075,9 @@
       renderLogos(null);
     }
   }
+  } // fin arrancar
+
+  decidirRol().then(arrancar);
 </script>
 </body>
 </html>
