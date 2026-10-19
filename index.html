@@ -97,18 +97,25 @@
   }
   .logo-box:hover{ border-color: var(--verde-acento); color: var(--verde-acento); }
   .logo-box img{ width:100%; height:100%; object-fit: contain; }
-  .logo-box.principal{ width: clamp(70px, 8vh, 110px); height: clamp(70px, 8vh, 110px); font-size: 0.78rem; }
+  .logo-box.principal{
+    height: clamp(84px, 12.5vh, 160px);
+    min-width: clamp(84px, 12.5vh, 160px);
+    max-width: 34vh;
+    font-size: 0.85rem;
+  }
+  .logo-box.principal img{ width: auto; height: 100%; max-width: 100%; }
+  .logo-box.con-logo{ border-color: transparent; background: transparent; padding: 0; }
   .logo-box.chico{ width: clamp(50px, 5.6vh, 74px); height: clamp(50px, 5.6vh, 74px); font-size: 0.68rem; }
 
   .brand h1{
     margin:0;
     font-family: 'Archivo Black', sans-serif;
     font-weight: 400;
-    font-size: clamp(1rem, 2.1vh, 1.6rem);
+    font-size: clamp(0.95rem, 2.2vh, 1.9rem);
     color: var(--blanco);
     letter-spacing: 0.02em;
     line-height: 1.15;
-    max-width: 15ch;
+    white-space: nowrap;
     text-align: center;
   }
 
@@ -422,17 +429,20 @@
   }
   .m-logo-colegio{
     display:none;
-    width: 56px;
-    height: 56px;
+    height: 88px;
+    width: auto;
+    max-width: 70%;
     object-fit: contain;
     background: #fff;
-    border-radius: 10px;
-    padding: 4px;
-    margin: 0 auto 6px;
+    border-radius: 14px;
+    padding: 6px 10px;
+    margin: 0 auto 8px;
   }
   .m-header h1{
     font-family: 'Archivo Black', sans-serif;
-    font-size: 1.15rem;
+    font-weight: 400;
+    font-size: clamp(0.9rem, 5vw, 1.3rem);
+    white-space: nowrap;
     color: var(--blanco);
     margin: 4px 0 0;
     letter-spacing: 0.02em;
@@ -539,9 +549,156 @@
     margin-top: 14px;
     line-height: 1.4;
   }
+
+  /* ================= CONTROL (admin desde el celular) ================= */
+  body.cargando{ overflow: hidden; }
+  body.cargando .page, body.cargando .m-page, body.cargando .c-page{ display:none; }
+  body.control{ overflow-y: auto; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+  body.control .page, body.control .m-page{ display:none; }
+  .c-page{ display:none; max-width: 520px; margin: 0 auto; padding: 0 14px 120px; }
+  body.control .c-page{ display:block; }
+
+  /* barra superior fija */
+  .c-topbar{
+    position: sticky; top: 0; z-index: 30;
+    display:flex; align-items:center; gap: 10px;
+    margin: 0 -14px 12px; padding: 10px 14px;
+    background: rgba(12,35,27,0.94);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .c-logo{
+    display:none; flex-shrink:0;
+    height: 42px; width: auto; max-width: 72px; object-fit: contain;
+    background:#fff; border-radius: 8px; padding: 3px 5px;
+  }
+  .c-titulo{ flex:1; min-width:0; }
+  .c-titulo h1{
+    margin:0; font-family:'Archivo Black', sans-serif; font-weight:400;
+    font-size: clamp(0.8rem, 4vw, 1.1rem); color: var(--blanco);
+    white-space: nowrap;
+  }
+  .c-estado .estado-conexion{ position: static; top:auto; right:auto; margin-top: 3px; font-size: 0.6rem; }
+  .c-pill{
+    flex-shrink:0; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase;
+    font-weight: 700; color:#2a2205; background: var(--dorado);
+    padding: 5px 9px; border-radius: 999px;
+  }
+
+  /* tarjeta principal: llamada actual */
+  .c-hero{ background: linear-gradient(160deg, #1c4a38 0%, #16362a 70%); }
+  .c-hero-top{ display:flex; align-items:center; gap: 16px; }
+  .c-hero .bola.grande{ width: 96px; height: 96px; font-size: 2.5rem; }
+  .c-hero-info{ min-width:0; display:flex; flex-direction:column; gap: 3px; }
+  .c-etq{ font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gris-suave); }
+  .c-callout{ font-family:'Archivo Black', sans-serif; font-size: 2.1rem; line-height: 1.05; color: var(--blanco); }
+  .c-prev{ font-size: 0.85rem; color: var(--gris-suave); }
+  .c-prev strong{ color: var(--blanco); font-weight: 600; }
+  .c-ultimas-wrap{
+    display:flex; align-items:center; gap: 10px; margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .c-ultimas-wrap .c-etq{ flex-shrink:0; width: 62px; line-height: 1.3; }
+  .c-ultimas{ display:flex; align-items:center; gap: 6px; flex:1; min-width:0; }
+  .c-ultimas .bola.chica{ width: 38px; height: 38px; font-size: 0.95rem; }
+  .c-ultimas:empty::before{ content:'Aún no hay llamadas anteriores'; font-size: 0.75rem; color: var(--gris-suave); }
+
+  /* letras + números */
+  .c-tabs{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+  .c-tab{
+    --c: var(--verde-acento); --on:#0c2118;
+    border: 1.5px solid rgba(255,255,255,0.08); border-bottom: 4px solid var(--c);
+    border-radius: 12px; padding: 8px 0 6px; cursor:pointer; touch-action: manipulation;
+    background: rgba(255,255,255,0.05); color: var(--blanco);
+    font-family:'Archivo Black', sans-serif; font-size: 1.35rem; line-height: 1.1;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .c-tab small{ display:block; margin-top:2px; font-family:'Space Grotesk', sans-serif; font-size: 0.62rem; font-weight: 600; opacity: 0.8; }
+  .c-tab.L-I{ --c: var(--dorado); --on:#2a2205; }
+  .c-tab.L-N{ --c: var(--gris-claro); --on:#202422; }
+  .c-tab.L-G{ --c:#2c8158; --on:#ffffff; }
+  .c-tab.L-O{ --c:#7b837f; --on:#ffffff; }
+  .c-tab.activa{ background: var(--c); color: var(--on); border-color: var(--c); }
+
+  .c-grid{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 9px; }
+  .c-num{
+    aspect-ratio: 1 / 1; border: 2px solid transparent; border-radius: 14px;
+    background: var(--gris-celda); color: var(--gris-texto);
+    font-family:'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.5rem;
+    cursor:pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+    transition: transform .08s ease, background-color .12s ease;
+  }
+  .c-num:active{ transform: scale(0.92); }
+  .c-num.marcada{
+    background: var(--verde-acento); color:#0c2118; border-color: var(--verde-acento-oscuro);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.18);
+  }
+  .c-num.actual{ box-shadow: 0 0 0 3px var(--dorado), inset 0 0 0 2px rgba(255,255,255,0.18); }
+
+  .c-progreso{ height: 6px; border-radius: 999px; background: rgba(255,255,255,0.08); margin-top: 14px; overflow:hidden; }
+  .c-progreso-barra{ height:100%; width:0; background: var(--verde-acento); border-radius: 999px; transition: width .25s ease; }
+  .c-resumen{ text-align:center; font-size: 0.8rem; color: var(--gris-suave); margin-top: 8px; }
+  .c-resumen strong{ color: var(--verde-acento); font-size: 1.05em; }
+
+  /* secciones plegables */
+  .c-det{ padding: 0; }
+  .c-det summary{
+    list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap: 10px;
+    padding: 14px; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris-texto); font-weight: 600;
+  }
+  .c-det summary::-webkit-details-marker{ display:none; }
+  .c-det summary::after{ content:'▾'; color: var(--gris-suave); transition: transform .15s ease; }
+  .c-det[open] summary::after{ transform: rotate(180deg); }
+  .c-sum-valor{ margin-left:auto; font-family:'Archivo Black', sans-serif; letter-spacing: 0; text-transform:none; font-size: 0.95rem; color: var(--dorado); max-width: 48%; overflow:hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .c-det-cuerpo{ padding: 0 14px 14px; }
+  .c-input{
+    width:100%; background:#081912; border: 1px solid rgba(255,255,255,0.14); border-radius: 10px;
+    color: var(--blanco); font-family:'Space Grotesk', sans-serif; font-size: 1rem;
+    padding: 11px 12px; margin: 4px 0 12px;
+  }
+  .c-input:focus{ outline: 2px solid var(--verde-acento); }
+  .c-chips{ display:flex; flex-wrap:wrap; gap: 6px; padding: 0 14px 14px; }
+  .c-chips:empty::before{ content:'Todavía no se ha llamado ningún número'; font-size: 0.8rem; color: var(--gris-suave); }
+  .c-chip{
+    font-family:'Archivo Black', sans-serif; font-size: 0.8rem; padding: 6px 10px; border-radius: 999px;
+    background: var(--verde-acento); color:#0c2118;
+  }
+  .c-chip.L-I{ background: var(--dorado); color:#2a2205; }
+  .c-chip.L-N{ background: var(--gris-claro); color:#202422; }
+  .c-chip.L-G{ background:#2c8158; color:#fff; }
+  .c-chip.L-O{ background:#7b837f; color:#fff; }
+  .c-nota{ text-align:center; font-size: 0.68rem; color: var(--gris-suave); line-height: 1.45; margin: 6px 0 0; }
+
+  /* barra de acciones fija abajo (al alcance del pulgar) */
+  .c-bar{
+    position: fixed; left:0; right:0; bottom:0; z-index: 40;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(12,35,27,0.96);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .c-bar-in{ max-width: 520px; margin: 0 auto; display:flex; gap: 10px; }
+  .c-btn{
+    border-radius: 14px; padding: 14px 10px; cursor:pointer; touch-action: manipulation;
+    font-family:'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem;
+    border: 2px solid var(--gris-suave); background: transparent; color: var(--blanco);
+  }
+  .c-btn:active{ transform: scale(0.97); }
+  .c-btn:disabled{ opacity: 0.35; cursor: default; }
+  .c-btn-prim{ flex: 2; background: var(--verde-header); border-color: var(--verde-acento-oscuro); }
+  .c-btn-peligro{ flex: 1; border-color:#b5483f; color:#ee968d; }
+
+  .c-toast{
+    position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); z-index: 50;
+    transform: translateX(-50%) translateY(8px); opacity: 0; pointer-events:none;
+    background: rgba(0,0,0,0.85); color: var(--blanco); font-size: 0.85rem; font-weight: 600;
+    padding: 9px 16px; border-radius: 999px; white-space: nowrap;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .c-toast.visible{ opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
-<body class="host">
+<body class="cargando">
 
   <div class="estado-conexion" id="estadoConexion">
     <span class="punto" id="puntoConexion"></span>
@@ -649,6 +806,66 @@
     <p class="m-footer-nota">Esta pantalla se actualiza sola a medida que se cantan los números.<br>No necesitas recargar ni marcar nada aquí.</p>
   </div>
 
+
+  <!-- ======================= VISTA CONTROL (admin desde el celular) ======================= -->
+  <div class="c-page" id="vistaControl">
+
+    <header class="c-topbar">
+      <img class="c-logo" id="cLogo" alt="Logo colegio">
+      <div class="c-titulo">
+        <h1>Bingo Oxford School 2026</h1>
+        <div class="c-estado" id="cEstado"></div>
+      </div>
+    </header>
+
+    <section class="m-card c-hero">
+      <div class="c-hero-top">
+        <div class="bola grande vacia" id="cBolaActual">-</div>
+        <div class="c-hero-info">
+          <span class="c-etq">Llamada actual</span>
+          <div class="c-callout" id="cCallout">Sin llamadas</div>
+          <div class="c-prev">Anterior: <strong id="cNumAnterior">--</strong></div>
+        </div>
+      </div>
+      <div class="c-ultimas-wrap">
+        <span class="c-etq">Últimas llamadas</span>
+        <div class="c-ultimas" id="cUltimas"></div>
+      </div>
+    </section>
+
+    <section class="m-card">
+      <div class="c-tabs" id="cTabs"></div>
+      <div class="c-grid" id="cGrid"></div>
+      <div class="c-progreso"><div class="c-progreso-barra" id="cBarra"></div></div>
+      <div class="c-resumen"><strong id="cContador">0</strong> de 75 números llamados</div>
+    </section>
+
+    <details class="m-card c-det">
+      <summary><span>Premio</span><span class="c-sum-valor" id="cPremioResumen">$200.000</span></summary>
+      <div class="c-det-cuerpo">
+        <span class="c-etq">Título del premio</span>
+        <input class="c-input" id="cPremioLabel" type="text" maxlength="40" placeholder="Premio" autocomplete="off">
+        <span class="c-etq">Monto o premio</span>
+        <input class="c-input" id="cPremioValor" type="text" maxlength="40" placeholder="$200.000" autocomplete="off">
+      </div>
+    </details>
+
+    <details class="m-card c-det">
+      <summary><span>Historial de llamadas</span><span class="c-sum-valor" id="cHistCount">0</span></summary>
+      <div class="c-chips" id="cChips"></div>
+    </details>
+
+    <p class="c-nota">Lo que marques aquí se ve al instante en el proyector y en los celulares.<br>Los logos se cambian desde el proyector.</p>
+
+    <div class="c-bar">
+      <div class="c-bar-in">
+        <button class="c-btn c-btn-prim" id="cDeshacer" type="button">↩ Deshacer último</button>
+        <button class="c-btn c-btn-peligro" id="cLimpiar" type="button">Limpiar</button>
+      </div>
+    </div>
+    <div class="c-toast" id="cToast"></div>
+  </div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -709,7 +926,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // Determinar rol: host (proyector) o mobile (celular via QR)
+  // Determinar rol: espectador (celulares via QR), proyector o control
   // ---------------------------------------------------------------------
   // La sala es fija por defecto (BINGO2026) para que el QR impreso
   // siempre funcione sin importar cuántas veces se recargue la página.
@@ -720,16 +937,19 @@
   // -----------------------------------------------------------------
   // SEGURIDAD REAL (Firebase Authentication)
   // Por defecto todos ven la vista de espectador (solo lectura).
-  // Para controlar el tablero hay que iniciar sesión con la cuenta de
-  // administrador creada en Firebase. Además, las reglas de la base de
-  // datos solo aceptan escrituras de esa cuenta: aunque alguien edite
-  // la URL o el código de la página, NO puede alterar el sorteo.
+  // Para administrar hay que iniciar sesión con la cuenta de host creada
+  // en Firebase. Las reglas de la base de datos solo aceptan escrituras
+  // de esa cuenta, así que nadie más puede alterar el sorteo.
+  // Se puede administrar desde VARIOS dispositivos a la vez (proyector
+  // + celular): el estado del juego vive en Firebase y todos lo comparten.
   // -----------------------------------------------------------------
   const EMAIL_HOST = 'host@bingo-oxford-school.app';
 
   const params = new URLSearchParams(location.search);
   let room = params.get('sala') || SALA_FIJA;
   const esVistaMovilExplicita = params.get('vista') === 'movil';
+
+  const $ = (id) => document.getElementById(id);
 
   function esperarUsuarioActual(){
     return new Promise(resolve => {
@@ -741,19 +961,31 @@
     });
   }
 
+  // Si eres admin: celular -> panel de control; computador/proyector -> tablero.
+  // Se puede forzar con ?modo=control o ?modo=proyector.
+  function elegirPanelAdmin(){
+    const forzado = params.get('modo');
+    if(forzado === 'control' || forzado === 'proyector') return forzado;
+    const tactil = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const esCelular = window.innerWidth < 600 ||
+      (tactil && Math.min(window.innerWidth, window.innerHeight) < 700);
+    return esCelular ? 'control' : 'proyector';
+  }
+
+  // Devuelve 'espectador' | 'proyector' | 'control'
   async function decidirRol(){
-    if(esVistaMovilExplicita) return false;
-    if(!firebaseConfigurado || !window.__fbAuth) return true; // modo local sin Firebase
+    if(esVistaMovilExplicita) return 'espectador';
+    if(!firebaseConfigurado || !window.__fbAuth) return 'proyector'; // modo local sin Firebase
     const usuario = await esperarUsuarioActual();
-    if(usuario && usuario.email === EMAIL_HOST) return true;
+    if(usuario && usuario.email === EMAIL_HOST) return elegirPanelAdmin();
     const clave = prompt('Panel de administración del bingo.\nIngresa la contraseña de administrador (o cancela para ver solo en modo espectador):');
-    if(!clave) return false;
+    if(!clave) return 'espectador';
     try{
       await window.__fbAuth.signInWithEmailAndPassword(EMAIL_HOST, clave);
-      return true;
+      return elegirPanelAdmin();
     } catch(e){
       alert('Contraseña incorrecta. Se mostrará la vista de espectador.');
-      return false;
+      return 'espectador';
     }
   }
 
@@ -765,31 +997,149 @@
     textoEl.textContent = texto;
   }
 
-  function arrancar(esHost){
-  const esMobile = !esHost;
-
-  if(!params.get('sala')){
-    const nuevaUrl = new URL(location.href);
-    nuevaUrl.searchParams.set('sala', room);
-    history.replaceState(null, '', nuevaUrl.toString());
+  // ---------------------------------------------------------------------
+  // Utilidades compartidas
+  // ---------------------------------------------------------------------
+  // Firebase puede devolver listas como arreglo u objeto; esto las normaliza.
+  function aLista(valor){
+    if(!valor) return [];
+    const lista = Array.isArray(valor)
+      ? valor
+      : Object.keys(valor).sort((a, b) => a - b).map(k => valor[k]);
+    return lista.filter(x => x !== null && x !== undefined);
   }
 
-  document.body.className = esMobile ? 'mobile' : 'host';
+  function debounce(fn, ms){
+    let t = null;
+    return function(){
+      const args = arguments;
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(null, args), ms);
+    };
+  }
+
+  // Pinta la bola actual, el número anterior y (opcional) las últimas 5 llamadas.
+  function pintarLlamadas(historial, els){
+    const total = historial.length;
+    if(total > 0){
+      const actual = historial[total - 1];
+      els.bola.className = 'bola grande bola-' + letraDeNumero(actual);
+      els.bola.textContent = actual;
+    } else {
+      els.bola.className = 'bola grande vacia';
+      els.bola.textContent = '-';
+    }
+    els.anterior.textContent = total > 1 ? historial[total - 2] : '--';
+    if(els.historial){
+      els.historial.innerHTML = '';
+      historial.slice(0, Math.max(total - 1, 0)).slice(-5).reverse()
+        .forEach(n => els.historial.appendChild(crearBola(n, 'chica')));
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Operaciones de administrador (las usan el proyector Y el celular).
+  // Cada una escribe SOLO lo que cambia, directamente en Firebase, así
+  // dos dispositivos admin nunca se pisan entre sí.
+  // ---------------------------------------------------------------------
+  const rutaSala = () => window.__fbDb.ref('salasBingo/' + room);
+  const rutaLogos = () => window.__fbDb.ref('logosBingo/' + room);
+
+  function errorEscritura(){
+    marcarConexion(false, 'Sin permiso: reinicia sesión');
+  }
+
+  function alternarNumero(n){
+    rutaSala().child('historial').transaction(actual => {
+      const lista = aLista(actual);
+      const i = lista.indexOf(n);
+      if(i === -1) lista.push(n); else lista.splice(i, 1);
+      return lista.length ? lista : null;
+    }).catch(errorEscritura);
+  }
+
+  function deshacerUltimo(){
+    rutaSala().child('historial').transaction(actual => {
+      const lista = aLista(actual);
+      if(!lista.length) return; // nada que deshacer
+      lista.pop();
+      return lista.length ? lista : null;
+    }).catch(errorEscritura);
+  }
+
+  function limpiarTodo(){
+    rutaSala().child('historial').remove().catch(errorEscritura);
+  }
+
+  function guardarPremio(valor){
+    rutaSala().child('premio').set(valor).catch(errorEscritura);
+  }
+
+  function guardarTituloPremio(valor){
+    rutaSala().child('premioLabel').set(valor).catch(errorEscritura);
+  }
+
+  // Se suscribe al estado compartido: así todos los dispositivos admin
+  // muestran lo mismo y, al recargar, NO se pierde nada.
+  function conectarAdmin(alCambiarEstado, alCambiarLogos){
+    const db = window.__fbDb;
+    if(!db){ alert('Firebase no está configurado.'); return; }
+    db.ref('.info/connected').on('value', (snap) => {
+      const ok = snap.val() === true;
+      marcarConexion(ok, ok ? 'En vivo · sala ' + room : 'Sin conexión');
+    });
+    rutaSala().on('value',
+      (snap) => alCambiarEstado(snap.val() || {}),
+      () => marcarConexion(false, 'Sin permiso de lectura'));
+    if(alCambiarLogos){
+      rutaLogos().on('value', (snap) => alCambiarLogos(snap.val() || {}));
+    }
+  }
+
+  function procesarImagenLogo(file, callback){
+    const lector = new FileReader();
+    lector.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 240;
+        let w = img.width, h = img.height;
+        if(w > maxDim || h > maxDim){
+          if(w > h){ h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        callback(canvas.toDataURL('image/png'));
+      };
+      img.src = ev.target.result;
+    };
+    lector.readAsDataURL(file);
+  }
+
+  function arrancar(rol){
+    if(!params.get('sala')){
+      const nuevaUrl = new URL(location.href);
+      nuevaUrl.searchParams.set('sala', room);
+      history.replaceState(null, '', nuevaUrl.toString());
+    }
+    document.body.className = rol === 'proyector' ? 'host' : (rol === 'control' ? 'control' : 'mobile');
+
+    if(rol === 'proyector') iniciarProyector();
+    else if(rol === 'control') iniciarControl();
+    else iniciarEspectador();
+  }
 
   // =======================================================================
-  // VISTA HOST
+  // VISTA PROYECTOR (admin en el computador)
   // =======================================================================
-  if(!esMobile){
-    const board = document.getElementById('board');
-    const contadorEl = document.getElementById('contadorNum');
-    const bolaActual = document.getElementById('bolaActual');
-    const numAnterior = document.getElementById('numAnterior');
-    const historyBalls = document.getElementById('historyBalls');
-    const premioValor = document.getElementById('premioValor');
-    const premioLabel = document.getElementById('premioLabel');
-
-    let marcados = 0;
-    let historial = [];
+  function iniciarProyector(){
+    const board = $('board');
+    const contadorEl = $('contadorNum');
+    const premioValor = $('premioValor');
+    const premioLabel = $('premioLabel');
+    const celdas = {};
 
     rangos.forEach(({letra, inicio, fin}) => {
       const fila = document.createElement('div');
@@ -804,86 +1154,43 @@
         const celda = document.createElement('div');
         celda.className = 'celda';
         celda.textContent = n;
-        celda.dataset.valor = n;
-
-        celda.addEventListener('click', () => {
-          const yaMarcada = celda.classList.toggle('marcada');
-          marcados += yaMarcada ? 1 : -1;
-          contadorEl.textContent = marcados;
-
-          if(yaMarcada){
-            historial.push(n);
-          } else {
-            const idx = historial.indexOf(n);
-            if(idx !== -1) historial.splice(idx, 1);
-          }
-          actualizarLlamadas();
-          enviarEstado();
-        });
-
+        celda.addEventListener('click', () => alternarNumero(n));
+        celdas[n] = celda;
         fila.appendChild(celda);
       }
       board.appendChild(fila);
     });
 
-    function actualizarLlamadas(){
-      const total = historial.length;
+    const elsLlamadas = { bola: $('bolaActual'), anterior: $('numAnterior'), historial: $('historyBalls') };
 
-      bolaActual.innerHTML = '';
-      if(total > 0){
-        const actual = historial[total - 1];
-        bolaActual.className = 'bola grande bola-' + letraDeNumero(actual);
-        bolaActual.textContent = actual;
-      } else {
-        bolaActual.className = 'bola grande vacia';
-        bolaActual.textContent = '-';
-      }
-
-      numAnterior.textContent = total > 1 ? historial[total - 2] : '--';
-
-      historyBalls.innerHTML = '';
-      const previas = historial.slice(0, Math.max(total - 1, 0)).slice(-5).reverse();
-      previas.forEach(n => historyBalls.appendChild(crearBola(n, 'chica')));
+    function renderProyector(estado){
+      const historial = aLista(estado.historial);
+      const marcados = new Set(historial);
+      Object.keys(celdas).forEach(k => celdas[k].classList.toggle('marcada', marcados.has(Number(k))));
+      contadorEl.textContent = historial.length;
+      pintarLlamadas(historial, elsLlamadas);
+      // no pisar el texto mientras se está escribiendo en el campo
+      if(document.activeElement !== premioValor && typeof estado.premio === 'string') premioValor.textContent = estado.premio;
+      if(document.activeElement !== premioLabel && typeof estado.premioLabel === 'string') premioLabel.textContent = estado.premioLabel;
     }
 
-    document.getElementById('btnLimpiar').addEventListener('click', () => {
-      document.querySelectorAll('.celda.marcada').forEach(c => c.classList.remove('marcada'));
-      marcados = 0;
-      contadorEl.textContent = marcados;
-      historial = [];
-      actualizarLlamadas();
-      enviarEstado();
+    $('btnLimpiar').addEventListener('click', () => {
+      if(confirm('¿Limpiar todos los números marcados? Esto también se verá en los celulares.')) limpiarTodo();
     });
 
-    premioValor.addEventListener('input', () => enviarEstado());
-    premioLabel.addEventListener('input', () => enviarEstado());
+    const guardarPremioDif = debounce(() => guardarPremio(premioValor.textContent.trim()), 400);
+    const guardarTituloDif = debounce(() => guardarTituloPremio(premioLabel.textContent.trim()), 400);
+    premioValor.addEventListener('input', guardarPremioDif);
+    premioLabel.addEventListener('input', guardarTituloDif);
+    premioValor.addEventListener('blur', () => guardarPremio(premioValor.textContent.trim()));
+    premioLabel.addEventListener('blur', () => guardarTituloPremio(premioLabel.textContent.trim()));
 
-    // ---- carga de logos (colegio y auspiciadores), con sincronización ----
-    const logosState = { colegio: null, auspiciadores: [null, null, null, null] };
+    // ---- logos (colegio y auspiciadores): se guardan en Firebase y se
+    // cargan de vuelta al abrir, así no se pierden al recargar ----
+    const cajaColegio = $('logoColegio');
+    const cajasAus = Array.from(document.querySelectorAll('#sponsorSlots .logo-box'));
 
-    function procesarImagenLogo(file, callback){
-      const lector = new FileReader();
-      lector.onload = (ev) => {
-        const img = new Image();
-        img.onload = () => {
-          const maxDim = 240;
-          let w = img.width, h = img.height;
-          if(w > maxDim || h > maxDim){
-            if(w > h){ h = Math.round(h * maxDim / w); w = maxDim; }
-            else { w = Math.round(w * maxDim / h); h = maxDim; }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          callback(canvas.toDataURL('image/png'));
-        };
-        img.src = ev.target.result;
-      };
-      lector.readAsDataURL(file);
-    }
-
-    function habilitarSubidaLogo(el, key){
+    function habilitarSubidaLogo(el, ruta){
       el.addEventListener('click', () => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -892,17 +1199,7 @@
           const file = e.target.files[0];
           if(!file) return;
           procesarImagenLogo(file, (dataUrl) => {
-            el.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = dataUrl;
-            el.appendChild(img);
-
-            if(key === 'colegio'){
-              logosState.colegio = dataUrl;
-            } else {
-              logosState.auspiciadores[key] = dataUrl;
-            }
-            enviarLogos();
+            rutaLogos().child(ruta).set(dataUrl).catch(errorEscritura);
           });
         });
         document.body.appendChild(input);
@@ -910,81 +1207,175 @@
         input.remove();
       });
     }
-    habilitarSubidaLogo(document.getElementById('logoColegio'), 'colegio');
-    document.querySelectorAll('#sponsorSlots .logo-box').forEach((el, idx) => habilitarSubidaLogo(el, idx));
+    habilitarSubidaLogo(cajaColegio, 'colegio');
+    cajasAus.forEach((el, idx) => habilitarSubidaLogo(el, 'auspiciadores/' + idx));
+
+    function pintarLogoEnCaja(el, src){
+      if(!src || el.dataset.src === src) return;
+      el.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = src;
+      el.appendChild(img);
+      el.classList.add('con-logo');
+      el.dataset.src = src;
+    }
+
+    function renderLogosProyector(logos){
+      pintarLogoEnCaja(cajaColegio, logos.colegio);
+      const aus = logos.auspiciadores || {};
+      cajasAus.forEach((el, idx) => pintarLogoEnCaja(el, aus[idx]));
+    }
 
     // ---- abrir página imprimible del QR, ya enlazada a esta sala ----
-    document.getElementById('qrRoomTexto').textContent = 'Sala ' + room;
-    document.getElementById('btnImprimirQR').addEventListener('click', () => {
+    $('qrRoomTexto').textContent = 'Sala ' + room;
+    $('btnImprimirQR').addEventListener('click', () => {
       const urlQr = new URL('qr-imprimir.html', location.href);
       urlQr.searchParams.set('sala', room);
       window.open(urlQr.toString(), '_blank');
     });
 
-    // ---- el panel de "Imprimir QR" / "Copiar enlace de host" está
-    // oculto por defecto para no ocupar espacio en el proyector (ya
-    // que normalmente se usa una sola vez). Se puede volver a mostrar
-    // presionando la tecla Q (solo en el proyector). ----
-    document.getElementById('qrPanel').classList.remove('visible');
+    // ---- el panel de "Imprimir QR" está oculto por defecto para no
+    // ocupar espacio en el proyector. Se muestra/oculta con la tecla Q. ----
+    $('qrPanel').classList.remove('visible');
     document.addEventListener('keydown', (e) => {
       if(e.key.toLowerCase() === 'q' && !e.ctrlKey && !e.metaKey && !e.altKey){
         const activo = document.activeElement;
         const escribiendo = activo && (activo.tagName === 'INPUT' || activo.tagName === 'TEXTAREA' || activo.isContentEditable);
-        if(!escribiendo){
-          document.getElementById('qrPanel').classList.toggle('visible');
-        }
+        if(!escribiendo) $('qrPanel').classList.toggle('visible');
       }
     });
 
-    // ---- sincronización con Firebase ----
-    // El estado de juego (números marcados y premio) se envía seguido,
-    // así que se mantiene liviano. Los logos casi no cambian durante el
-    // evento, por eso van en un canal aparte que solo se actualiza cuando
-    // efectivamente subes un logo nuevo — esto evita reenviar imágenes
-    // pesadas cada vez que se marca un número.
-    let envioPendiente = null;
-    function enviarEstado(){
-      if(!firebaseConfigurado || !window.__fbDb) return;
-      clearTimeout(envioPendiente);
-      envioPendiente = setTimeout(() => {
-        window.__fbDb.ref('salasBingo/' + room).set({
-          historial: historial,
-          premio: premioValor.textContent.trim(),
-          premioLabel: premioLabel.textContent.trim(),
-          actualizado: Date.now()
-        }).then(() => marcarConexion(true, 'Sincronizado'))
-          .catch(() => marcarConexion(false, 'Sin conexión'));
-      }, 250);
-    }
-
-    function enviarLogos(){
-      if(!firebaseConfigurado || !window.__fbDb) return;
-      window.__fbDb.ref('logosBingo/' + room).set(logosState)
-        .catch(() => marcarConexion(false, 'Sin conexión'));
-    }
-
-    if(firebaseConfigurado){
-      marcarConexion(true, 'Sala ' + room);
-      enviarEstado();
-      enviarLogos();
-    } else {
-      marcarConexion(false, 'Configura Firebase');
-    }
+    conectarAdmin(renderProyector, renderLogosProyector);
   }
 
   // =======================================================================
-  // VISTA MOBILE
+  // VISTA CONTROL (admin desde el celular)
   // =======================================================================
-  if(esMobile){
-    const mBoard = document.getElementById('mBoard');
-    const mBolaActual = document.getElementById('mBolaActual');
-    const mNumAnterior = document.getElementById('mNumAnterior');
-    const mHistoryBalls = document.getElementById('mHistoryBalls');
-    const mPremioValor = document.getElementById('mPremioValor');
-    const mPremioLabel = document.getElementById('mPremioLabel');
-    const mLogoColegio = document.getElementById('mLogoColegio');
-    const mSponsorsCard = document.getElementById('mSponsorsCard');
-    const mSponsorRow = document.getElementById('mSponsorRow');
+  function iniciarControl(){
+    const cTabs = $('cTabs');
+    const cGrid = $('cGrid');
+    const cContador = $('cContador');
+    const cBarra = $('cBarra');
+    const cDeshacer = $('cDeshacer');
+    const cPremioLabel = $('cPremioLabel');
+    const cPremioValor = $('cPremioValor');
+    const cPremioResumen = $('cPremioResumen');
+    const cCallout = $('cCallout');
+    const cChips = $('cChips');
+    const cHistCount = $('cHistCount');
+    const cLogo = $('cLogo');
+    const cToast = $('cToast');
+    const elsLlamadas = { bola: $('cBolaActual'), anterior: $('cNumAnterior'), historial: $('cUltimas') };
+
+    // el indicador de conexión pasa a la barra superior
+    $('cEstado').appendChild($('estadoConexion'));
+
+    let letraActiva = 'B';
+    let historialActual = [];
+    let temporizadorToast = null;
+
+    const etiqueta = (n) => letraDeNumero(n) + '-' + n;
+
+    function mostrarToast(msg){
+      cToast.textContent = msg;
+      cToast.classList.add('visible');
+      clearTimeout(temporizadorToast);
+      temporizadorToast = setTimeout(() => cToast.classList.remove('visible'), 1600);
+    }
+
+    function pintarTabs(){
+      cTabs.innerHTML = '';
+      rangos.forEach(r => {
+        const enLetra = historialActual.filter(n => n >= r.inicio && n <= r.fin).length;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'c-tab L-' + r.letra + (r.letra === letraActiva ? ' activa' : '');
+        b.innerHTML = r.letra + '<small>' + enLetra + '/15</small>';
+        b.addEventListener('click', () => { letraActiva = r.letra; pintarTabs(); pintarGrid(); });
+        cTabs.appendChild(b);
+      });
+    }
+
+    function pintarGrid(){
+      const r = rangos.find(x => x.letra === letraActiva);
+      const actual = historialActual[historialActual.length - 1];
+      cGrid.innerHTML = '';
+      for(let n = r.inicio; n <= r.fin; n++){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'c-num' + (historialActual.includes(n) ? ' marcada' : '') + (n === actual ? ' actual' : '');
+        b.textContent = n;
+        b.addEventListener('click', () => {
+          const yaMarcado = historialActual.includes(n);
+          // quitar un número ya llamado pide confirmación (evita toques por error)
+          if(yaMarcado && !confirm('¿Quitar el ' + etiqueta(n) + ' de los números llamados?')) return;
+          if(navigator.vibrate) navigator.vibrate(15);
+          alternarNumero(n);
+          mostrarToast(yaMarcado ? etiqueta(n) + ' quitado' : '✔ ' + etiqueta(n) + ' marcado');
+        });
+        cGrid.appendChild(b);
+      }
+    }
+
+    function pintarHistorial(){
+      cChips.innerHTML = '';
+      historialActual.slice().reverse().forEach(n => {
+        const chip = document.createElement('span');
+        chip.className = 'c-chip L-' + letraDeNumero(n);
+        chip.textContent = etiqueta(n);
+        cChips.appendChild(chip);
+      });
+      cHistCount.textContent = historialActual.length;
+    }
+
+    function renderControl(estado){
+      historialActual = aLista(estado.historial);
+      pintarLlamadas(historialActual, elsLlamadas);
+      const total = historialActual.length;
+      cCallout.textContent = total ? etiqueta(historialActual[total - 1]) : 'Sin llamadas';
+      cContador.textContent = total;
+      cBarra.style.width = Math.round(total / 75 * 100) + '%';
+      cDeshacer.disabled = total === 0;
+      pintarTabs();
+      pintarGrid();
+      pintarHistorial();
+      if(typeof estado.premio === 'string') cPremioResumen.textContent = estado.premio;
+      if(document.activeElement !== cPremioLabel && typeof estado.premioLabel === 'string') cPremioLabel.value = estado.premioLabel;
+      if(document.activeElement !== cPremioValor && typeof estado.premio === 'string') cPremioValor.value = estado.premio;
+    }
+
+    function renderLogoControl(logos){
+      if(logos.colegio){
+        cLogo.src = logos.colegio;
+        cLogo.style.display = 'block';
+      }
+    }
+
+    cDeshacer.addEventListener('click', () => {
+      if(!historialActual.length) return;
+      mostrarToast('↩ ' + etiqueta(historialActual[historialActual.length - 1]) + ' deshecho');
+      deshacerUltimo();
+    });
+    $('cLimpiar').addEventListener('click', () => {
+      if(confirm('¿Limpiar todos los números marcados? Esto también se verá en el proyector y en los celulares.')) limpiarTodo();
+    });
+    cPremioLabel.addEventListener('input', debounce(() => guardarTituloPremio(cPremioLabel.value.trim()), 400));
+    cPremioValor.addEventListener('input', debounce(() => guardarPremio(cPremioValor.value.trim()), 400));
+
+    conectarAdmin(renderControl, renderLogoControl);
+  }
+
+  // =======================================================================
+  // VISTA ESPECTADOR (celulares via QR, solo lectura)
+  // =======================================================================
+  function iniciarEspectador(){
+    const mBoard = $('mBoard');
+    const mPremioValor = $('mPremioValor');
+    const mPremioLabel = $('mPremioLabel');
+    const mLogoColegio = $('mLogoColegio');
+    const mSponsorsCard = $('mSponsorsCard');
+    const mSponsorRow = $('mSponsorRow');
+    const elsLlamadas = { bola: $('mBolaActual'), anterior: $('mNumAnterior'), historial: $('mHistoryBalls') };
 
     const celdasMobile = {};
 
@@ -1008,31 +1399,12 @@
     });
 
     function renderEstado(estado){
-      const historial = (estado && estado.historial) || [];
-      const premio = (estado && estado.premio) || '$200.000';
-      const premioLabel = (estado && estado.premioLabel) || 'Premio de este bingo';
-      const total = historial.length;
-
-      Object.keys(celdasMobile).forEach(n => celdasMobile[n].classList.remove('marcada'));
-      historial.forEach(n => { if(celdasMobile[n]) celdasMobile[n].classList.add('marcada'); });
-
-      if(total > 0){
-        const actual = historial[total - 1];
-        mBolaActual.className = 'bola grande bola-' + letraDeNumero(actual);
-        mBolaActual.textContent = actual;
-      } else {
-        mBolaActual.className = 'bola grande vacia';
-        mBolaActual.textContent = '-';
-      }
-
-      mNumAnterior.textContent = total > 1 ? historial[total - 2] : '--';
-
-      mHistoryBalls.innerHTML = '';
-      const previas = historial.slice(0, Math.max(total - 1, 0)).slice(-5).reverse();
-      previas.forEach(n => mHistoryBalls.appendChild(crearBola(n, 'chica')));
-
-      mPremioValor.textContent = premio;
-      mPremioLabel.textContent = premioLabel;
+      const historial = aLista(estado && estado.historial);
+      const marcados = new Set(historial);
+      Object.keys(celdasMobile).forEach(n => celdasMobile[n].classList.toggle('marcada', marcados.has(Number(n))));
+      pintarLlamadas(historial, elsLlamadas);
+      mPremioValor.textContent = (estado && estado.premio) || '$200.000';
+      mPremioLabel.textContent = (estado && estado.premioLabel) || 'Premio de este bingo';
     }
 
     function renderLogos(logos){
@@ -1045,7 +1417,7 @@
         mLogoColegio.style.display = 'none';
       }
 
-      const auspiciadores = (logos.auspiciadores || []).filter(Boolean);
+      const auspiciadores = aLista(logos.auspiciadores);
       if(auspiciadores.length){
         mSponsorsCard.style.display = 'block';
         mSponsorRow.innerHTML = '';
@@ -1075,7 +1447,6 @@
       renderLogos(null);
     }
   }
-  } // fin arrancar
 
   decidirRol().then(arrancar);
 </script>
