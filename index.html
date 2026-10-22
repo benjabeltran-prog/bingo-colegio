@@ -871,6 +871,7 @@
   .mc-privado{ font-size: 0.7rem; color: var(--gris-suave); margin: 2px 0 0; line-height: 1.4; }
   .mc-in.dudoso{ background:#3d3300; border-color: var(--dorado); box-shadow: 0 0 0 2px rgba(203,161,53,0.35); }
   .mc-btn-foto{ margin-bottom: 12px; }
+  #mcVistaFoto{ display:block; width:100%; max-width:320px; margin: 4px auto 6px; border-radius: 10px; background:#000; }
   .mc-btn:disabled{ opacity: 0.45; cursor: default; }
 </style>
 </head>
@@ -1089,6 +1090,10 @@
       <input class="mc-texto" id="mcNombre" type="text" maxlength="24" placeholder="Nombre (opcional), ej. Cartón 1" autocomplete="off">
       <button class="mc-btn mc-btn-foto" id="mcFoto" type="button">📷 Llenar desde una foto del cartón</button>
       <input type="file" id="mcFotoArchivo" accept="image/*" style="display:none">
+      <div id="mcVistaCaja" style="display:none">
+        <canvas id="mcVistaFoto"></canvas>
+        <p class="mc-privado" style="text-align:center">Tu foto enderezada: compárala con los números de abajo.</p>
+      </div>
       <div class="mc-cols"><span class="m-letra L-B">B</span><span class="m-letra L-I">I</span><span class="m-letra L-N">N</span><span class="m-letra L-G">G</span><span class="m-letra L-O">O</span></div>
       <div class="mc-grid" id="mcGrid"></div>
       <label class="mc-libre-fila"><input type="checkbox" id="mcLibre" checked> El centro es casilla libre</label>
@@ -1622,8 +1627,211 @@
     return { x: ax + (bx - ax) * v, y: ay + (by - ay) * v };
   }
 
+  // recorta una casilla (sin los bordes) a un rectángulo de OW x OH, en grises.
+  // El tamaño respeta la proporción real de la casilla (muchos cartones no son cuadrados).
+  // Muestreo bicúbico: los números chicos se ven más nítidos al ampliarlos.
+  function recortarCasilla(img, quad, fila, col, OW, OH, margen){
+    const gris = img.__gris || (img.__gris = (() => {
+      const a = new Float32Array(img.width * img.height), d = img.data;
+      for(let i = 0, j = 0; i < a.length; i++, j += 4) a[i] = 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
+      return a;
+    })());
+    const W = img.width, H = img.height;
+    const out = new Float32Array(OW * OH);
+    const u0 = (col + margen) / 5, u1 = (col + 1 - margen) / 5;
+    const v0 = (fila + margen) / 5, v1 = (fila + 1 - margen) / 5;
+    const cub = (t) => { const a = Math.abs(t); return a < 1 ? 1.5 * a * a * a - 2.5 * a * a + 1 : (a < 2 ? -0.5 * a * a * a + 2.5 * a * a - 4 * a + 2 : 0); };
+    const wx = [0, 0, 0, 0], wy = [0, 0, 0, 0];
+    for(let j = 0; j < OH; j++){
+      const v = v0 + (v1 - v0) * (j + 0.5) / OH;
+      for(let i = 0; i < OW; i++){
+        const u = u0 + (u1 - u0) * (i + 0.5) / OW;
+        const p = puntoEnCuadrilatero(quad, u, v);
+        const x = p.x - 0.5, y = p.y - 0.5;
+        const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi;
+        for(let k = 0; k < 4; k++){ wx[k] = cub(fx - (k - 1)); wy[k] = cub(fy - (k - 1)); }
+        let acc = 0, wsum = 0;
+        for(let m = 0; m < 4; m++){
+          let yy = yi + m - 1; yy = yy < 0 ? 0 : (yy > H - 1 ? H - 1 : yy);
+          for(let n = 0; n < 4; n++){
+            let xx = xi + n - 1; xx = xx < 0 ? 0 : (xx > W - 1 ? W - 1 : xx);
+            const w = wx[n] * wy[m];
+            acc += gris[yy * W + xx] * w; wsum += w;
+          }
+        }
+        const val = acc / (wsum || 1);
+        out[j * OW + i] = val < 0 ? 0 : (val > 255 ? 255 : val);
+      }
+    }
+    return out;
+  }
+
+  // máximo / mínimo deslizante (cuadrado de radio r), separable
+  function filtroExtremo(src, W, H, r, maximo){
+    const tmp = new Float32Array(W * H), out = new Float32Array(W * H);
+    for(let y = 0; y < H; y++){
+      const o = y * W;
+      for(let x = 0; x < W; x++){
+        let m = maximo ? -1e9 : 1e9;
+        const a = Math.max(0, x - r), b = Math.min(W - 1, x + r);
+        for(let k = a; k <= b; k++){ const v = src[o + k]; if(maximo ? v > m : v < m) m = v; }
+        tmp[o + x] = m;
+      }
+    }
+    for(let x = 0; x < W; x++){
+      for(let y = 0; y < H; y++){
+        let m = maximo ? -1e9 : 1e9;
+        const a = Math.max(0, y - r), b = Math.min(H - 1, y + r);
+        for(let k = a; k <= b; k++){ const v = tmp[k * W + x]; if(maximo ? v > m : v < m) m = v; }
+        out[y * W + x] = m;
+      }
+    }
+    return out;
+  }
+
+  function percentil(arr, p){
+    const c = Array.from(arr).sort((a, b) => a - b);
+    return c[Math.min(c.length - 1, Math.max(0, Math.floor(c.length * p)))];
+  }
+
+  // Mide qué trazos contrastan con su entorno (oscuros sobre claro o claros sobre oscuro).
+  // No depende de un umbral global, así que sirve con círculos claros sobre madera,
+  // casillas de colores, sombras, etc.
+  function analizarContraste(g, W, H, polaridad){
+    const r = Math.max(3, Math.round(H * 0.09));
+    const cierre = filtroExtremo(filtroExtremo(g, W, H, r, true), W, H, r, false);
+    const apertura = filtroExtremo(filtroExtremo(g, W, H, r, false), W, H, r, true);
+    const bh = new Float32Array(W * H), th = new Float32Array(W * H);
+    for(let i = 0; i < bh.length; i++){ bh[i] = Math.max(0, cierre[i] - g[i]); th[i] = Math.max(0, g[i] - apertura[i]); }
+    const oscuro = polaridad ? polaridad === 'oscuro' : percentil(bh, 0.985) >= percentil(th, 0.985);
+    const resp = oscuro ? bh : th;
+    return { resp: resp, oscuro: oscuro, pico: percentil(resp, 0.995) };
+  }
+
+  // Elige los dígitos de la casilla con una sensibilidad dada (fracción del contraste máximo).
+  function seleccionarDigitos(an, g, W, H, frac){
+    if(an.pico < 18) return { vacio: true };
+    const umbral = Math.max(14, an.pico * frac);
+    const mask = new Uint8Array(W * H);
+    for(let i = 0; i < mask.length; i++) mask[i] = an.resp[i] >= umbral ? 1 : 0;
+
+    const etiqueta = new Int32Array(W * H).fill(-1);
+    const comps = [];
+    for(let k0 = 0; k0 < mask.length; k0++){
+      if(!mask[k0] || etiqueta[k0] >= 0) continue;
+      const id = comps.length, pila = [k0];
+      etiqueta[k0] = id;
+      let x0 = W, y0 = H, x1 = -1, y1 = -1, area = 0, toca = false;
+      while(pila.length){
+        const k = pila.pop(), x = k % W, y = (k / W) | 0;
+        area++;
+        if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y;
+        if(x === 0 || y === 0 || x === W - 1 || y === H - 1) toca = true;
+        for(let dy = -1; dy <= 1; dy++) for(let dx = -1; dx <= 1; dx++){
+          if(!dx && !dy) continue;
+          const nx = x + dx, ny = y + dy;
+          if(nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+          const nk = ny * W + nx;
+          if(mask[nk] && etiqueta[nk] < 0){ etiqueta[nk] = id; pila.push(nk); }
+        }
+      }
+      comps.push({ id: id, x0: x0, y0: y0, x1: x1, y1: y1, area: area, toca: toca });
+    }
+    let utiles = comps.filter(c => {
+      const bw = c.x1 - c.x0 + 1, bh2 = c.y1 - c.y0 + 1;
+      if(c.area < W * H * 0.0022) return false;
+      if(bh2 > H * 0.80 || bw > W * 0.80) return false;
+      if(c.toca && (bh2 > H * 0.45 || bw > W * 0.45)) return false;
+      if(bh2 < H * 0.14) return false;
+      if(bw < bh2 * 0.17) return false;                           // demasiado delgado para ser un dígito (borde, veta)
+      return true;
+    });
+    // quitar contornos que rodean a otros trazos (el borde del círculo, marcos)
+    utiles = utiles.filter(a => {
+      const bwA = a.x1 - a.x0 + 1, bhA = a.y1 - a.y0 + 1;
+      const rodea = utiles.some(b => b !== a &&
+        b.x0 >= a.x0 - 1 && b.x1 <= a.x1 + 1 && b.y0 >= a.y0 - 1 && b.y1 <= a.y1 + 1 &&
+        (b.y1 - b.y0 + 1) < bhA * 0.85);
+      return !(rodea && a.area / (bwA * bhA) < 0.55);
+    });
+    if(!utiles.length) return { vacio: true };
+    let mejor = null, mejorPuntaje = -1;
+    utiles.forEach(base => {
+      const hb = base.y1 - base.y0 + 1, cyb = (base.y0 + base.y1) / 2;
+      const grupo = utiles.filter(c => {
+        const hc = c.y1 - c.y0 + 1, cyc = (c.y0 + c.y1) / 2;
+        return hc >= hb * 0.55 && hc <= hb * 1.8 && Math.abs(cyc - cyb) <= hb * 0.55;
+      });
+      let area = 0, gx0 = W, gx1 = -1, gy0 = H, gy1 = -1;
+      grupo.forEach(c => { area += c.area; gx0 = Math.min(gx0, c.x0); gx1 = Math.max(gx1, c.x1); gy0 = Math.min(gy0, c.y0); gy1 = Math.max(gy1, c.y1); });
+      if(gx1 - gx0 + 1 > W * 0.9) return;
+      const cx = (gx0 + gx1) / 2, centralidad = 1 - Math.min(1, Math.abs(cx - W / 2) / (W / 2));
+      const puntaje = area * (0.35 + centralidad) * (grupo.length <= 3 ? 1 : 0.7);
+      if(puntaje > mejorPuntaje){ mejorPuntaje = puntaje; mejor = { grupo: grupo, x0: gx0, x1: gx1, y0: gy0, y1: gy1 }; }
+    });
+    if(!mejor) return { vacio: true };
+    const ids = new Set(mejor.grupo.map(c => c.id));
+    const sel = new Uint8Array(W * H);
+    for(let i = 0; i < sel.length; i++) if(etiqueta[i] >= 0 && ids.has(etiqueta[i])) sel[i] = 1;
+    return { vacio: false, g: g, sel: sel, oscuro: an.oscuro, caja: { x0: mejor.x0, y0: mejor.y0, x1: mejor.x1, y1: mejor.y1 }, W: W, H: H };
+  }
+
+  // dilatación simple de una máscara
+  function dilatar(m, W, H, r){
+    const out = new Uint8Array(W * H);
+    for(let y = 0; y < H; y++) for(let x = 0; x < W; x++){
+      if(!m[y * W + x]) continue;
+      for(let dy = -r; dy <= r; dy++) for(let dx = -r; dx <= r; dx++){
+        const nx = x + dx, ny = y + dy;
+        if(nx >= 0 && ny >= 0 && nx < W && ny < H) out[ny * W + nx] = 1;
+      }
+    }
+    return out;
+  }
+
+  // imagen final para el OCR: texto negro, fondo blanco, altura fija, con margen.
+  //  modo 'masc': solo la forma del dígito (blanco/negro).  modo 'gris': el dígito con sus bordes suaves.
+  function canvasParaOCR(prep, modo){
+    const { g, sel, oscuro, caja, W, H } = prep;
+    const pad = modo === 'zona' ? 6 : 3;
+    const x0 = Math.max(0, caja.x0 - pad), y0 = Math.max(0, caja.y0 - pad);
+    const x1 = Math.min(W - 1, caja.x1 + pad), y1 = Math.min(H - 1, caja.y1 + pad);
+    const w = x1 - x0 + 1, h = y1 - y0 + 1;
+    const zona = modo === 'zona' ? null : dilatar(sel, W, H, modo === 'masc' ? 1 : 2);
+    // contraste local dentro de la caja
+    let lo = 255, hi = 0;
+    for(let y = y0; y <= y1; y++) for(let x = x0; x <= x1; x++){ const v = g[y * W + x]; if(v < lo) lo = v; if(v > hi) hi = v; }
+    const rango = Math.max(25, hi - lo);
+    const src = document.createElement('canvas');
+    src.width = w; src.height = h;
+    const cx = src.getContext('2d'), im = cx.createImageData(w, h);
+    for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
+      const k = (y + y0) * W + (x + x0);
+      let v = 255;
+      if(modo === 'zona' || zona[k]){
+        if(modo === 'masc') v = sel[k] ? 0 : 255;
+        else { const n = (g[k] - lo) / rango; v = (oscuro ? n : 1 - n) * 255; if(v < 0) v = 0; if(v > 255) v = 255; }
+      }
+      const o = (y * w + x) * 4;
+      im.data[o] = im.data[o + 1] = im.data[o + 2] = v; im.data[o + 3] = 255;
+    }
+    cx.putImageData(im, 0, 0);
+    const alto = 56, padOut = 22, escala = alto / h;
+    const dst = document.createElement('canvas');
+    dst.width = Math.round(w * escala) + padOut * 2;
+    dst.height = alto + padOut * 2;
+    const dx = dst.getContext('2d');
+    dx.fillStyle = '#fff';
+    dx.fillRect(0, 0, dst.width, dst.height);
+    dx.imageSmoothingEnabled = true;
+    dx.imageSmoothingQuality = 'high';
+    dx.drawImage(src, padOut, padOut, Math.round(w * escala), alto);
+    return dst;
+  }
+
+  // ===== Método A: umbral global por casilla (muy bueno con cartones de papel) =====
   // recorta una casilla (sin los bordes) y la endereza a un cuadrado de TAM x TAM, en grises
-  function recortarCasilla(img, quad, fila, col, TAM, margen){
+  function recortarCasillaCuadrada(img, quad, fila, col, TAM, margen){
     const out = new Float32Array(TAM * TAM);
     const u0 = (col + margen) / 5, u1 = (col + 1 - margen) / 5;
     const v0 = (fila + margen) / 5, v1 = (fila + 1 - margen) / 5;
@@ -1670,7 +1878,7 @@
   }
 
   // deja negro el texto sobre fondo blanco, quita líneas de la grilla y centra el número
-  function prepararCasilla(g, TAM){
+  function prepararCasillaOtsu(g, TAM){
     // estirar contraste
     const orden = Array.from(g).sort((a, b) => a - b);
     const lo = orden[Math.floor(orden.length * 0.02)], hi = orden[Math.floor(orden.length * 0.98)];
@@ -1730,7 +1938,7 @@
   }
 
   // imagen final para el OCR: texto negro, fondo blanco, altura fija, con margen
-  function canvasParaOCR(prep, TAM, modo){
+  function canvasParaOCROtsu(prep, TAM, modo){
     const { bin, s, invertir, caja } = prep;
     const w = caja.x1 - caja.x0 + 1, h = caja.y1 - caja.y0 + 1;
     const src = document.createElement('canvas');
@@ -1787,52 +1995,158 @@
     return { valor: mejor, exacto: false, dist: mejorDist, empate: empate };
   }
 
+  // Qué tan nítido y grande es el número recortado.
+  //  ancho: grosor del borde de los trazos respecto al alto del número (borroso si es grande).
+  //  alto: alto del número en píxeles de la foto original (muy chico si es poco).
+  function medirNitidez(g, W, H, caja, pxPorCasillaAlto){
+    const x0 = Math.max(1, caja.x0 - 2), x1 = Math.min(W - 2, caja.x1 + 2), y0 = Math.max(1, caja.y0 - 2), y1 = Math.min(H - 2, caja.y1 + 2);
+    const grad = [], vals = [];
+    for(let y = y0; y <= y1; y++) for(let x = x0; x <= x1; x++){
+      const i = y * W + x;
+      const gx = (g[i - W + 1] + 2 * g[i + 1] + g[i + W + 1] - g[i - W - 1] - 2 * g[i - 1] - g[i + W - 1]) / 8;
+      const gy = (g[i + W - 1] + 2 * g[i + W] + g[i + W + 1] - g[i - W - 1] - 2 * g[i - W] - g[i - W + 1]) / 8;
+      grad.push(Math.sqrt(gx * gx + gy * gy)); vals.push(g[i]);
+    }
+    if(grad.length < 20) return null;
+    const gmax = percentil(grad, 0.98);
+    const contraste = percentil(vals, 0.97) - percentil(vals, 0.03);
+    if(gmax < 1 || contraste < 25) return null;
+    const alto = caja.y1 - caja.y0 + 1;
+    return { ancho: (contraste / gmax) / alto, alto: alto * pxPorCasillaAlto };
+  }
+
+  // ¿el texto leído es coherente con la forma de lo recortado? Si el recorte es ancho (dos cifras)
+  // pero solo se leyó una cifra, seguramente se perdió una (p. ej. "13" leído como "1").
+  function coherenteConForma(texto, caja){
+    if(!caja || !texto) return true;
+    const w = caja.x1 - caja.x0 + 1, h = caja.y1 - caja.y0 + 1;
+    return !(w / h >= 0.95 && texto.length === 1);
+  }
+
   // lee los 25 números del cartón. quad = 4 esquinas de la grilla de números (sin las letras BINGO)
   async function leerCartonDeImagen(canvas, quad, alProgreso){
-    const TAM = 128;
     const img = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
     const worker = await obtenerWorkerOCR();
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    const celdaW = (dist(quad[0], quad[1]) + dist(quad[3], quad[2])) / 10;
+    const celdaH = (dist(quad[0], quad[3]) + dist(quad[1], quad[2])) / 10;
+    // tamaño de trabajo del método B: se amplía lo chico y se respeta la proporción de la casilla
+    const OH = Math.max(96, Math.min(200, Math.round(celdaH * 3.2)));
+    const OW = Math.max(60, Math.min(320, Math.round(OH * celdaW / celdaH)));
+    const TAM = 128;
     const celdas = new Array(25).fill(NaN);
     const dudosas = [];
     const detalle = [];
+    const calidades = {};
     let libre = true;
+
+    const leerImagen = async (cv, col) => {
+      const r = await worker.recognize(cv);
+      const texto = (r.data.text || '').replace(/\D/g, '');
+      const cor = corregirConColumna(texto, col);
+      return { valor: cor.valor, exacto: cor.exacto, dist: cor.dist, empate: cor.empate, conf: r.data.confidence || 0, texto: texto };
+    };
+    const vacioCand = () => ({ valor: NaN, exacto: false, dist: 9, conf: 0, texto: '', seguro: false, desacuerdo: false });
+    const mejoraA = (cand, mejor) => (cand.exacto && !mejor.exacto) ||
+      (cand.exacto === mejor.exacto && (cand.dist < mejor.dist || (cand.dist === mejor.dist && cand.conf > mejor.conf)));
 
     for(let k = 0; k < 25; k++){
       const fila = (k / 5) | 0, col = k % 5;
       if(alProgreso) alProgreso(k, 25);
-      const g = recortarCasilla(img, quad, fila, col, TAM, 0.06);
-      const prep = prepararCasilla(g, TAM);
-      let mejor = { valor: NaN, exacto: false, dist: 9, conf: 0, texto: '' };
-      let desacuerdo = false;
-      if(!prep.vacio){
-        // dos lecturas con tratamientos distintos de la imagen; si no coinciden, la casilla se marca como dudosa
-        const lecturas = [];
-        for(const modo of ['bin', 'gris']){
-          const cv = canvasParaOCR(prep, TAM, modo);
-          const r = await worker.recognize(cv);
-          const texto = (r.data.text || '').replace(/\D/g, '');
-          const cor = corregirConColumna(texto, col);
-          lecturas.push({ valor: cor.valor, exacto: cor.exacto, dist: cor.dist, empate: cor.empate, conf: r.data.confidence || 0, texto: texto });
+
+      // ---------- Método A ----------
+      let candA = vacioCand();
+      const gA = recortarCasillaCuadrada(img, quad, fila, col, TAM, 0.06);
+      const prepA = prepararCasillaOtsu(gA, TAM);
+      if(!prepA.vacio){
+        const lect = [];
+        for(const modo of ['bin', 'gris']) lect.push(await leerImagen(canvasParaOCROtsu(prepA, TAM, modo), col));
+        lect.forEach(c => { if(mejoraA(c, candA)) candA = Object.assign(vacioCand(), c); });
+        candA.desacuerdo = lect[0].valor !== lect[1].valor;
+        candA.seguro = candA.exacto && candA.conf >= 65 && !candA.empate && !candA.desacuerdo && coherenteConForma(candA.texto, prepA.caja);
+        // tercera opinión: otro margen y otra escala. Confusiones típicas (5 con 3, 1 con 7) suelen cambiar de resultado.
+        if(candA.seguro){
+          const gA2 = recortarCasillaCuadrada(img, quad, fila, col, 160, 0.11);
+          const prepA2 = prepararCasillaOtsu(gA2, 160);
+          if(!prepA2.vacio){
+            const t = await leerImagen(canvasParaOCROtsu(prepA2, 160, 'gris'), col);
+            if(t.valor !== candA.valor){ candA.seguro = false; candA.desacuerdo = true; }
+          }
         }
-        lecturas.forEach(cand => {
-          const mejorQueActual = (cand.exacto && !mejor.exacto) ||
-            (cand.exacto === mejor.exacto && (cand.dist < mejor.dist || (cand.dist === mejor.dist && cand.conf > mejor.conf)));
-          if(mejorQueActual) mejor = cand;
-        });
-        desacuerdo = lecturas[0].valor !== lecturas[1].valor;
       }
-      mejor.desacuerdo = desacuerdo;
+
+      // calidad de la foto en esta casilla
+      {
+        const gQ = recortarCasilla(img, quad, fila, col, OW, OH, 0.04);
+        const pQ = seleccionarDigitos(analizarContraste(gQ, OW, OH, 'oscuro'), gQ, OW, OH, 0.38);
+        if(!pQ.vacio){ const q = medirNitidez(gQ, OW, OH, pQ.caja, celdaH / OH); if(q) calidades[k] = q; }
+      }
+
+      let mejor = candA;
+      // ---------- Método B (solo si A no quedó seguro): contraste local, para fichas, madera, fondos con dibujo ----------
+      if(!candA.seguro){
+        const gB = recortarCasilla(img, quad, fila, col, OW, OH, 0.04);
+        let candB = vacioCand();
+        let desacuerdo = false;
+        const mejoraB = (cand) => mejoraA(cand, candB);
+        for(const pol of ['oscuro', 'claro']){
+          const an = analizarContraste(gB, OW, OH, pol);
+          for(const frac of [0.38, 0.52, 0.30, 0.66]){
+            const prep = seleccionarDigitos(an, gB, OW, OH, frac);
+            if(prep.vacio) continue;
+            const a = await leerImagen(canvasParaOCR(prep, 'gris'), col);
+            if(mejoraB(a)) candB = Object.assign(vacioCand(), a);
+            if(a.exacto && a.conf >= 75 && coherenteConForma(a.texto, prep.caja)){
+              const b = await leerImagen(canvasParaOCR(prep, 'masc'), col);
+              if(b.exacto && b.valor === a.valor){ candB = Object.assign(vacioCand(), a.conf >= b.conf ? a : b); candB.seguro = true; break; }
+              if(mejoraB(b)) candB = Object.assign(vacioCand(), b);
+            } else {
+              const b = await leerImagen(canvasParaOCR(prep, 'masc'), col);
+              if(mejoraB(b)) candB = Object.assign(vacioCand(), b);
+              if(b.exacto && a.exacto && b.valor !== a.valor) desacuerdo = true;
+              if(!(b.exacto && b.conf >= 75)){
+                const z = await leerImagen(canvasParaOCR(prep, 'zona'), col);
+                if(mejoraB(z)) candB = Object.assign(vacioCand(), z);
+              }
+            }
+          }
+          if(candB.seguro) break;
+        }
+        candB.desacuerdo = desacuerdo && !candB.seguro;
+        if(candB.seguro) mejor = candB;
+        else {
+          mejor = mejoraA(candB, candA) ? candB : candA;
+          mejor.seguro = false;
+          mejor.desacuerdo = mejor.desacuerdo || (candA.exacto && candB.exacto && candA.valor !== candB.valor);
+        }
+      }
       detalle.push(mejor);
       if(fila === 2 && col === 2){
-        // centro: si lo leído es un número válido y seguro, el cartón no tiene casilla libre
         if(mejor.exacto && mejor.conf >= 70){ libre = false; celdas[k] = mejor.valor; }
         else { libre = true; celdas[k] = 0; }
         continue;
       }
       celdas[k] = mejor.valor;
-      if(!mejor.exacto || mejor.conf < 65 || mejor.empate || mejor.desacuerdo) dudosas.push(k);
+      if(!mejor.seguro || !mejor.exacto || mejor.conf < 65 || mejor.empate || mejor.desacuerdo) dudosas.push(k);
     }
-    // repetidos: se marcan ambos como dudosos
+    // un "1" suelto en la columna B puede ser un "13" al que se le perdió una cifra
+    detalle.forEach((d, i) => {
+      if(i % 5 === 0 && d.valor === 1 && d.texto && d.texto.length === 1 && dudosas.indexOf(i) < 0) dudosas.push(i);
+    });
+    // calidad de la foto en general: si es borrosa o está muy lejos no se puede confiar en ninguna casilla
+    const anchos = Object.values(calidades).map(q => q.ancho).sort((a, b) => a - b);
+    const altos = Object.values(calidades).map(q => q.alto).sort((a, b) => a - b);
+    const mediana = (a) => a.length ? a[Math.floor(a.length / 2)] : NaN;
+    const nitidez = mediana(anchos), altoNum = mediana(altos);
+    const sinMedida = !(nitidez >= 0) || !(altoNum >= 0);   // no se pudo medir: no se confía
+    const borrosa = sinMedida || nitidez > 0.17;
+    const chica = sinMedida || altoNum < 10;
+    if(borrosa || chica){
+      for(let i = 0; i < 25; i++) if(!(i === CENTRO && libre) && dudosas.indexOf(i) < 0) dudosas.push(i);
+    } else {
+      // casillas individuales muy borrosas
+      Object.keys(calidades).forEach(key => { const i = Number(key); if(calidades[i].ancho > 0.30 && dudosas.indexOf(i) < 0 && !(i === CENTRO && libre)) dudosas.push(i); });
+    }
     const vistos = {};
     celdas.forEach((n, i) => {
       if(!(n > 0) || (libre && i === CENTRO)) return;
@@ -1842,7 +2156,8 @@
       } else vistos[n] = i;
     });
     if(alProgreso) alProgreso(25, 25);
-    return { celdas: celdas.map(n => (n > 0 ? n : 0)), libre: libre, dudosas: dudosas, detalle: detalle };
+    return { celdas: celdas.map(n => (n > 0 ? n : 0)), libre: libre, dudosas: dudosas, detalle: detalle,
+      calidad: { nitidez: nitidez, altoNumero: altoNum, borrosa: borrosa, chica: chica } };
   }
 
   function crearMisCartones(){
@@ -1971,6 +2286,7 @@
         if(carton && !(carton.libre && i === CENTRO) && carton.celdas[i] > 0) inp.value = String(carton.celdas[i]);
       });
       txtPegar.value = '';
+      $('mcVistaCaja').style.display = 'none';
       msgError.className = 'mc-error info';
       msgError.textContent = 'Escribe los números tal como están en tu cartón, de izquierda a derecha y de arriba hacia abajo.';
       revisarEditor(false);
@@ -2475,6 +2791,24 @@
       ['mcFotoLeer', 'mcFotoGirar', 'mcFotoOtra', 'mcFotoCancelar'].forEach(id => { $(id).disabled = !activos; });
     }
 
+    function dibujarVistaFoto(fuente, quad){
+      const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+      const cw = (dist(quad[0], quad[1]) + dist(quad[3], quad[2])) / 2, ch = (dist(quad[0], quad[3]) + dist(quad[1], quad[2])) / 2;
+      const W = 320, H = Math.max(120, Math.min(420, Math.round(W * ch / cw)));
+      const cv = $('mcVistaFoto');
+      cv.width = W; cv.height = H;
+      const img = fuente.getContext('2d').getImageData(0, 0, fuente.width, fuente.height);
+      const out = cv.getContext('2d').createImageData(W, H);
+      for(let y = 0; y < H; y++) for(let x = 0; x < W; x++){
+        const p = puntoEnCuadrilatero(quad, (x + 0.5) / W, (y + 0.5) / H);
+        const sx = Math.max(0, Math.min(img.width - 1, Math.round(p.x))), sy = Math.max(0, Math.min(img.height - 1, Math.round(p.y)));
+        const si = (sy * img.width + sx) * 4, di = (y * W + x) * 4;
+        out.data[di] = img.data[si]; out.data[di + 1] = img.data[si + 1]; out.data[di + 2] = img.data[si + 2]; out.data[di + 3] = 255;
+      }
+      cv.getContext('2d').putImageData(out, 0, 0);
+      $('mcVistaCaja').style.display = 'block';
+    }
+
     function aplicarLectura(r){
       chkLibre.checked = r.libre;
       aplicarLibre();
@@ -2486,8 +2820,13 @@
       revisarEditor(false);
       const nd = r.dudosas.length;
       msgError.className = 'mc-error info';
-      msgError.textContent = (nd ? 'Leí tu cartón. Revisa ' + (nd === 1 ? 'el número' : 'los ' + nd + ' números') + ' en amarillo' : 'Leí tu cartón') +
-        ' y confirma que TODOS coincidan con el tuyo antes de guardar.';
+      if(r.calidad && (r.calidad.borrosa || r.calidad.chica)){
+        msgError.className = 'mc-error';
+        msgError.textContent = 'La foto está borrosa o muy lejos, así que no me fío de la lectura: revisa TODOS los números (o toma otra foto más cerca, con buena luz y sin movimiento).';
+      } else {
+        msgError.textContent = (nd ? 'Leí tu cartón. Revisa ' + (nd === 1 ? 'el número' : 'los ' + nd + ' números') + ' en amarillo' : 'Leí tu cartón') +
+          ' y confirma que TODOS coincidan con el tuyo antes de guardar.';
+      }
     }
 
     async function leerFotoActual(){
@@ -2504,6 +2843,7 @@
         const r = await leerCartonDeImagen(fotoOrig, quad, (k, n) => {
           if(k < n) fotoMsg.textContent = 'Leyendo casilla ' + (k + 1) + ' de ' + n + '…';
         });
+        try{ dibujarVistaFoto(fotoOrig, quad); } catch(e){}
         aplicarLectura(r);
         cerrarFoto();
       } catch(e){
