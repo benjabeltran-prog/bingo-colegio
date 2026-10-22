@@ -55,7 +55,7 @@
   .topbar{
     display:flex;
     align-items: stretch;
-    gap: clamp(10px, 1vw, 18px);
+    gap: clamp(8px, 0.75vw, 14px);
     flex-wrap: nowrap;
   }
 
@@ -64,7 +64,7 @@
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 14px;
     box-shadow: 0 10px 26px var(--sombra);
-    padding: clamp(8px, 0.9vh, 14px) clamp(10px, 1vw, 18px);
+    padding: clamp(8px, 0.9vh, 14px) clamp(10px, 0.75vw, 14px);
     display:flex;
     flex-direction: column;
     justify-content: center;
@@ -105,7 +105,20 @@
   }
   .logo-box.principal img{ width: auto; height: 100%; max-width: 100%; }
   .logo-box.con-logo{ border-color: transparent; background: transparent; padding: 0; }
-  .logo-box.chico{ width: clamp(50px, 5.6vh, 74px); height: clamp(50px, 5.6vh, 74px); font-size: 0.68rem; }
+  .logo-box{ position: relative; }
+  .logo-box.chico{
+    width: calc(var(--aus-base) * var(--aus-escala, 1));
+    height: calc(var(--aus-base) * var(--aus-escala, 1));
+    font-size: 0.68rem;
+  }
+  /* botón para quitar un auspiciador (aparece al pasar el mouse) */
+  .logo-box .quitar{
+    display:none; position:absolute; top:2px; right:2px; width:18px; height:18px; padding:0;
+    border:none; border-radius:50%; background: rgba(0,0,0,0.75); color:#fff;
+    font-size: 13px; line-height: 18px; text-align:center; cursor:pointer;
+  }
+  .logo-box.con-logo:hover .quitar{ display:block; }
+  .logo-box .quitar:hover{ background:#b5483f; }
 
   .brand h1{
     margin:0;
@@ -250,7 +263,13 @@
     text-transform: uppercase;
     text-align: center;
   }
-  .sponsor-slots{ display:flex; gap: 6px; }
+  .sponsor-slots{
+    --aus-base: clamp(40px, 5.6vh, 74px);
+    display:grid;
+    grid-template-columns: repeat(var(--cols, 4), calc(var(--aus-base) * var(--aus-escala, 1)));
+    gap: 6px;
+    justify-content: center;
+  }
 
   /* QR panel */
   .qr-panel{
@@ -696,6 +715,64 @@
     transition: opacity .18s ease, transform .18s ease;
   }
   .c-toast.visible{ opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* En pantallas menores se oculta la etiqueta "Llamada actual" para que
+     el panel del binguito quepa sin desbordar el encabezado. */
+  @media (max-width: 1700px){ .call-label{ display:none; } }
+
+  /* ================= BINGUITO (letra que hay que formar en el cartón) ================= */
+  .patron{
+    display:grid; grid-template-columns: repeat(5, var(--pc, 18px)); grid-auto-rows: var(--pc, 18px);
+    gap: var(--pg, 3px);
+  }
+  .pat-celda{ background: rgba(255,255,255,0.09); border-radius: 3px; }
+  .pat-celda.on{ background: var(--dorado); box-shadow: 0 0 6px rgba(203,161,53,0.45); }
+
+  .binguito-panel{ flex: 0 0 auto; align-items:center; text-align:center; gap: 5px; display:none; }
+  .binguito-panel .patron{ --pc: clamp(12px, 2.25vh, 28px); --pg: clamp(2px, 0.3vh, 4px); }
+  .bin-label{ font-size: clamp(0.55rem, 1vh, 0.68rem); letter-spacing: 0.16em; text-transform: uppercase; color: var(--blanco); }
+  .bin-letra{ font-family:'Archivo Black', sans-serif; font-size: clamp(0.75rem, 1.5vh, 1.05rem); color: var(--dorado); letter-spacing: 0.08em; }
+
+  .sel-ronda{ display:flex; align-items:center; gap: 8px; font-size: clamp(0.75rem, 1.2vh, 0.95rem); color: var(--gris-suave); letter-spacing: 0.04em; }
+  .sel-ronda select{
+    font-family:'Space Grotesk', sans-serif; font-weight: 600; font-size: inherit; color: var(--blanco);
+    background: transparent; border: 2px solid var(--gris-suave); border-radius: 999px;
+    padding: 0.45em 1em; cursor: pointer; max-width: 46vw;
+  }
+  .sel-ronda select:hover{ border-color: var(--verde-acento); }
+  .sel-ronda option{ background:#0c231b; color:#fff; }
+
+  /* espectador */
+  .m-binguito .prize-label{ display:block; text-align:center; margin-bottom: 10px; }
+  .m-bin-fila{ display:flex; align-items:center; justify-content:center; gap: 18px; }
+  .m-binguito .patron{ --pc: 22px; --pg: 4px; }
+  .m-bin-texto{ font-size: 0.95rem; color: var(--gris-texto); line-height: 1.3; text-align:left; }
+  .m-bin-texto strong{ display:block; font-family:'Archivo Black', sans-serif; font-weight:400; font-size: 2.4rem; color: var(--dorado); line-height: 1.05; }
+
+  /* control (celular) */
+  .c-rondas{ display:flex; flex-direction:column; gap: 8px; margin-bottom: 14px; }
+  .c-ronda{
+    display:flex; align-items:center; gap: 12px; width:100%; text-align:left; padding: 11px 12px;
+    border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+    color: var(--blanco); cursor:pointer; touch-action: manipulation; font-family:'Space Grotesk', sans-serif;
+  }
+  .c-ronda:active{ transform: scale(0.98); }
+  .c-ronda-hora{ font-family:'Archivo Black', sans-serif; color: var(--dorado); font-size: 0.95rem; min-width: 50px; }
+  .c-ronda-nombre{ flex:1; min-width:0; font-size: 0.9rem; font-weight: 600; line-height: 1.25; }
+  .c-ronda-nombre b{ display:block; color: var(--dorado); font-family:'Archivo Black', sans-serif; font-weight:400; font-size: 1rem; }
+  .c-ronda-bin{ font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gris-suave); text-align:right; }
+  .c-ronda.activa{ background: var(--verde-header); border-color: var(--verde-acento); }
+  .c-ronda.activa .c-ronda-bin{ color: var(--dorado); }
+  .c-binlet{ display:grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 4px 0 14px; }
+  .c-binbtn{
+    padding: 11px 0; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05);
+    color: var(--blanco); font-family:'Archivo Black', sans-serif; font-size: 1rem; cursor:pointer; touch-action: manipulation;
+  }
+  .c-binbtn.activa{ background: var(--dorado); color:#2a2205; border-color: var(--dorado); }
+  .c-binbtn.ninguno{ font-family:'Space Grotesk', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .c-bin-prev{ display:flex; justify-content:center; }
+  .c-bin-prev .patron{ --pc: 18px; --pg: 3px; }
+  #cRondaResumen{ max-width: 62%; }
 </style>
 </head>
 <body class="cargando">
@@ -737,6 +814,12 @@
         <span class="prize-hint">clic para editar</span>
       </div>
 
+      <div class="panel binguito-panel" id="panelBinguito">
+        <span class="bin-label">Binguito</span>
+        <div id="binPatron"></div>
+        <span class="bin-letra" id="binLetra">Letra B</span>
+      </div>
+
       <div class="panel qr-panel" id="qrPanel">
         <span class="qr-label">Ver en el celular</span>
         <button class="btn-qr" id="btnImprimirQR" type="button">Imprimir QR</button>
@@ -746,10 +829,6 @@
       <div class="panel sponsors">
         <span class="sponsors-label">Auspiciadores</span>
         <div class="sponsor-slots" id="sponsorSlots">
-          <div class="logo-box chico" data-slot="1">+</div>
-          <div class="logo-box chico" data-slot="2">+</div>
-          <div class="logo-box chico" data-slot="3">+</div>
-          <div class="logo-box chico" data-slot="4">+</div>
         </div>
       </div>
     </div>
@@ -759,6 +838,7 @@
     </div>
 
     <div class="bottom-bar">
+      <label class="sel-ronda">Ronda <select id="selRonda"></select></label>
       <span class="contador"><strong id="contadorNum">0</strong> números marcados</span>
       <button class="btn-limpiar" id="btnLimpiar">Limpiar selecciones</button>
     </div>
@@ -792,6 +872,14 @@
     <div class="m-card m-prize">
       <span class="prize-label" id="mPremioLabel">Premio de este bingo</span>
       <div class="prize-value-display" id="mPremioValor">$200.000</div>
+    </div>
+
+    <div class="m-card m-binguito" id="mBinguitoCard" style="display:none;">
+      <span class="prize-label">Binguito</span>
+      <div class="m-bin-fila">
+        <div id="mPatron"></div>
+        <div class="m-bin-texto">Forma la letra<strong id="mBinLetra">B</strong>en tu cartón</div>
+      </div>
     </div>
 
     <div class="m-card m-sponsors-card" id="mSponsorsCard" style="display:none;">
@@ -839,6 +927,17 @@
       <div class="c-progreso"><div class="c-progreso-barra" id="cBarra"></div></div>
       <div class="c-resumen"><strong id="cContador">0</strong> de 75 números llamados</div>
     </section>
+
+    <details class="m-card c-det" id="cDetRonda">
+      <summary><span>Ronda y binguito</span><span class="c-sum-valor" id="cRondaResumen">Sin ronda</span></summary>
+      <div class="c-det-cuerpo">
+        <span class="c-etq">Programa (al elegir, cambia premio y binguito)</span>
+        <div class="c-rondas" id="cRondas"></div>
+        <span class="c-etq">Letra del binguito</span>
+        <div class="c-binlet" id="cBinLet"></div>
+        <div class="c-bin-prev" id="cBinPrev"></div>
+      </div>
+    </details>
 
     <details class="m-card c-det">
       <summary><span>Premio</span><span class="c-sum-valor" id="cPremioResumen">$200.000</span></summary>
@@ -1079,6 +1178,83 @@
     rutaSala().child('premioLabel').set(valor).catch(errorEscritura);
   }
 
+  // ---------------------------------------------------------------------
+  // PROGRAMA DEL EVENTO: rondas y binguitos
+  // Si cambia el programa, edita esta lista. Cada ronda define el premio
+  // del bingo y la letra del "binguito" (la letra que hay que formar en
+  // el cartón). Si una ronda no tiene binguito, usa binguito: null.
+  // ---------------------------------------------------------------------
+  const RONDAS = [
+    { id: 1, hora: '13:30', nombre: 'Bingo',             premio: '$200.000',   binguito: 'B' },
+    { id: 2, hora: '14:30', nombre: 'Bingo',             premio: '$300.000',   binguito: 'I' },
+    { id: 3, hora: '15:35', nombre: 'Bingo',             premio: '$300.000',   binguito: 'N' },
+    { id: 4, hora: '16:45', nombre: 'Bingo',             premio: '$500.000',   binguito: 'G' },
+    { id: 5, hora: '17:15', nombre: 'Bingo Mala suerte', premio: '$200.000',   binguito: null },
+    { id: 6, hora: '17:45', nombre: 'Bingo',             premio: '$1.000.000', binguito: 'O' }
+  ];
+
+  // Forma de cada letra sobre el cartón de 5x5 (X = casilla que hay que marcar).
+  const FORMAS_BINGUITO = {
+    B: ['XXXX.',
+        'X...X',
+        'XXXX.',
+        'X...X',
+        'XXXX.'],
+    I: ['XXXXX',
+        '..X..',
+        '..X..',
+        '..X..',
+        'XXXXX'],
+    N: ['X...X',
+        'XX..X',
+        'X.X.X',
+        'X..XX',
+        'X...X'],
+    G: ['.XXXX',
+        'X....',
+        'X.XXX',
+        'X...X',
+        '.XXX.'],
+    O: ['.XXX.',
+        'X...X',
+        'X...X',
+        'X...X',
+        '.XXX.']
+  };
+
+  function formaValida(letra){
+    return typeof letra === 'string' && Object.prototype.hasOwnProperty.call(FORMAS_BINGUITO, letra);
+  }
+
+  // Dibuja la letra como una mini grilla de 5x5.
+  function crearPatron(letra){
+    const cont = document.createElement('div');
+    cont.className = 'patron';
+    FORMAS_BINGUITO[letra].forEach(fila => {
+      fila.split('').forEach(c => {
+        const celda = document.createElement('div');
+        celda.className = 'pat-celda' + (c === 'X' ? ' on' : '');
+        cont.appendChild(celda);
+      });
+    });
+    return cont;
+  }
+
+  function descripcionRonda(r){
+    return r.hora + ' · ' + r.nombre + ' ' + r.premio + (r.binguito ? ' · Binguito ' + r.binguito : '');
+  }
+
+  // Al elegir una ronda se cambian de una vez el premio, el título y el binguito.
+  function elegirRonda(r){
+    rutaSala().update({ ronda: r.id, premio: r.premio, premioLabel: r.nombre, binguito: r.binguito || null }).catch(errorEscritura);
+  }
+  function quitarRonda(){
+    rutaSala().update({ ronda: null, binguito: null }).catch(errorEscritura);
+  }
+  function guardarBinguito(letra){
+    rutaSala().update({ binguito: letra || null }).catch(errorEscritura);
+  }
+
   // Se suscribe al estado compartido: así todos los dispositivos admin
   // muestran lo mismo y, al recargar, NO se pierde nada.
   function conectarAdmin(alCambiarEstado, alCambiarLogos){
@@ -1139,7 +1315,12 @@
     const contadorEl = $('contadorNum');
     const premioValor = $('premioValor');
     const premioLabel = $('premioLabel');
+    const panelBin = $('panelBinguito');
+    const binPatron = $('binPatron');
+    const binLetra = $('binLetra');
+    const selRonda = $('selRonda');
     const celdas = {};
+    let letraBinActual = null;
 
     rangos.forEach(({letra, inicio, fin}) => {
       const fila = document.createElement('div');
@@ -1172,7 +1353,29 @@
       // no pisar el texto mientras se está escribiendo en el campo
       if(document.activeElement !== premioValor && typeof estado.premio === 'string') premioValor.textContent = estado.premio;
       if(document.activeElement !== premioLabel && typeof estado.premioLabel === 'string') premioLabel.textContent = estado.premioLabel;
+
+      // binguito: letra que hay que formar en el cartón
+      const letra = formaValida(estado.binguito) ? estado.binguito : null;
+      if(letra !== letraBinActual){
+        letraBinActual = letra;
+        panelBin.style.display = letra ? 'flex' : 'none';
+        binPatron.innerHTML = '';
+        if(letra){
+          binPatron.appendChild(crearPatron(letra));
+          binLetra.textContent = 'Letra ' + letra;
+        }
+      }
+      if(document.activeElement !== selRonda) selRonda.value = estado.ronda ? String(estado.ronda) : '';
     }
+
+    // selector de ronda (barra inferior)
+    selRonda.innerHTML = '<option value="">Sin ronda</option>' +
+      RONDAS.map(r => '<option value="' + r.id + '">' + descripcionRonda(r) + '</option>').join('');
+    selRonda.addEventListener('change', () => {
+      const r = RONDAS.find(x => String(x.id) === selRonda.value);
+      if(r) elegirRonda(r); else quitarRonda();
+      selRonda.blur();
+    });
 
     $('btnLimpiar').addEventListener('click', () => {
       if(confirm('¿Limpiar todos los números marcados? Esto también se verá en los celulares.')) limpiarTodo();
@@ -1188,7 +1391,6 @@
     // ---- logos (colegio y auspiciadores): se guardan en Firebase y se
     // cargan de vuelta al abrir, así no se pierden al recargar ----
     const cajaColegio = $('logoColegio');
-    const cajasAus = Array.from(document.querySelectorAll('#sponsorSlots .logo-box'));
 
     function habilitarSubidaLogo(el, ruta){
       el.addEventListener('click', () => {
@@ -1208,7 +1410,50 @@
       });
     }
     habilitarSubidaLogo(cajaColegio, 'colegio');
-    cajasAus.forEach((el, idx) => habilitarSubidaLogo(el, 'auspiciadores/' + idx));
+
+    // ---- auspiciadores: siempre hay un casillero "+" libre después del
+    // último logo, así se pueden agregar más (hasta MAX_AUSPICIADORES).
+    // Con más de 8 los casilleros se achican para que quepan en el encabezado. ----
+    const MAX_AUSPICIADORES = 18;
+    const MIN_CASILLEROS = 4;
+    const contenedorAus = $('sponsorSlots');
+    let logosAus = {};   // posición -> imagen
+
+    function dibujarAuspiciadores(){
+      const posiciones = Object.keys(logosAus).map(Number);
+      const ultima = posiciones.length ? Math.max.apply(null, posiciones) : -1;
+      const visibles = Math.min(MAX_AUSPICIADORES, Math.max(MIN_CASILLEROS, ultima + 2));
+      const compacto = visibles > 8;
+      contenedorAus.style.setProperty('--cols', compacto ? 6 : 4);
+      contenedorAus.style.setProperty('--aus-escala', compacto ? 0.66 : 1);
+      contenedorAus.innerHTML = '';
+      for(let i = 0; i < visibles; i++){
+        const caja = document.createElement('div');
+        caja.className = 'logo-box chico';
+        const src = logosAus[i];
+        if(src){
+          const img = document.createElement('img');
+          img.src = src;
+          caja.appendChild(img);
+          caja.classList.add('con-logo');
+          const quitar = document.createElement('button');
+          quitar.type = 'button';
+          quitar.className = 'quitar';
+          quitar.title = 'Quitar este auspiciador';
+          quitar.textContent = '×';
+          quitar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(confirm('¿Quitar este auspiciador?')) rutaLogos().child('auspiciadores/' + i).remove().catch(errorEscritura);
+          });
+          caja.appendChild(quitar);
+        } else {
+          caja.textContent = '+';
+        }
+        habilitarSubidaLogo(caja, 'auspiciadores/' + i);
+        contenedorAus.appendChild(caja);
+      }
+    }
+    dibujarAuspiciadores();
 
     function pintarLogoEnCaja(el, src){
       if(!src || el.dataset.src === src) return;
@@ -1223,7 +1468,9 @@
     function renderLogosProyector(logos){
       pintarLogoEnCaja(cajaColegio, logos.colegio);
       const aus = logos.auspiciadores || {};
-      cajasAus.forEach((el, idx) => pintarLogoEnCaja(el, aus[idx]));
+      logosAus = {};
+      Object.keys(aus).forEach(k => { if(aus[k]) logosAus[Number(k)] = aus[k]; });
+      dibujarAuspiciadores();
     }
 
     // ---- abrir página imprimible del QR, ya enlazada a esta sala ----
@@ -1328,6 +1575,60 @@
       cHistCount.textContent = historialActual.length;
     }
 
+    // ---- ronda y binguito ----
+    const cRondas = $('cRondas');
+    const cBinLet = $('cBinLet');
+    const cBinPrev = $('cBinPrev');
+    const cRondaResumen = $('cRondaResumen');
+
+    function pintarRondas(estado){
+      const activa = estado.ronda ? Number(estado.ronda) : null;
+      const letra = formaValida(estado.binguito) ? estado.binguito : null;
+
+      cRondas.innerHTML = '';
+      RONDAS.forEach(r => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'c-ronda' + (r.id === activa ? ' activa' : '');
+        b.innerHTML = '<span class="c-ronda-hora">' + r.hora + '</span>' +
+          '<span class="c-ronda-nombre">' + r.nombre + '<b>' + r.premio + '</b></span>' +
+          '<span class="c-ronda-bin">' + (r.binguito ? 'Binguito<br>letra ' + r.binguito : 'Sin<br>binguito') + '</span>';
+        b.addEventListener('click', () => {
+          if(r.id === activa) return;
+          if(!confirm('¿Cambiar a la ronda de las ' + r.hora + '?\n' + r.nombre + ' ' + r.premio + (r.binguito ? ' · Binguito ' + r.binguito : '') +
+            '\n\nLos números marcados no se borran (usa "Limpiar" si empieza un juego nuevo).')) return;
+          if(navigator.vibrate) navigator.vibrate(15);
+          elegirRonda(r);
+          mostrarToast('Ronda ' + r.hora + (r.binguito ? ' · Binguito ' + r.binguito : ''));
+        });
+        cRondas.appendChild(b);
+      });
+
+      cBinLet.innerHTML = '';
+      Object.keys(FORMAS_BINGUITO).forEach(l => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'c-binbtn' + (l === letra ? ' activa' : '');
+        b.textContent = l;
+        b.addEventListener('click', () => { guardarBinguito(l === letra ? null : l); });
+        cBinLet.appendChild(b);
+      });
+      const ninguno = document.createElement('button');
+      ninguno.type = 'button';
+      ninguno.className = 'c-binbtn ninguno' + (!letra ? ' activa' : '');
+      ninguno.textContent = 'Ninguno';
+      ninguno.addEventListener('click', () => guardarBinguito(null));
+      cBinLet.appendChild(ninguno);
+
+      cBinPrev.innerHTML = '';
+      if(letra) cBinPrev.appendChild(crearPatron(letra));
+
+      const rondaActiva = RONDAS.find(r => r.id === activa);
+      cRondaResumen.textContent = rondaActiva
+        ? rondaActiva.hora + ' · ' + (letra ? 'Letra ' + letra : 'sin binguito')
+        : (letra ? 'Letra ' + letra : 'Sin ronda');
+    }
+
     function renderControl(estado){
       historialActual = aLista(estado.historial);
       pintarLlamadas(historialActual, elsLlamadas);
@@ -1339,6 +1640,7 @@
       pintarTabs();
       pintarGrid();
       pintarHistorial();
+      pintarRondas(estado);
       if(typeof estado.premio === 'string') cPremioResumen.textContent = estado.premio;
       if(document.activeElement !== cPremioLabel && typeof estado.premioLabel === 'string') cPremioLabel.value = estado.premioLabel;
       if(document.activeElement !== cPremioValor && typeof estado.premio === 'string') cPremioValor.value = estado.premio;
@@ -1375,6 +1677,10 @@
     const mLogoColegio = $('mLogoColegio');
     const mSponsorsCard = $('mSponsorsCard');
     const mSponsorRow = $('mSponsorRow');
+    const mBinguitoCard = $('mBinguitoCard');
+    const mPatron = $('mPatron');
+    const mBinLetra = $('mBinLetra');
+    let letraBinEsp = null;
     const elsLlamadas = { bola: $('mBolaActual'), anterior: $('mNumAnterior'), historial: $('mHistoryBalls') };
 
     const celdasMobile = {};
@@ -1405,6 +1711,17 @@
       pintarLlamadas(historial, elsLlamadas);
       mPremioValor.textContent = (estado && estado.premio) || '$200.000';
       mPremioLabel.textContent = (estado && estado.premioLabel) || 'Premio de este bingo';
+
+      const letra = estado && formaValida(estado.binguito) ? estado.binguito : null;
+      if(letra !== letraBinEsp){
+        letraBinEsp = letra;
+        mBinguitoCard.style.display = letra ? 'block' : 'none';
+        mPatron.innerHTML = '';
+        if(letra){
+          mPatron.appendChild(crearPatron(letra));
+          mBinLetra.textContent = letra;
+        }
+      }
     }
 
     function renderLogos(logos){
