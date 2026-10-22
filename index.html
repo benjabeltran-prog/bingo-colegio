@@ -875,6 +875,17 @@
   .c-binest-txt strong{ display:block; font-size: 0.95rem; color: var(--blanco); font-weight: 600; margin-top: 2px; }
   .c-binest .c-btn{ width:auto; flex-shrink:0; padding: 10px 14px; font-size: 0.85rem; }
   .c-binest.entregado .c-btn{ border-color: var(--dorado); color: var(--dorado); }
+
+  /* binguito extra: elegir cualquier letra */
+  .c-extra{ margin: -2px 0 12px; }
+  .c-extra summary{ list-style:none; cursor:pointer; font-size: 0.82rem; font-weight: 600; color: var(--verde-acento); padding: 6px 0; }
+  .c-extra summary::-webkit-details-marker{ display:none; }
+  .c-extra summary::before{ content: '＋ '; }
+  .c-extra[open] summary::before{ content: '－ '; }
+  .c-letras{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 6px; }
+  .c-letras .c-binbtn{ padding: 10px 0; font-size: 0.95rem; }
+  .c-det .c-extra summary{ display:block; padding: 6px 0; text-transform: none; letter-spacing: 0; font-size: 0.85rem; font-weight: 600; color: var(--verde-acento); }
+  .c-det .c-extra summary::after{ content: none; }
 </style>
 </head>
 <body class="cargando">
@@ -941,6 +952,7 @@
 
     <div class="bottom-bar">
       <label class="sel-ronda">Ronda <select id="selRonda"></select></label>
+      <label class="sel-ronda">Binguito extra <select id="selLetraExtra"></select></label>
       <span class="contador"><strong id="contadorNum">0</strong> números marcados</span>
       <button class="btn-limpiar btn-bin" id="btnBinguito" style="display:none">Marcar binguito entregado</button>
       <button class="btn-limpiar" id="btnLimpiar">Limpiar selecciones</button>
@@ -980,7 +992,7 @@
     <div class="m-card m-binguito" id="mBinguitoCard" style="display:none;">
       <div class="m-bin-fila">
         <div class="m-bin-txt">
-          <span class="prize-label">Binguito</span>
+          <span class="prize-label" id="mBinTit">Binguito</span>
           <span class="m-bin-estado" id="mBinEstado" style="display:none">Entregado ✓</span>
         </div>
         <div id="mPatron"></div>
@@ -1063,6 +1075,10 @@
         <div class="c-rondas" id="cRondas"></div>
         <span class="c-etq">Letra del binguito</span>
         <div class="c-binlet" id="cBinLet"></div>
+        <details class="c-extra" id="cExtra">
+          <summary>Binguito extra: elegir otra letra</summary>
+          <div class="c-letras" id="cLetras"></div>
+        </details>
         <div class="c-bin-prev" id="cBinPrev"></div>
       </div>
     </details>
@@ -1357,33 +1373,142 @@
   ];
 
   // Forma de cada letra sobre el cartón de 5x5 (X = casilla que hay que marcar).
+  // Se incluyen las esquinas cuando la letra las usa (G y O las usan). El centro es casilla libre.
+  // Las letras del programa son B, I, N, G, O; el resto sirve para un binguito EXTRA.
   const FORMAS_BINGUITO = {
+    A: ['.XXX.',
+        'X...X',
+        'XXXXX',
+        'X...X',
+        'X...X'],
     B: ['XXXX.',
         'X...X',
         'XXXX.',
         'X...X',
         'XXXX.'],
+    C: ['XXXXX',
+        'X....',
+        'X....',
+        'X....',
+        'XXXXX'],
+    D: ['XXXX.',
+        'X...X',
+        'X...X',
+        'X...X',
+        'XXXX.'],
+    E: ['XXXXX',
+        'X....',
+        'XXXX.',
+        'X....',
+        'XXXXX'],
+    F: ['XXXXX',
+        'X....',
+        'XXXX.',
+        'X....',
+        'X....'],
+    G: ['XXXXX',
+        'X....',
+        'X.XXX',
+        'X...X',
+        'XXXXX'],
+    H: ['X...X',
+        'X...X',
+        'XXXXX',
+        'X...X',
+        'X...X'],
     I: ['XXXXX',
         '..X..',
         '..X..',
         '..X..',
         'XXXXX'],
+    J: ['..XXX',
+        '...X.',
+        '...X.',
+        'X..X.',
+        '.XX..'],
+    K: ['X...X',
+        'X..X.',
+        'XXX..',
+        'X..X.',
+        'X...X'],
+    L: ['X....',
+        'X....',
+        'X....',
+        'X....',
+        'XXXXX'],
+    M: ['X...X',
+        'XX.XX',
+        'X.X.X',
+        'X...X',
+        'X...X'],
     N: ['X...X',
         'XX..X',
         'X.X.X',
         'X..XX',
         'X...X'],
-    G: ['.XXXX',
+    O: ['XXXXX',
+        'X...X',
+        'X...X',
+        'X...X',
+        'XXXXX'],
+    P: ['XXXX.',
+        'X...X',
+        'XXXX.',
         'X....',
-        'X.XXX',
+        'X....'],
+    Q: ['.XXX.',
+        'X...X',
+        'X...X',
+        'X..XX',
+        '.XXXX'],
+    R: ['XXXX.',
+        'X...X',
+        'XXXX.',
+        'X..X.',
+        'X...X'],
+    S: ['.XXXX',
+        'X....',
+        '.XXX.',
+        '....X',
+        'XXXX.'],
+    T: ['XXXXX',
+        '..X..',
+        '..X..',
+        '..X..',
+        '..X..'],
+    U: ['X...X',
+        'X...X',
+        'X...X',
         'X...X',
         '.XXX.'],
-    O: ['.XXX.',
+    V: ['X...X',
         'X...X',
         'X...X',
+        '.X.X.',
+        '..X..'],
+    W: ['X...X',
         'X...X',
-        '.XXX.']
+        'X.X.X',
+        'XX.XX',
+        'X...X'],
+    X: ['X...X',
+        '.X.X.',
+        '..X..',
+        '.X.X.',
+        'X...X'],
+    Y: ['X...X',
+        '.X.X.',
+        '..X..',
+        '..X..',
+        '..X..'],
+    Z: ['XXXXX',
+        '...X.',
+        '..X..',
+        '.X...',
+        'XXXXX']
   };
+  const LETRAS_PROGRAMA = ['B', 'I', 'N', 'G', 'O'];
+  const ALFABETO = Object.keys(FORMAS_BINGUITO);
 
   function formaValida(letra){
     return typeof letra === 'string' && Object.prototype.hasOwnProperty.call(FORMAS_BINGUITO, letra);
@@ -1414,6 +1539,14 @@
   function quitarRonda(){
     rutaSala().update({ ronda: null, binguito: null, binguitoGanado: null }).catch(errorEscritura);
   }
+  // ¿la letra del binguito no es la que corresponde a la ronda elegida? (concurso extra)
+  function esBinguitoExtra(estado){
+    const letra = estado && formaValida(estado.binguito) ? estado.binguito : null;
+    if(!letra) return false;
+    const r = RONDAS.find(x => x.id === Number(estado.ronda));
+    return !r || r.binguito !== letra;
+  }
+
   function guardarBinguito(letra){
     rutaSala().update({ binguito: letra || null, binguitoGanado: null }).catch(errorEscritura);
   }
@@ -2104,6 +2237,7 @@
     const binPatron = $('binPatron');
     const binLetra = $('binLetra');
     const selRonda = $('selRonda');
+    const selLetraExtra = $('selLetraExtra');
     const celdas = {};
     let letraBinActual = null;
     let binguitoEntregado = false;
@@ -2155,7 +2289,9 @@
 
       // binguito ya entregado
       binguitoEntregado = !!estado.binguitoGanado && !!letra;
-      if(letra) binLetra.textContent = binguitoEntregado ? 'Entregado ✓' : 'Letra ' + letra;   // misma línea: el encabezado no cambia de alto
+      const extra = esBinguitoExtra(estado);
+      if(letra) binLetra.textContent = binguitoEntregado ? 'Entregado ✓' : (extra ? 'Extra · ' + letra : 'Letra ' + letra);   // misma línea: el encabezado no cambia de alto
+      if(document.activeElement !== selLetraExtra) selLetraExtra.value = extra ? letra : '';
       panelBin.classList.toggle('entregado', binguitoEntregado);
       const btnBin = $('btnBinguito');
       btnBin.style.display = letra ? '' : 'none';
@@ -2166,6 +2302,16 @@
     // selector de ronda (barra inferior)
     selRonda.innerHTML = '<option value="">Sin ronda</option>' +
       RONDAS.map(r => '<option value="' + r.id + '">' + descripcionRonda(r) + '</option>').join('');
+    // binguito extra: cualquier letra, para un concurso fuera del programa
+    selLetraExtra.innerHTML = '<option value="">Letra…</option><option value="-">Quitar binguito</option>' +
+      ALFABETO.map(l => '<option value="' + l + '">' + l + '</option>').join('');
+    selLetraExtra.addEventListener('change', () => {
+      const v = selLetraExtra.value;
+      if(v === '-') guardarBinguito(null);
+      else if(v) guardarBinguito(v);
+      selLetraExtra.blur();
+    });
+
     selRonda.addEventListener('change', () => {
       const r = RONDAS.find(x => String(x.id) === selRonda.value);
       if(r) elegirRonda(r); else quitarRonda();
@@ -2402,7 +2548,7 @@
       });
 
       cBinLet.innerHTML = '';
-      Object.keys(FORMAS_BINGUITO).forEach(l => {
+      LETRAS_PROGRAMA.forEach(l => {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'c-binbtn' + (l === letra ? ' activa' : '');
@@ -2417,13 +2563,26 @@
       ninguno.addEventListener('click', () => guardarBinguito(null));
       cBinLet.appendChild(ninguno);
 
+      // cualquier letra, para un concurso extra fuera del programa
+      const cLetras = $('cLetras');
+      cLetras.innerHTML = '';
+      ALFABETO.forEach(l => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'c-binbtn' + (l === letra ? ' activa' : '');
+        b.textContent = l;
+        b.addEventListener('click', () => { guardarBinguito(l); mostrarToast('Binguito extra: letra ' + l); });
+        cLetras.appendChild(b);
+      });
+
       cBinPrev.innerHTML = '';
       if(letra) cBinPrev.appendChild(crearPatron(letra));
 
       const rondaActiva = RONDAS.find(r => r.id === activa);
+      const extra = esBinguitoExtra(estado);
       cRondaResumen.textContent = rondaActiva
-        ? rondaActiva.hora + ' · ' + (letra ? 'Letra ' + letra : 'sin binguito')
-        : (letra ? 'Letra ' + letra : 'Sin ronda');
+        ? rondaActiva.hora + ' · ' + (letra ? (extra ? 'Extra ' + letra : 'Letra ' + letra) : 'sin binguito')
+        : (letra ? 'Extra ' + letra : 'Sin ronda');
     }
 
     // ---- binguito entregado ----
@@ -2434,7 +2593,7 @@
       const caja = $('cBinEstado');
       caja.style.display = letra ? '' : 'none';
       caja.classList.toggle('entregado', binguitoEntregadoCtl);
-      $('cBinEstadoTxt').textContent = letra ? 'Letra ' + letra + (binguitoEntregadoCtl ? ' · ¡entregado!' : ' · en juego') : '';
+      $('cBinEstadoTxt').textContent = letra ? (esBinguitoExtra(estado) ? 'Extra · letra ' : 'Letra ') + letra + (binguitoEntregadoCtl ? ' · ¡entregado!' : ' · en juego') : '';
       $('cBinEntregado').textContent = binguitoEntregadoCtl ? 'Deshacer' : 'Marcar entregado';
     }
     $('cBinEntregado').addEventListener('click', () => {
@@ -2535,6 +2694,7 @@
           mPatron.appendChild(crearPatron(letra));
         }
       }
+      $('mBinTit').textContent = esBinguitoExtra(estado) ? 'Binguito extra' : 'Binguito';
       const entregado = !!(estado && estado.binguitoGanado) && !!letra;
       $('mBinEstado').style.display = entregado ? 'inline' : 'none';
       mBinguitoCard.classList.toggle('entregado', entregado);
