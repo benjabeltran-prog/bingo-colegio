@@ -778,8 +778,16 @@
   body.mobile .estado-conexion{ background: rgba(12,35,27,0.88); padding: 3px 10px; border-radius: 999px; }
 
   /* ================= MIS CARTONES (espectador) ================= */
-  .m-cartones .mc-cab{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
-  .m-cartones .prize-label{ margin:0; }
+  /* sección plegable al final de la vista del asistente */
+  .m-cartones{ padding: 0; }
+  .m-cartones > summary{ list-style:none; cursor:pointer; display:flex; align-items:center; gap: 10px; padding: 14px; }
+  .m-cartones > summary::-webkit-details-marker{ display:none; }
+  .m-cartones > summary::after{ content:'▾'; color: var(--gris-suave); transition: transform .15s ease; }
+  .m-cartones[open] > summary::after{ transform: rotate(180deg); }
+  .mc-sum-tit{ font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blanco); font-weight: 600; }
+  .m-cartones .mc-resumen{ margin-left:auto; text-align:right; }
+  .m-cartones .mc-resumen.gano{ color: var(--dorado); font-weight: 700; }
+  .mc-seccion{ padding: 0 14px 14px; }
   .mc-resumen{ font-size: 0.75rem; color: var(--gris-suave); }
   .mc-ayuda{ margin: 6px 0 12px; font-size: 0.85rem; color: var(--gris-texto); line-height: 1.4; }
   .mc-btn{
@@ -853,6 +861,17 @@
   .mc-al-tit{ font-family:'Archivo Black', sans-serif; font-size: 1.8rem; line-height: 1.1; }
   .mc-al-txt{ font-size: 0.95rem; font-weight: 600; margin: 6px 0 12px; line-height: 1.35; }
   .mc-al-btn{ background:#2a2205; color:#f4e3a8; border:none; border-radius: 999px; padding: 10px 26px; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size: 0.9rem; cursor:pointer; }
+
+  /* lector de foto del cartón */
+  .mc-modal-foto{ z-index: 110; }
+  .mc-foto-caja{ display:flex; justify-content:center; margin: 8px 0 10px; }
+  #mcFotoCanvas{ touch-action: none; border-radius: 10px; background:#000; max-width:100%; }
+  .mc-foto-acc{ display:flex; gap: 8px; margin-bottom: 6px; }
+  .mc-foto-acc .mc-btn{ flex:1; padding: 10px; font-size: 0.85rem; }
+  .mc-privado{ font-size: 0.7rem; color: var(--gris-suave); margin: 2px 0 0; line-height: 1.4; }
+  .mc-in.dudoso{ background:#3d3300; border-color: var(--dorado); box-shadow: 0 0 0 2px rgba(203,161,53,0.35); }
+  .mc-btn-foto{ margin-bottom: 12px; }
+  .mc-btn:disabled{ opacity: 0.45; cursor: default; }
 </style>
 </head>
 <body class="cargando">
@@ -962,21 +981,6 @@
       </div>
     </div>
 
-    <div class="m-card m-cartones" id="mCartonesCard">
-      <div class="mc-cab">
-        <span class="prize-label">Mis cartones</span>
-        <span class="mc-resumen" id="mcResumen"></span>
-      </div>
-      <p class="mc-ayuda" id="mcAyuda">Agrega tus cartones y esta página te avisa cuando completes el binguito o el bingo.</p>
-      <div id="mcLista"></div>
-      <button class="mc-btn" id="mcAgregar" type="button">+ Agregar cartón</button>
-      <div class="mc-opciones">
-        <label><input type="checkbox" id="mcSonido" checked> Sonido y vibración al ganar</label>
-        <label><input type="checkbox" id="mcPantalla" checked> Mantener la pantalla encendida</label>
-      </div>
-      <p class="mc-aviso">Es solo una ayuda: el premio lo valida la organización con tu cartón. Para recibir avisos, deja esta página abierta con la pantalla encendida. Tus cartones se guardan solo en este teléfono.</p>
-    </div>
-
     <div class="m-card m-sponsors-card" id="mSponsorsCard" style="display:none;">
       <span class="sponsors-label">Auspiciadores</span>
       <div class="m-sponsor-row" id="mSponsorRow"></div>
@@ -985,6 +989,24 @@
     <div class="m-card">
       <div class="m-board" id="mBoard"></div>
     </div>
+
+    <details class="m-card m-cartones" id="mCartonesCard">
+      <summary>
+        <span class="mc-sum-tit">Mis cartones</span>
+        <span class="mc-resumen" id="mcResumen"></span>
+      </summary>
+      <div class="mc-seccion">
+        <p class="mc-ayuda" id="mcAyuda">Agrega tus cartones (también puedes subir una foto) y esta página te avisa cuando completes el binguito o el bingo.</p>
+        <div id="mcLista"></div>
+        <button class="mc-btn" id="mcAgregar" type="button">+ Agregar cartón</button>
+        <div class="mc-opciones">
+          <label><input type="checkbox" id="mcSonido" checked> Sonido y vibración al ganar</label>
+          <label><input type="checkbox" id="mcPantalla" checked> Mantener la pantalla encendida</label>
+          <button class="mc-btn sec" id="mcProbar" type="button" style="margin-top:2px">🔊 Probar sonido</button>
+        </div>
+        <p class="mc-aviso">Si no oyes nada, sube el volumen y revisa que el teléfono no esté en silencio. Es solo una ayuda: el premio lo valida la organización con tu cartón. Para recibir avisos, deja esta página abierta con la pantalla encendida. Tus cartones se guardan solo en este teléfono.</p>
+      </div>
+    </details>
 
     <p class="m-footer-nota">Esta pantalla se actualiza sola a medida que se cantan los números.<br>No necesitas recargar ni marcar nada aquí.</p>
   </div>
@@ -1065,6 +1087,8 @@
     <div class="mc-hoja">
       <div class="mc-hoja-cab"><strong id="mcTituloEditor">Nuevo cartón</strong><button class="mc-x" id="mcCerrar" type="button" aria-label="Cerrar">✕</button></div>
       <input class="mc-texto" id="mcNombre" type="text" maxlength="24" placeholder="Nombre (opcional), ej. Cartón 1" autocomplete="off">
+      <button class="mc-btn mc-btn-foto" id="mcFoto" type="button">📷 Llenar desde una foto del cartón</button>
+      <input type="file" id="mcFotoArchivo" accept="image/*" style="display:none">
       <div class="mc-cols"><span class="m-letra L-B">B</span><span class="m-letra L-I">I</span><span class="m-letra L-N">N</span><span class="m-letra L-G">G</span><span class="m-letra L-O">O</span></div>
       <div class="mc-grid" id="mcGrid"></div>
       <label class="mc-libre-fila"><input type="checkbox" id="mcLibre" checked> El centro es casilla libre</label>
@@ -1077,6 +1101,23 @@
       <div class="mc-pie">
         <button class="mc-btn sec" id="mcCancelar" type="button">Cancelar</button>
         <button class="mc-btn prim" id="mcGuardar" type="button">Guardar cartón</button>
+      </div>
+    </div>
+  </div>
+  <div class="mc-modal mc-modal-foto" id="mcFotoModal">
+    <div class="mc-hoja">
+      <div class="mc-hoja-cab"><strong>Alinea tu cartón</strong><button class="mc-x" id="mcFotoCerrar" type="button" aria-label="Cerrar">✕</button></div>
+      <p class="mc-ayuda" style="margin-top:0">Arrastra las 4 esquinas amarillas hasta que la grilla cubra <b>solo los 25 números</b> (sin las letras B-I-N-G-O). Si la foto sale de lado, usa "Girar".</p>
+      <div class="mc-foto-caja" id="mcFotoCaja"><canvas id="mcFotoCanvas"></canvas></div>
+      <div class="mc-foto-acc">
+        <button class="mc-btn sec" id="mcFotoGirar" type="button">↻ Girar</button>
+        <button class="mc-btn sec" id="mcFotoOtra" type="button">Otra foto</button>
+      </div>
+      <div class="mc-error info" id="mcFotoMsg"></div>
+      <p class="mc-privado">🔒 La foto se lee en tu teléfono y no se sube a ningún lado.</p>
+      <div class="mc-pie">
+        <button class="mc-btn sec" id="mcFotoCancelar" type="button">Cancelar</button>
+        <button class="mc-btn prim" id="mcFotoLeer" type="button">Leer números</button>
       </div>
     </div>
   </div>
@@ -1475,6 +1516,335 @@
     try{ localStorage.setItem(clave, JSON.stringify(lista)); return true; } catch(e){ return false; }
   }
 
+
+  // Ordena 4 puntos como [arriba-izq, arriba-der, abajo-der, abajo-izq]
+  function ordenarCuadrilatero(p){
+    const suma = p.map(q => q.x + q.y), dif = p.map(q => q.x - q.y);
+    const tl = suma.indexOf(Math.min.apply(null, suma)), br = suma.indexOf(Math.max.apply(null, suma));
+    const tr = dif.indexOf(Math.max.apply(null, dif)), bl = dif.indexOf(Math.min.apply(null, dif));
+    const idx = [tl, tr, br, bl];
+    if(new Set(idx).size !== 4) return p;   // puntos amontonados: se deja como está
+    return idx.map(i => p[i]);
+  }
+
+  // Genera un sonido de aviso (formato WAV, en memoria) con las notas dadas.
+  function generarWavURI(notas, opc){
+    opc = opc || {};
+    const sr = 22050, dur = opc.dur || 0.2, pausa = opc.pausa || 0.035, rep = opc.rep || 1, hueco = opc.hueco || 0.25;
+    const trozos = [];
+    let total = 0;
+    for(let r = 0; r < rep; r++){
+      notas.forEach(f => {
+        const n = Math.floor(sr * dur), a = new Float32Array(n);
+        for(let i = 0; i < n; i++){
+          const t = i / sr;
+          const env = Math.min(1, t / 0.006) * Math.exp(-3.0 * t / dur);
+          a[i] = (Math.sin(2 * Math.PI * f * t) + 0.5 * Math.sin(4 * Math.PI * f * t) + 0.25 * Math.sin(6 * Math.PI * f * t)) * env;
+        }
+        trozos.push(a); total += n;
+        const p = Math.floor(sr * pausa); trozos.push(new Float32Array(p)); total += p;
+      });
+      const h = Math.floor(sr * hueco); trozos.push(new Float32Array(h)); total += h;
+    }
+    const todo = new Float32Array(total);
+    let o = 0, pico = 0;
+    trozos.forEach(t => { todo.set(t, o); o += t.length; });
+    for(let i = 0; i < total; i++) pico = Math.max(pico, Math.abs(todo[i]));
+    const ganancia = pico ? 0.92 / pico : 1;
+    const buf = new ArrayBuffer(44 + total * 2), v = new DataView(buf);
+    const txt = (pos, str) => { for(let i = 0; i < str.length; i++) v.setUint8(pos + i, str.charCodeAt(i)); };
+    txt(0, 'RIFF'); v.setUint32(4, 36 + total * 2, true); txt(8, 'WAVE'); txt(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    txt(36, 'data'); v.setUint32(40, total * 2, true);
+    for(let i = 0; i < total; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, todo[i] * ganancia)) * 32767, true);
+    const bytes = new Uint8Array(buf);
+    let bin = '';
+    for(let i = 0; i < bytes.length; i += 8192) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+    return 'data:audio/wav;base64,' + btoa(bin);
+  }
+
+  // ---------------------------------------------------------------------
+  // LECTOR DE CARTÓN POR FOTO
+  // Todo ocurre en el teléfono: la foto NO se sube a ningún servidor.
+  // Usa Tesseract.js (OCR) que se descarga solo si alguien usa esta opción.
+  // ---------------------------------------------------------------------
+  const OCR_VERSION = '5.1.1';
+  const OCR_SCRIPT = 'https://cdn.jsdelivr.net/npm/tesseract.js@' + OCR_VERSION + '/dist/tesseract.min.js';
+  const OCR_WORKER = 'https://cdn.jsdelivr.net/npm/tesseract.js@' + OCR_VERSION + '/dist/worker.min.js';
+  const OCR_CORE = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@' + OCR_VERSION;
+  const OCR_LANG = 'https://tessdata.projectnaptha.com/4.0.0_fast';
+
+  let ocrWorkerPromise = null;
+  let ocrAvance = null;
+
+  function cargarScriptOCR(){
+    return new Promise((resolve, reject) => {
+      if(window.Tesseract) return resolve();
+      const s = document.createElement('script');
+      s.src = OCR_SCRIPT;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('No se pudo descargar el lector de fotos.'));
+      document.head.appendChild(s);
+    });
+  }
+
+  function obtenerWorkerOCR(){
+    if(!ocrWorkerPromise){
+      ocrWorkerPromise = (async () => {
+        await cargarScriptOCR();
+        const w = await Tesseract.createWorker('eng', 1, {
+          workerPath: OCR_WORKER, corePath: OCR_CORE, langPath: OCR_LANG,
+          logger: (m) => { if(ocrAvance) ocrAvance(m); }
+        });
+        await w.setParameters({
+          tessedit_char_whitelist: '0123456789',
+          tessedit_pageseg_mode: '7',
+          user_defined_dpi: '300'
+        });
+        return w;
+      })().catch((e) => { ocrWorkerPromise = null; throw e; });
+    }
+    return ocrWorkerPromise;
+  }
+
+  function cerrarWorkerOCR(){
+    if(!ocrWorkerPromise) return;
+    const p = ocrWorkerPromise;
+    ocrWorkerPromise = null;
+    p.then(w => w.terminate()).catch(() => {});
+  }
+
+  // punto dentro del cuadrilátero [arriba-izq, arriba-der, abajo-der, abajo-izq]
+  function puntoEnCuadrilatero(q, u, v){
+    const ax = q[0].x + (q[1].x - q[0].x) * u, ay = q[0].y + (q[1].y - q[0].y) * u;
+    const bx = q[3].x + (q[2].x - q[3].x) * u, by = q[3].y + (q[2].y - q[3].y) * u;
+    return { x: ax + (bx - ax) * v, y: ay + (by - ay) * v };
+  }
+
+  // recorta una casilla (sin los bordes) y la endereza a un cuadrado de TAM x TAM, en grises
+  function recortarCasilla(img, quad, fila, col, TAM, margen){
+    const out = new Float32Array(TAM * TAM);
+    const u0 = (col + margen) / 5, u1 = (col + 1 - margen) / 5;
+    const v0 = (fila + margen) / 5, v1 = (fila + 1 - margen) / 5;
+    const W = img.width, H = img.height, d = img.data;
+    for(let j = 0; j < TAM; j++){
+      const v = v0 + (v1 - v0) * (j + 0.5) / TAM;
+      for(let i = 0; i < TAM; i++){
+        const u = u0 + (u1 - u0) * (i + 0.5) / TAM;
+        const p = puntoEnCuadrilatero(quad, u, v);
+        let x = p.x - 0.5, y = p.y - 0.5;
+        if(x < 0) x = 0; if(y < 0) y = 0;
+        if(x > W - 1.001) x = W - 1.001; if(y > H - 1.001) y = H - 1.001;
+        const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0;
+        const i00 = (y0 * W + x0) * 4, i10 = i00 + 4, i01 = i00 + W * 4, i11 = i01 + 4;
+        const g00 = 0.299 * d[i00] + 0.587 * d[i00 + 1] + 0.114 * d[i00 + 2];
+        const g10 = 0.299 * d[i10] + 0.587 * d[i10 + 1] + 0.114 * d[i10 + 2];
+        const g01 = 0.299 * d[i01] + 0.587 * d[i01 + 1] + 0.114 * d[i01 + 2];
+        const g11 = 0.299 * d[i11] + 0.587 * d[i11 + 1] + 0.114 * d[i11 + 2];
+        out[j * TAM + i] = (g00 * (1 - fx) + g10 * fx) * (1 - fy) + (g01 * (1 - fx) + g11 * fx) * fy;
+      }
+    }
+    return out;
+  }
+
+  // umbral de Otsu sobre valores 0..255
+  function umbralOtsu(g){
+    const h = new Array(256).fill(0);
+    for(let i = 0; i < g.length; i++) h[Math.max(0, Math.min(255, Math.round(g[i])))]++;
+    const total = g.length;
+    let suma = 0;
+    for(let t = 0; t < 256; t++) suma += t * h[t];
+    let sumB = 0, wB = 0, mejor = 0, umbral = 128;
+    for(let t = 0; t < 256; t++){
+      wB += h[t];
+      if(!wB) continue;
+      const wF = total - wB;
+      if(!wF) break;
+      sumB += t * h[t];
+      const mB = sumB / wB, mF = (suma - sumB) / wF;
+      const varEntre = wB * wF * (mB - mF) * (mB - mF);
+      if(varEntre > mejor){ mejor = varEntre; umbral = t; }
+    }
+    return umbral;
+  }
+
+  // deja negro el texto sobre fondo blanco, quita líneas de la grilla y centra el número
+  function prepararCasilla(g, TAM){
+    // estirar contraste
+    const orden = Array.from(g).sort((a, b) => a - b);
+    const lo = orden[Math.floor(orden.length * 0.02)], hi = orden[Math.floor(orden.length * 0.98)];
+    const rango = Math.max(20, hi - lo);
+    const s = new Float32Array(g.length);
+    for(let i = 0; i < g.length; i++) s[i] = Math.max(0, Math.min(255, (g[i] - lo) * 255 / rango));
+    const t = umbralOtsu(s);
+    let oscuros = 0;
+    for(let i = 0; i < s.length; i++) if(s[i] <= t) oscuros++;
+    const invertir = oscuros > s.length * 0.5;       // el texto es la minoría
+    const bin = new Uint8Array(s.length);              // 1 = tinta
+    for(let i = 0; i < s.length; i++){ const oscuro = s[i] <= t; bin[i] = (invertir ? !oscuro : oscuro) ? 1 : 0; }
+
+    // quitar las líneas de la grilla: componentes largos y finos (o en "L") que tocan el borde.
+    // OJO: un número ancho también puede tocar el borde, por eso se mira la FORMA, no solo el borde.
+    const etiqueta = new Int32Array(s.length).fill(-1);
+    const comps = [];
+    for(let k0 = 0; k0 < bin.length; k0++){
+      if(!bin[k0] || etiqueta[k0] >= 0) continue;
+      const id = comps.length;
+      const pila = [k0];
+      etiqueta[k0] = id;
+      let cx0 = TAM, cy0 = TAM, cx1 = -1, cy1 = -1, area = 0, toca = false;
+      while(pila.length){
+        const k = pila.pop();
+        const x = k % TAM, y = (k / TAM) | 0;
+        area++;
+        if(x < cx0) cx0 = x; if(x > cx1) cx1 = x; if(y < cy0) cy0 = y; if(y > cy1) cy1 = y;
+        if(x === 0 || y === 0 || x === TAM - 1 || y === TAM - 1) toca = true;
+        for(let dy = -1; dy <= 1; dy++) for(let dx = -1; dx <= 1; dx++){
+          if(!dx && !dy) continue;
+          const nx = x + dx, ny = y + dy;
+          if(nx < 0 || ny < 0 || nx >= TAM || ny >= TAM) continue;
+          const nk = ny * TAM + nx;
+          if(bin[nk] && etiqueta[nk] < 0){ etiqueta[nk] = id; pila.push(nk); }
+        }
+      }
+      comps.push({ x0: cx0, y0: cy0, x1: cx1, y1: cy1, area: area, toca: toca });
+    }
+    const quitar = new Uint8Array(comps.length);
+    comps.forEach((c, id) => {
+      const bw = c.x1 - c.x0 + 1, bh = c.y1 - c.y0 + 1;
+      const largo = Math.max(bw, bh), fino = Math.min(bw, bh);
+      const relleno = c.area / (bw * bh);
+      const manchita = c.area < TAM * TAM * 0.004;
+      const linea = c.toca && ((largo >= TAM * 0.6 && fino <= TAM * 0.22) || (bw >= TAM * 0.7 && bh >= TAM * 0.7 && relleno <= 0.22));
+      if(manchita || linea) quitar[id] = 1;
+    });
+    for(let k = 0; k < bin.length; k++) if(bin[k] && quitar[etiqueta[k]]) bin[k] = 0;
+    // caja del texto restante
+    let x0 = TAM, y0 = TAM, x1 = -1, y1 = -1, n = 0;
+    for(let y = 0; y < TAM; y++) for(let x = 0; x < TAM; x++){
+      if(bin[y * TAM + x]){ n++; if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+    }
+    if(n < TAM * TAM * 0.012 || x1 < 0) return { vacio: true };
+    return { vacio: false, bin: bin, s: s, invertir: invertir, caja: { x0: x0, y0: y0, x1: x1, y1: y1 } };
+  }
+
+  // imagen final para el OCR: texto negro, fondo blanco, altura fija, con margen
+  function canvasParaOCR(prep, TAM, modo){
+    const { bin, s, invertir, caja } = prep;
+    const w = caja.x1 - caja.x0 + 1, h = caja.y1 - caja.y0 + 1;
+    const src = document.createElement('canvas');
+    src.width = w; src.height = h;
+    const cx = src.getContext('2d');
+    const im = cx.createImageData(w, h);
+    for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
+      const k = (y + caja.y0) * TAM + (x + caja.x0);
+      let v;
+      if(modo === 'bin') v = bin[k] ? 0 : 255;
+      else { v = invertir ? 255 - s[k] : s[k]; }
+      const o = (y * w + x) * 4;
+      im.data[o] = im.data[o + 1] = im.data[o + 2] = v; im.data[o + 3] = 255;
+    }
+    cx.putImageData(im, 0, 0);
+    const alto = 56, pad = 22;
+    const escala = alto / h;
+    const dst = document.createElement('canvas');
+    dst.width = Math.round(w * escala) + pad * 2;
+    dst.height = alto + pad * 2;
+    const dx = dst.getContext('2d');
+    dx.fillStyle = '#fff';
+    dx.fillRect(0, 0, dst.width, dst.height);
+    dx.imageSmoothingEnabled = true;
+    dx.imageSmoothingQuality = 'high';
+    dx.drawImage(src, pad, pad, Math.round(w * escala), alto);
+    return dst;
+  }
+
+  function distanciaEdicion(a, b){
+    const m = a.length, n = b.length;
+    const d = [];
+    for(let i = 0; i <= m; i++){ d[i] = [i]; }
+    for(let j = 1; j <= n; j++) d[0][j] = j;
+    for(let i = 1; i <= m; i++) for(let j = 1; j <= n; j++){
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    return d[m][n];
+  }
+
+  // elige el número válido de la columna que más se parece a lo que leyó el OCR
+  function corregirConColumna(texto, col){
+    const a = RANGOS_COLUMNA[col][0], b = RANGOS_COLUMNA[col][1];
+    if(texto && /^\d+$/.test(texto) && Number(texto) >= a && Number(texto) <= b && String(Number(texto)) === texto){
+      return { valor: Number(texto), exacto: true, dist: 0 };
+    }
+    if(!texto) return { valor: NaN, exacto: false, dist: 9 };
+    let mejor = null, mejorDist = 99, empate = false;
+    for(let n = a; n <= b; n++){
+      const dd = distanciaEdicion(texto, String(n));
+      if(dd < mejorDist){ mejorDist = dd; mejor = n; empate = false; }
+      else if(dd === mejorDist) empate = true;
+    }
+    return { valor: mejor, exacto: false, dist: mejorDist, empate: empate };
+  }
+
+  // lee los 25 números del cartón. quad = 4 esquinas de la grilla de números (sin las letras BINGO)
+  async function leerCartonDeImagen(canvas, quad, alProgreso){
+    const TAM = 128;
+    const img = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+    const worker = await obtenerWorkerOCR();
+    const celdas = new Array(25).fill(NaN);
+    const dudosas = [];
+    const detalle = [];
+    let libre = true;
+
+    for(let k = 0; k < 25; k++){
+      const fila = (k / 5) | 0, col = k % 5;
+      if(alProgreso) alProgreso(k, 25);
+      const g = recortarCasilla(img, quad, fila, col, TAM, 0.06);
+      const prep = prepararCasilla(g, TAM);
+      let mejor = { valor: NaN, exacto: false, dist: 9, conf: 0, texto: '' };
+      let desacuerdo = false;
+      if(!prep.vacio){
+        // dos lecturas con tratamientos distintos de la imagen; si no coinciden, la casilla se marca como dudosa
+        const lecturas = [];
+        for(const modo of ['bin', 'gris']){
+          const cv = canvasParaOCR(prep, TAM, modo);
+          const r = await worker.recognize(cv);
+          const texto = (r.data.text || '').replace(/\D/g, '');
+          const cor = corregirConColumna(texto, col);
+          lecturas.push({ valor: cor.valor, exacto: cor.exacto, dist: cor.dist, empate: cor.empate, conf: r.data.confidence || 0, texto: texto });
+        }
+        lecturas.forEach(cand => {
+          const mejorQueActual = (cand.exacto && !mejor.exacto) ||
+            (cand.exacto === mejor.exacto && (cand.dist < mejor.dist || (cand.dist === mejor.dist && cand.conf > mejor.conf)));
+          if(mejorQueActual) mejor = cand;
+        });
+        desacuerdo = lecturas[0].valor !== lecturas[1].valor;
+      }
+      mejor.desacuerdo = desacuerdo;
+      detalle.push(mejor);
+      if(fila === 2 && col === 2){
+        // centro: si lo leído es un número válido y seguro, el cartón no tiene casilla libre
+        if(mejor.exacto && mejor.conf >= 70){ libre = false; celdas[k] = mejor.valor; }
+        else { libre = true; celdas[k] = 0; }
+        continue;
+      }
+      celdas[k] = mejor.valor;
+      if(!mejor.exacto || mejor.conf < 65 || mejor.empate || mejor.desacuerdo) dudosas.push(k);
+    }
+    // repetidos: se marcan ambos como dudosos
+    const vistos = {};
+    celdas.forEach((n, i) => {
+      if(!(n > 0) || (libre && i === CENTRO)) return;
+      if(vistos[n] !== undefined){
+        if(dudosas.indexOf(i) < 0) dudosas.push(i);
+        if(dudosas.indexOf(vistos[n]) < 0) dudosas.push(vistos[n]);
+      } else vistos[n] = i;
+    });
+    if(alProgreso) alProgreso(25, 25);
+    return { celdas: celdas.map(n => (n > 0 ? n : 0)), libre: libre, dudosas: dudosas, detalle: detalle };
+  }
+
   function crearMisCartones(){
     const CLAVE = 'bingoCartones:' + room;
     const CLAVE_PREFS = 'bingoCartonesPrefs';
@@ -1490,6 +1860,7 @@
     const txtPegar = $('mcPegar');
     const msgError = $('mcError');
     const alerta = $('mcAlerta');
+    const seccion = $('mCartonesCard');
 
     let cartones = leerCartonesGuardados(CLAVE);
     let abiertos = {};            // id -> true/false (cartón desplegado)
@@ -1520,6 +1891,7 @@
       inp.autocomplete = 'off';
       inp.className = 'mc-in';
       inp.addEventListener('input', () => {
+        inp.classList.remove('dudoso');
         inp.value = inp.value.replace(/\D/g, '').slice(0, 2);
         revisarEditor(false);
         if(debeAvanzar(i, inp.value)) enfocarSiguiente(i);
@@ -1595,6 +1967,7 @@
       aplicarLibre();
       inputs.forEach((inp, i) => {
         inp.value = '';
+        inp.classList.remove('dudoso');
         if(carton && !(carton.libre && i === CENTRO) && carton.celdas[i] > 0) inp.value = String(carton.celdas[i]);
       });
       txtPegar.value = '';
@@ -1607,6 +1980,7 @@
       if(!carton){ const primero = inputs[0]; setTimeout(() => primero.focus(), 60); }
     }
     function cerrarEditor(){
+      cerrarFoto();
       modal.classList.remove('abierto');
       document.body.style.overflow = '';
       editandoId = null;
@@ -1654,7 +2028,40 @@
     });
 
     // ---------- sonido, vibración y pantalla ----------
+    // El sonido es un archivo de audio generado en el teléfono (suena aunque el iPhone esté en
+    // silencio, a diferencia del audio "sintético"). Se desbloquea con el primer toque en la página.
+    let audios = null;
+    let audioDesbloqueado = false;
+    let tiemposSonido = [];
+
+    function crearAudios(){
+      if(audios) return audios;
+      audios = {
+        binguito: new Audio(generarWavURI([880, 1175, 1480], { dur: 0.2, rep: 2, hueco: 0.2 })),
+        bingo: new Audio(generarWavURI([523, 659, 784, 1047, 784, 1047, 1319, 1047, 1319, 1568], { dur: 0.17 }))
+      };
+      Object.keys(audios).forEach(k => { audios[k].preload = 'auto'; });
+      return audios;
+    }
+
     function desbloquearAudio(){
+      try{ if(navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e){}
+      try{
+        const a = crearAudios();
+        if(!audioDesbloqueado){
+          audioDesbloqueado = true;
+          Object.keys(a).forEach(k => {
+            const el = a[k];
+            el.__unl = true;
+            el.muted = true;
+            const p = el.play();
+            if(p && p.then){
+              p.then(() => { if(el.__unl){ el.pause(); el.currentTime = 0; } el.muted = false; el.__unl = false; })
+               .catch(() => { el.muted = false; el.__unl = false; });
+            } else { el.pause(); el.muted = false; el.__unl = false; }
+          });
+        }
+      } catch(e){}
       try{
         if(!ctxAudio){ const AC = window.AudioContext || window.webkitAudioContext; if(AC) ctxAudio = new AC(); }
         if(ctxAudio && ctxAudio.state === 'suspended') ctxAudio.resume();
@@ -1662,9 +2069,8 @@
     }
     ['pointerdown', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, desbloquearAudio, { passive: true }));
 
-    function sonar(tipo){
-      if(!prefs.sonido) return;
-      try{ if(navigator.vibrate) navigator.vibrate(tipo === 'bingo' ? [300, 120, 300, 120, 600] : [250, 100, 250]); } catch(e){}
+    // respaldo si el navegador no deja reproducir el archivo
+    function sonarWebAudio(tipo){
       try{
         desbloquearAudio();
         if(!ctxAudio) return;
@@ -1676,7 +2082,7 @@
           o.type = 'triangle';
           o.frequency.value = f;
           g.gain.setValueAtTime(0.0001, t);
-          g.gain.exponentialRampToValueAtTime(0.4, t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.5, t + 0.02);
           g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
           o.connect(g);
           g.connect(ctxAudio.destination);
@@ -1686,6 +2092,43 @@
         });
       } catch(e){}
     }
+
+    function sonarSolo(tipo){
+      try{
+        const el = crearAudios()[tipo];
+        el.__unl = false;
+        el.muted = false;
+        el.volume = 1;
+        try{ el.pause(); el.currentTime = 0; } catch(e){}
+        const p = el.play();
+        if(p && p.catch) p.catch(() => sonarWebAudio(tipo));
+      } catch(e){ sonarWebAudio(tipo); }
+    }
+
+    function sonar(tipo){
+      if(!prefs.sonido) return;
+      try{ if(navigator.vibrate) navigator.vibrate(tipo === 'bingo' ? [300, 120, 300, 120, 600] : [250, 100, 250]); } catch(e){}
+      sonarSolo(tipo);
+    }
+
+    function detenerSonidos(){
+      tiemposSonido.forEach(clearTimeout);
+      tiemposSonido = [];
+      try{ if(audios) Object.keys(audios).forEach(k => { audios[k].pause(); audios[k].currentTime = 0; }); } catch(e){}
+      try{ if(navigator.vibrate) navigator.vibrate(0); } catch(e){}
+    }
+
+    // el aviso suena tres veces (con pausa) hasta que se toque "Entendido"
+    function avisarConSonido(tipo){
+      detenerSonidos();
+      sonar(tipo);
+      [3600, 7200].forEach(ms => tiemposSonido.push(setTimeout(() => sonar(tipo), ms)));
+    }
+
+    $('mcProbar').addEventListener('click', () => {
+      sonarSolo('binguito');
+      try{ if(navigator.vibrate) navigator.vibrate(200); } catch(e){}
+    });
 
     async function ajustarPantalla(){
       try{
@@ -1723,11 +2166,11 @@
         ? nombres + (dellos.length > 1 ? ' están llenos' : ' está lleno') + '. ¡Avisa a la organización ahora!'
         : nombres + ' completó la letra ' + dellos[0].letra + '. ¡Avisa a la organización!';
       alerta.classList.add('visible');
-      sonar(tipo);
+      avisarConSonido(tipo);
       clearTimeout(temporizadorAlerta);
-      temporizadorAlerta = setTimeout(() => alerta.classList.remove('visible'), 20000);
+      temporizadorAlerta = setTimeout(() => { alerta.classList.remove('visible'); detenerSonidos(); }, 20000);
     }
-    $('mcAlOk').addEventListener('click', () => { alerta.classList.remove('visible'); clearTimeout(temporizadorAlerta); });
+    $('mcAlOk').addEventListener('click', () => { alerta.classList.remove('visible'); clearTimeout(temporizadorAlerta); detenerSonidos(); });
 
     // ---------- evaluación ----------
     function llaveAviso(c, tipo){ return estado.clave + '|' + c.id + '|' + tipo; }
@@ -1854,7 +2297,13 @@
         lista.appendChild(det);
       });
 
-      resumen.textContent = total ? (total + (total === 1 ? ' cartón' : ' cartones')) + (ganados ? ' · 🎉' : '') : '';
+      resumen.classList.toggle('gano', ganados > 0);
+      if(!total){
+        resumen.textContent = 'Agregar';
+      } else {
+        const hayBingo = cartones.some(c => evaluarCarton(c, estado.llamados, estado.letra).bingo);
+        resumen.textContent = total + (total === 1 ? ' cartón' : ' cartones') + (ganados ? (hayBingo ? ' · 🏆 ¡Bingo!' : ' · 🎉 ¡Binguito!') : '');
+      }
       if(!guardadoOk && total){
         const aviso = document.createElement('p');
         aviso.className = 'mc-aviso';
@@ -1862,6 +2311,229 @@
         lista.appendChild(aviso);
       }
     }
+
+
+    // ---------- sección plegable: recordar si estaba abierta ----------
+    try{ seccion.open = localStorage.getItem('bingoCartonesAbierto') === '1'; } catch(e){}
+    seccion.addEventListener('toggle', (e) => {
+      if(e.target !== seccion) return;
+      try{ localStorage.setItem('bingoCartonesAbierto', seccion.open ? '1' : '0'); } catch(err){}
+    });
+
+    // ---------- llenar el cartón desde una foto ----------
+    const modalFoto = $('mcFotoModal');
+    const fotoCanvas = $('mcFotoCanvas');
+    const fotoMsg = $('mcFotoMsg');
+    const fotoArchivo = $('mcFotoArchivo');
+    let fotoOrig = null;      // foto a resolución de trabajo
+    let fotoQuad = null;      // 4 esquinas, en coordenadas de la foto
+    let fotoK = 1;            // píxeles de pantalla por píxel de foto
+    let arrastrando = -1;
+    let leyendo = false;
+    let temporizadorOCR = null;
+
+    function cuadrilateroInicial(w, h){
+      const lado = 0.6 * Math.min(w, h), cx = w / 2, cy = h * 0.52;
+      return [
+        { x: cx - lado / 2, y: cy - lado / 2 }, { x: cx + lado / 2, y: cy - lado / 2 },
+        { x: cx + lado / 2, y: cy + lado / 2 }, { x: cx - lado / 2, y: cy + lado / 2 }
+      ];
+    }
+
+    async function cargarFoto(file){
+      let bmp;
+      try{ bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+      catch(e){
+        bmp = await new Promise((ok, mal) => { const im = new Image(); im.onload = () => ok(im); im.onerror = mal; im.src = URL.createObjectURL(file); });
+      }
+      const w0 = bmp.width, h0 = bmp.height;
+      const esc = Math.min(1, 1800 / Math.max(w0, h0));
+      const c = document.createElement('canvas');
+      c.width = Math.round(w0 * esc);
+      c.height = Math.round(h0 * esc);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      if(bmp.close) bmp.close();
+      fotoOrig = c;
+      fotoQuad = cuadrilateroInicial(c.width, c.height);
+      fotoMsg.className = 'mc-error info';
+      fotoMsg.textContent = '';
+      modalFoto.classList.add('abierto');
+      dibujarFoto();
+    }
+
+    function dibujarFoto(){
+      if(!fotoOrig) return;
+      const caja = $('mcFotoCaja');
+      const maxW = Math.min(caja.clientWidth || 340, 440);
+      const maxH = Math.max(220, window.innerHeight * 0.5);
+      fotoK = Math.min(maxW / fotoOrig.width, maxH / fotoOrig.height);
+      const w = Math.round(fotoOrig.width * fotoK), h = Math.round(fotoOrig.height * fotoK);
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      fotoCanvas.width = Math.round(w * dpr);
+      fotoCanvas.height = Math.round(h * dpr);
+      fotoCanvas.style.width = w + 'px';
+      fotoCanvas.style.height = h + 'px';
+      const ctx = fotoCanvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.drawImage(fotoOrig, 0, 0, w, h);
+      const q = fotoQuad.map(p => ({ x: p.x * fotoK, y: p.y * fotoK }));
+      const o = ordenarCuadrilatero(q);
+      ctx.beginPath();
+      ctx.moveTo(o[0].x, o[0].y);
+      for(let i = 1; i < 4; i++) ctx.lineTo(o[i].x, o[i].y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(203,161,53,0.10)';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#cba135';
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      for(let i = 1; i < 5; i++){
+        const a = puntoEnCuadrilatero(o, i / 5, 0), b = puntoEnCuadrilatero(o, i / 5, 1);
+        const c = puntoEnCuadrilatero(o, 0, i / 5), d = puntoEnCuadrilatero(o, 1, i / 5);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.stroke();
+      }
+      q.forEach((p, i) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 13, 0, Math.PI * 2);
+        ctx.fillStyle = i === arrastrando ? '#ffffff' : '#cba135';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#2a2205';
+        ctx.stroke();
+      });
+      // lupa para ver bien la esquina que se está moviendo
+      if(arrastrando >= 0){
+        const hp = fotoQuad[arrastrando];
+        const R = 52;
+        const lx = (q[arrastrando].x < R * 3 && q[arrastrando].y < R * 3) ? w - R - 8 : R + 8;
+        const ly = R + 8;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(lx, ly, R, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(fotoOrig, hp.x - 36, hp.y - 36, 72, 72, lx - R, ly - R, R * 2, R * 2);
+        ctx.restore();
+        ctx.beginPath(); ctx.arc(lx, ly, R, 0, Math.PI * 2);
+        ctx.lineWidth = 3; ctx.strokeStyle = '#cba135'; ctx.stroke();
+        ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.beginPath(); ctx.moveTo(lx - 10, ly); ctx.lineTo(lx + 10, ly); ctx.moveTo(lx, ly - 10); ctx.lineTo(lx, ly + 10); ctx.stroke();
+      }
+    }
+
+    function puntoDelToque(e){
+      const r = fotoCanvas.getBoundingClientRect();
+      return { x: (e.clientX - r.left) * (parseFloat(fotoCanvas.style.width) / r.width), y: (e.clientY - r.top) * (parseFloat(fotoCanvas.style.height) / r.height) };
+    }
+    function moverEsquina(p){
+      if(arrastrando < 0) return;
+      const w = parseFloat(fotoCanvas.style.width), h = parseFloat(fotoCanvas.style.height);
+      fotoQuad[arrastrando] = { x: Math.max(0, Math.min(w, p.x)) / fotoK, y: Math.max(0, Math.min(h, p.y)) / fotoK };
+      dibujarFoto();
+    }
+    fotoCanvas.addEventListener('pointerdown', (e) => {
+      if(leyendo || !fotoOrig) return;
+      const p = puntoDelToque(e);
+      let mejor = -1, dMin = 1e9;
+      fotoQuad.forEach((q, i) => { const d = Math.hypot(q.x * fotoK - p.x, q.y * fotoK - p.y); if(d < dMin){ dMin = d; mejor = i; } });
+      if(dMin <= 44){
+        arrastrando = mejor;
+        try{ fotoCanvas.setPointerCapture(e.pointerId); } catch(err){}
+        moverEsquina(p);
+        e.preventDefault();
+      }
+    });
+    fotoCanvas.addEventListener('pointermove', (e) => { if(arrastrando >= 0){ moverEsquina(puntoDelToque(e)); e.preventDefault(); } });
+    const soltar = () => { if(arrastrando >= 0){ arrastrando = -1; dibujarFoto(); } };
+    fotoCanvas.addEventListener('pointerup', soltar);
+    fotoCanvas.addEventListener('pointercancel', soltar);
+    window.addEventListener('resize', () => { if(modalFoto.classList.contains('abierto')) dibujarFoto(); });
+
+    function girarFoto(){
+      if(!fotoOrig || leyendo) return;
+      const W = fotoOrig.width, H = fotoOrig.height;
+      const c = document.createElement('canvas');
+      c.width = H; c.height = W;
+      const x = c.getContext('2d');
+      x.translate(H, 0);
+      x.rotate(Math.PI / 2);
+      x.drawImage(fotoOrig, 0, 0);
+      fotoOrig = c;
+      fotoQuad = cuadrilateroInicial(c.width, c.height);
+      dibujarFoto();
+    }
+
+    function cerrarFoto(){
+      modalFoto.classList.remove('abierto');
+      fotoOrig = null;
+      arrastrando = -1;
+    }
+
+    function botonesFoto(activos){
+      ['mcFotoLeer', 'mcFotoGirar', 'mcFotoOtra', 'mcFotoCancelar'].forEach(id => { $(id).disabled = !activos; });
+    }
+
+    function aplicarLectura(r){
+      chkLibre.checked = r.libre;
+      aplicarLibre();
+      inputs.forEach((inp, i) => {
+        inp.classList.remove('dudoso');
+        inp.value = (r.libre && i === CENTRO) || !(r.celdas[i] > 0) ? '' : String(r.celdas[i]);
+      });
+      r.dudosas.forEach(i => { if(!(r.libre && i === CENTRO)) inputs[i].classList.add('dudoso'); });
+      revisarEditor(false);
+      const nd = r.dudosas.length;
+      msgError.className = 'mc-error info';
+      msgError.textContent = (nd ? 'Leí tu cartón. Revisa ' + (nd === 1 ? 'el número' : 'los ' + nd + ' números') + ' en amarillo' : 'Leí tu cartón') +
+        ' y confirma que TODOS coincidan con el tuyo antes de guardar.';
+    }
+
+    async function leerFotoActual(){
+      if(leyendo || !fotoOrig) return;
+      leyendo = true;
+      botonesFoto(false);
+      const quad = ordenarCuadrilatero(fotoQuad);
+      fotoMsg.className = 'mc-error info';
+      fotoMsg.textContent = 'Preparando el lector… (la primera vez descarga unos 6 MB)';
+      ocrAvance = (m) => {
+        if(m && /loading/i.test(m.status || '')) fotoMsg.textContent = 'Descargando el lector (solo la primera vez)… ' + Math.round((m.progress || 0) * 100) + '%';
+      };
+      try{
+        const r = await leerCartonDeImagen(fotoOrig, quad, (k, n) => {
+          if(k < n) fotoMsg.textContent = 'Leyendo casilla ' + (k + 1) + ' de ' + n + '…';
+        });
+        aplicarLectura(r);
+        cerrarFoto();
+      } catch(e){
+        fotoMsg.className = 'mc-error';
+        fotoMsg.textContent = 'No pude leer la foto' + (navigator.onLine === false ? ' (no hay internet)' : '') + '. Prueba de nuevo o escribe los números a mano.';
+      } finally {
+        ocrAvance = null;
+        leyendo = false;
+        botonesFoto(true);
+        clearTimeout(temporizadorOCR);
+        temporizadorOCR = setTimeout(cerrarWorkerOCR, 90000);   // libera memoria si no se usa más
+      }
+    }
+
+    $('mcFoto').addEventListener('click', () => fotoArchivo.click());
+    $('mcFotoOtra').addEventListener('click', () => fotoArchivo.click());
+    fotoArchivo.addEventListener('change', () => {
+      const f = fotoArchivo.files && fotoArchivo.files[0];
+      fotoArchivo.value = '';
+      if(!f) return;
+      cargarFoto(f).catch(() => {
+        modalFoto.classList.add('abierto');
+        fotoMsg.className = 'mc-error';
+        fotoMsg.textContent = 'No pude abrir esa imagen. Prueba con otra foto.';
+      });
+    });
+    $('mcFotoGirar').addEventListener('click', girarFoto);
+    $('mcFotoLeer').addEventListener('click', leerFotoActual);
+    $('mcFotoCancelar').addEventListener('click', cerrarFoto);
+    $('mcFotoCerrar').addEventListener('click', cerrarFoto);
 
     pintar();
     ajustarPantalla();
