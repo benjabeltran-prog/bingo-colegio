@@ -773,6 +773,86 @@
   .c-bin-prev{ display:flex; justify-content:center; }
   .c-bin-prev .patron{ --pc: 18px; --pg: 3px; }
   #cRondaResumen{ max-width: 62%; }
+
+  /* el indicador fijo arriba no debe mezclarse con el contenido al hacer scroll */
+  body.mobile .estado-conexion{ background: rgba(12,35,27,0.88); padding: 3px 10px; border-radius: 999px; }
+
+  /* ================= MIS CARTONES (espectador) ================= */
+  .m-cartones .mc-cab{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+  .m-cartones .prize-label{ margin:0; }
+  .mc-resumen{ font-size: 0.75rem; color: var(--gris-suave); }
+  .mc-ayuda{ margin: 6px 0 12px; font-size: 0.85rem; color: var(--gris-texto); line-height: 1.4; }
+  .mc-btn{
+    width:100%; padding: 13px; border-radius: 12px; cursor:pointer; touch-action: manipulation;
+    font-family:'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem;
+    border: 2px solid var(--verde-acento); background: transparent; color: var(--verde-acento);
+  }
+  .mc-btn.prim{ background: var(--verde-acento); color:#0c2118; }
+  .mc-btn.sec{ border-color: var(--gris-suave); color: var(--blanco); }
+  .mc-btn:active{ transform: scale(0.98); }
+  .mc-opciones{ display:flex; flex-direction:column; gap: 8px; margin-top: 12px; font-size: 0.8rem; color: var(--gris-texto); }
+  .mc-opciones label{ display:flex; align-items:center; gap: 8px; }
+  .mc-aviso{ margin: 10px 0 0; font-size: 0.68rem; color: var(--gris-suave); line-height: 1.45; }
+
+  .mc-carton{ background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; margin-bottom: 10px; }
+  .mc-carton.gano{ border-color: var(--dorado); box-shadow: 0 0 0 1px var(--dorado), 0 0 18px rgba(203,161,53,0.25); }
+  .mc-carton summary{ list-style:none; cursor:pointer; display:flex; align-items:center; gap: 8px; padding: 11px 12px; }
+  .mc-carton summary::-webkit-details-marker{ display:none; }
+  .mc-nombre{ font-weight: 700; font-size: 0.92rem; flex:1; min-width:0; overflow:hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mc-chip{ font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,0.08); color: var(--gris-texto); white-space: nowrap; }
+  .mc-chip.ok{ background: var(--dorado); color:#2a2205; }
+  .mc-chip.cerca{ background: rgba(63,174,114,0.25); color: var(--verde-acento); }
+  .mc-cuerpo{ padding: 0 12px 12px; }
+  .mc-celdas{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-width: 250px; margin: 2px auto 10px; }
+  .mc-c{ aspect-ratio: 1 / 1; display:flex; align-items:center; justify-content:center; border-radius: 8px; background: var(--gris-celda); color: var(--gris-texto); font-weight: 700; font-size: 0.95rem; }
+  .mc-c.on{ background: var(--verde-acento); color:#0c2118; }
+  .mc-c.pat{ box-shadow: inset 0 0 0 2px var(--dorado); }
+  .mc-c.libre{ background: var(--verde-header); color: var(--dorado); font-size: 0.55rem; letter-spacing: 0.04em; }
+  .mc-estado{ font-size: 0.8rem; color: var(--gris-texto); line-height: 1.5; text-align:center; }
+  .mc-estado strong{ color: var(--dorado); }
+  .mc-acciones{ display:flex; gap: 8px; margin-top: 10px; }
+  .mc-acciones button{ flex:1; padding: 9px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.2); background: transparent; color: var(--blanco); font-family:'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.8rem; cursor:pointer; }
+  .mc-acciones button.borrar{ border-color:#b5483f; color:#ee968d; }
+
+  /* editor de cartón (hoja inferior) */
+  .mc-modal{ position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.72); display:none; align-items:flex-end; justify-content:center; }
+  .mc-modal.abierto{ display:flex; }
+  .mc-hoja{ width:100%; max-width: 480px; max-height: 94vh; overflow-y:auto; background: var(--verde-panel); border-radius: 18px 18px 0 0; padding: 16px 16px 22px; color: var(--gris-texto); }
+  .mc-hoja-cab{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
+  .mc-hoja-cab strong{ font-family:'Archivo Black', sans-serif; font-weight:400; font-size: 1.05rem; color: var(--blanco); }
+  .mc-x{ background:none; border:none; color: var(--gris-suave); font-size: 1.4rem; cursor:pointer; padding: 4px 8px; }
+  .mc-texto{ width:100%; background:#081912; border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; color: var(--blanco); font-family:'Space Grotesk', sans-serif; font-size: 1rem; padding: 10px 12px; margin-bottom: 12px; }
+  .mc-cols{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 6px; }
+  .mc-cols .m-letra{ padding: 6px 0; }
+  .mc-grid{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .mc-in{
+    width:100%; aspect-ratio: 1 / 1; text-align:center; font-family:'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700;
+    background:#081912; color: var(--blanco); border: 2px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 0;
+  }
+  .mc-in:focus{ outline:none; border-color: var(--verde-acento); box-shadow: 0 0 0 2px rgba(63,174,114,0.35); }
+  .mc-in.err{ border-color:#d9534f; background: #2b1210; }
+  .mc-in.aviso{ border-color: var(--dorado); }
+  .mc-in:disabled{ background: var(--verde-header); border-color: transparent; color: var(--dorado); font-size: 0.6rem; }
+  .mc-libre-fila{ display:flex; align-items:center; gap: 8px; font-size: 0.85rem; margin: 12px 0 6px; }
+  .mc-hoja details{ margin-top: 8px; font-size: 0.85rem; }
+  .mc-hoja details summary{ cursor:pointer; color: var(--verde-acento); }
+  .mc-hoja textarea{ width:100%; min-height: 70px; margin-top: 8px; background:#081912; color: var(--blanco); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; padding: 10px; font-family:'Space Grotesk', sans-serif; font-size: 0.95rem; }
+  .mc-error{ min-height: 1.2em; margin: 10px 0 4px; font-size: 0.8rem; color:#ee968d; line-height: 1.4; }
+  .mc-error.info{ color: var(--gris-suave); }
+  .mc-pie{ display:flex; gap: 10px; margin-top: 8px; }
+  .mc-pie .mc-btn{ flex:1; }
+
+  /* aviso de binguito / bingo */
+  .mc-alerta{
+    position: fixed; left: 12px; right: 12px; top: 12px; z-index: 200; max-width: 456px; margin: 0 auto;
+    padding: 16px; border-radius: 18px; text-align:center;
+    background: linear-gradient(135deg, #cba135, #ecd07a); color:#2a2205; box-shadow: 0 14px 44px rgba(0,0,0,0.55);
+    transform: translateY(-160%); transition: transform .3s ease; pointer-events:none;
+  }
+  .mc-alerta.visible{ transform: translateY(0); pointer-events:auto; }
+  .mc-al-tit{ font-family:'Archivo Black', sans-serif; font-size: 1.8rem; line-height: 1.1; }
+  .mc-al-txt{ font-size: 0.95rem; font-weight: 600; margin: 6px 0 12px; line-height: 1.35; }
+  .mc-al-btn{ background:#2a2205; color:#f4e3a8; border:none; border-radius: 999px; padding: 10px 26px; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size: 0.9rem; cursor:pointer; }
 </style>
 </head>
 <body class="cargando">
@@ -882,6 +962,21 @@
       </div>
     </div>
 
+    <div class="m-card m-cartones" id="mCartonesCard">
+      <div class="mc-cab">
+        <span class="prize-label">Mis cartones</span>
+        <span class="mc-resumen" id="mcResumen"></span>
+      </div>
+      <p class="mc-ayuda" id="mcAyuda">Agrega tus cartones y esta página te avisa cuando completes el binguito o el bingo.</p>
+      <div id="mcLista"></div>
+      <button class="mc-btn" id="mcAgregar" type="button">+ Agregar cartón</button>
+      <div class="mc-opciones">
+        <label><input type="checkbox" id="mcSonido" checked> Sonido y vibración al ganar</label>
+        <label><input type="checkbox" id="mcPantalla" checked> Mantener la pantalla encendida</label>
+      </div>
+      <p class="mc-aviso">Es solo una ayuda: el premio lo valida la organización con tu cartón. Para recibir avisos, deja esta página abierta con la pantalla encendida. Tus cartones se guardan solo en este teléfono.</p>
+    </div>
+
     <div class="m-card m-sponsors-card" id="mSponsorsCard" style="display:none;">
       <span class="sponsors-label">Auspiciadores</span>
       <div class="m-sponsor-row" id="mSponsorRow"></div>
@@ -965,6 +1060,32 @@
     <div class="c-toast" id="cToast"></div>
   </div>
 
+  <!-- ======================= EDITOR DE CARTÓN Y AVISO (espectador) ======================= -->
+  <div class="mc-modal" id="mcModal">
+    <div class="mc-hoja">
+      <div class="mc-hoja-cab"><strong id="mcTituloEditor">Nuevo cartón</strong><button class="mc-x" id="mcCerrar" type="button" aria-label="Cerrar">✕</button></div>
+      <input class="mc-texto" id="mcNombre" type="text" maxlength="24" placeholder="Nombre (opcional), ej. Cartón 1" autocomplete="off">
+      <div class="mc-cols"><span class="m-letra L-B">B</span><span class="m-letra L-I">I</span><span class="m-letra L-N">N</span><span class="m-letra L-G">G</span><span class="m-letra L-O">O</span></div>
+      <div class="mc-grid" id="mcGrid"></div>
+      <label class="mc-libre-fila"><input type="checkbox" id="mcLibre" checked> El centro es casilla libre</label>
+      <details>
+        <summary>Pegar los 24 números de una vez</summary>
+        <textarea id="mcPegar" placeholder="En orden, fila por fila (izquierda a derecha, arriba a abajo). Sirve con espacios, comas o saltos de línea."></textarea>
+        <button class="mc-btn sec" id="mcImportar" type="button" style="margin-top:8px">Cargar números</button>
+      </details>
+      <div class="mc-error" id="mcError"></div>
+      <div class="mc-pie">
+        <button class="mc-btn sec" id="mcCancelar" type="button">Cancelar</button>
+        <button class="mc-btn prim" id="mcGuardar" type="button">Guardar cartón</button>
+      </div>
+    </div>
+  </div>
+  <div class="mc-alerta" id="mcAlerta" role="alert" aria-live="assertive">
+    <div class="mc-al-tit" id="mcAlTit"></div>
+    <div class="mc-al-txt" id="mcAlTxt"></div>
+    <button class="mc-al-btn" id="mcAlOk" type="button">Entendido</button>
+  </div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1014,7 +1135,9 @@
   ];
 
   function letraDeNumero(n){
-    return rangos.find(r => n >= r.inicio && n <= r.fin).letra;
+    // si llegara un número fuera de 1 a 75 no debe romper la pantalla de nadie
+    const r = rangos.find(x => n >= x.inicio && n <= x.fin);
+    return r ? r.letra : 'B';
   }
 
   function crearBola(n, clase){
@@ -1253,6 +1376,496 @@
   }
   function guardarBinguito(letra){
     rutaSala().update({ binguito: letra || null }).catch(errorEscritura);
+  }
+
+  // =======================================================================
+  // MIS CARTONES (solo en el celular del espectador)
+  // Los cartones se guardan en el propio teléfono (localStorage) y el
+  // chequeo se hace allí mismo con los números llamados que ya llegan para
+  // mostrar el tablero. NO se escribe nada en Firebase ni se piden más datos.
+  //
+  // Reglas (ajústalas aquí si cambian):
+  //  - BINGUITO: completar sobre el cartón la letra de la ronda.
+  //  - BINGO: cartón lleno (todas las casillas marcadas; el centro libre cuenta).
+  // =======================================================================
+  const MAX_CARTONES = 20;
+  const RANGOS_COLUMNA = [[1, 15], [16, 30], [31, 45], [46, 60], [61, 75]];
+  const CENTRO = 12;
+
+  // Marca el cartón con los números llamados y calcula cuánto le falta.
+  function evaluarCarton(carton, llamados, letra){
+    const marcadas = [];
+    let faltanBingo = 0;
+    for(let i = 0; i < 25; i++){
+      const m = (carton.libre && i === CENTRO) || llamados.has(carton.celdas[i]);
+      marcadas.push(m);
+      if(!m) faltanBingo++;
+    }
+    const patron = [];
+    let faltanBinguito = null;
+    if(letra && formaValida(letra)){
+      faltanBinguito = 0;
+      FORMAS_BINGUITO[letra].forEach((fila, r) => {
+        fila.split('').forEach((ch, c) => {
+          if(ch === 'X'){
+            const i = r * 5 + c;
+            patron.push(i);
+            if(!marcadas[i]) faltanBinguito++;
+          }
+        });
+      });
+    }
+    return {
+      marcadas: marcadas, patron: patron,
+      faltanBingo: faltanBingo, faltanBinguito: faltanBinguito,
+      bingo: faltanBingo === 0,
+      binguito: faltanBinguito !== null && faltanBinguito === 0
+    };
+  }
+
+  // Revisa un cartón a medio ingresar. "errores" impiden guardar; "avisos" solo advierten.
+  function validarCarton(celdas, libre){
+    const errores = [];
+    const avisos = [];
+    const vistos = {};
+    for(let i = 0; i < 25; i++){
+      if(libre && i === CENTRO) continue;
+      const n = celdas[i];
+      if(!Number.isInteger(n)){ errores.push({ i: i, tipo: 'vacio' }); continue; }
+      if(n < 1 || n > 75){ errores.push({ i: i, tipo: 'rango' }); continue; }
+      if(vistos[n] !== undefined){
+        errores.push({ i: i, tipo: 'repetido' });
+        errores.push({ i: vistos[n], tipo: 'repetido' });
+      } else {
+        vistos[n] = i;
+      }
+      const col = i % 5;
+      if(n < RANGOS_COLUMNA[col][0] || n > RANGOS_COLUMNA[col][1]) avisos.push({ i: i, col: col });
+    }
+    return { errores: errores, avisos: avisos };
+  }
+
+  // Convierte un texto pegado en un cartón. Acepta 24 números (sin el centro)
+  // o 25 (con el centro, que puede venir como * / libre / free).
+  function parsearLista(texto){
+    const fichas = String(texto || '').toLowerCase().match(/\d+|\*|libre|free/g) || [];
+    let valores;
+    let libre = true;
+    if(fichas.length === 24 && fichas.every(f => /^\d+$/.test(f))){
+      valores = fichas.map(Number);
+      valores.splice(CENTRO, 0, 0);
+    } else if(fichas.length === 25){
+      valores = fichas.map(f => /^\d+$/.test(f) ? Number(f) : 0);
+      const centro = fichas[CENTRO];
+      libre = !/^\d+$/.test(centro) || Number(centro) === 0;
+    } else {
+      return { error: 'Necesito 24 números (o 25 si incluyes el centro). Encontré ' + fichas.length + '.' };
+    }
+    return { celdas: valores, libre: libre };
+  }
+
+  function leerCartonesGuardados(clave){
+    try{
+      const lista = JSON.parse(localStorage.getItem(clave) || '[]');
+      if(!Array.isArray(lista)) return [];
+      return lista.filter(c => c && typeof c.id === 'string' && Array.isArray(c.celdas) && c.celdas.length === 25);
+    } catch(e){ return []; }
+  }
+  function guardarCartonesLocal(clave, lista){
+    try{ localStorage.setItem(clave, JSON.stringify(lista)); return true; } catch(e){ return false; }
+  }
+
+  function crearMisCartones(){
+    const CLAVE = 'bingoCartones:' + room;
+    const CLAVE_PREFS = 'bingoCartonesPrefs';
+    const lista = $('mcLista');
+    const resumen = $('mcResumen');
+    const ayuda = $('mcAyuda');
+    const chkSonido = $('mcSonido');
+    const chkPantalla = $('mcPantalla');
+    const modal = $('mcModal');
+    const grid = $('mcGrid');
+    const inpNombre = $('mcNombre');
+    const chkLibre = $('mcLibre');
+    const txtPegar = $('mcPegar');
+    const msgError = $('mcError');
+    const alerta = $('mcAlerta');
+
+    let cartones = leerCartonesGuardados(CLAVE);
+    let abiertos = {};            // id -> true/false (cartón desplegado)
+    let editandoId = null;
+    let estado = { llamados: new Set(), letra: null, clave: '' };
+    let alertados = {};           // evita avisar dos veces lo mismo en el mismo juego
+    let primeraVez = true;
+    let guardadoOk = true;
+    let ctxAudio = null;
+    let wakeLock = null;
+    let temporizadorAlerta = null;
+
+    let prefs = { sonido: true, pantalla: true };
+    try{ prefs = Object.assign(prefs, JSON.parse(localStorage.getItem(CLAVE_PREFS) || '{}')); } catch(e){}
+    chkSonido.checked = !!prefs.sonido;
+    chkPantalla.checked = !!prefs.pantalla;
+
+    // ---------- editor ----------
+    const inputs = [];
+    grid.innerHTML = '';
+    for(let i = 0; i < 25; i++){
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.setAttribute('inputmode', 'numeric');
+      inp.setAttribute('pattern', '[0-9]*');
+      inp.setAttribute('enterkeyhint', 'next');
+      inp.maxLength = 2;
+      inp.autocomplete = 'off';
+      inp.className = 'mc-in';
+      inp.addEventListener('input', () => {
+        inp.value = inp.value.replace(/\D/g, '').slice(0, 2);
+        revisarEditor(false);
+        if(debeAvanzar(i, inp.value)) enfocarSiguiente(i);
+      });
+      inp.addEventListener('focus', () => { try{ inp.select(); } catch(e){} });
+      inp.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); enfocarSiguiente(i); } });
+      inputs.push(inp);
+      grid.appendChild(inp);
+    }
+
+    // avanza solo cuando el número ya no puede alargarse dentro de su columna
+    function debeAvanzar(i, v){
+      if(v.length === 2) return true;
+      if(v.length !== 1) return false;
+      const col = i % 5;
+      const a = RANGOS_COLUMNA[col][0];
+      const b = RANGOS_COLUMNA[col][1];
+      const d = Number(v);
+      const unoValido = d >= a && d <= b;
+      let sigue = false;
+      for(let n = Math.max(a, 10); n <= b; n++){ if(Math.floor(n / 10) === d) sigue = true; }
+      return unoValido && !sigue;
+    }
+    function enfocarSiguiente(i){
+      for(let j = i + 1; j < 25; j++){
+        if(!inputs[j].disabled){ inputs[j].focus(); return; }
+      }
+      inputs[i].blur();
+    }
+
+    function leerEditor(){
+      const libre = chkLibre.checked;
+      const celdas = inputs.map((inp, i) => {
+        if(libre && i === CENTRO) return 0;
+        return inp.value === '' ? NaN : Number(inp.value);
+      });
+      return { celdas: celdas, libre: libre };
+    }
+
+    function aplicarLibre(){
+      const libre = chkLibre.checked;
+      inputs[CENTRO].disabled = libre;
+      inputs[CENTRO].placeholder = libre ? 'LIBRE' : '';
+      if(libre) inputs[CENTRO].value = '';
+    }
+    chkLibre.addEventListener('change', () => { aplicarLibre(); revisarEditor(false); });
+
+    function revisarEditor(mostrarMensaje){
+      const d = leerEditor();
+      const v = validarCarton(d.celdas, d.libre);
+      inputs.forEach(inp => { inp.classList.remove('err'); inp.classList.remove('aviso'); });
+      v.avisos.forEach(a => inputs[a.i].classList.add('aviso'));
+      v.errores.forEach(e => { if(e.tipo !== 'vacio') inputs[e.i].classList.add('err'); });
+      if(mostrarMensaje){
+        const rep = v.errores.filter(e => e.tipo === 'repetido').length;
+        const vacios = v.errores.filter(e => e.tipo === 'vacio').length;
+        const rango = v.errores.filter(e => e.tipo === 'rango').length;
+        const partes = [];
+        if(vacios) partes.push('faltan ' + vacios + ' casilla' + (vacios > 1 ? 's' : ''));
+        if(rep) partes.push('hay números repetidos (en rojo)');
+        if(rango) partes.push('hay números fuera de 1 a 75 (en rojo)');
+        msgError.className = 'mc-error';
+        msgError.textContent = partes.length ? 'Revisa: ' + partes.join(', ') + '.' : '';
+      }
+      return v;
+    }
+
+    function abrirEditor(carton){
+      editandoId = carton ? carton.id : null;
+      $('mcTituloEditor').textContent = carton ? 'Editar cartón' : 'Nuevo cartón';
+      inpNombre.value = carton ? carton.nombre : '';
+      chkLibre.checked = carton ? !!carton.libre : true;
+      aplicarLibre();
+      inputs.forEach((inp, i) => {
+        inp.value = '';
+        if(carton && !(carton.libre && i === CENTRO) && carton.celdas[i] > 0) inp.value = String(carton.celdas[i]);
+      });
+      txtPegar.value = '';
+      msgError.className = 'mc-error info';
+      msgError.textContent = 'Escribe los números tal como están en tu cartón, de izquierda a derecha y de arriba hacia abajo.';
+      revisarEditor(false);
+      modal.classList.add('abierto');
+      document.body.style.overflow = 'hidden';
+      desbloquearAudio();
+      if(!carton){ const primero = inputs[0]; setTimeout(() => primero.focus(), 60); }
+    }
+    function cerrarEditor(){
+      modal.classList.remove('abierto');
+      document.body.style.overflow = '';
+      editandoId = null;
+    }
+
+    $('mcAgregar').addEventListener('click', () => {
+      if(cartones.length >= MAX_CARTONES){ alert('Puedes guardar hasta ' + MAX_CARTONES + ' cartones.'); return; }
+      abrirEditor(null);
+    });
+    $('mcCerrar').addEventListener('click', cerrarEditor);
+    $('mcCancelar').addEventListener('click', cerrarEditor);
+
+    $('mcImportar').addEventListener('click', () => {
+      const r = parsearLista(txtPegar.value);
+      if(r.error){ msgError.className = 'mc-error'; msgError.textContent = r.error; return; }
+      chkLibre.checked = r.libre;
+      aplicarLibre();
+      inputs.forEach((inp, i) => {
+        inp.value = (r.libre && i === CENTRO) || !(r.celdas[i] > 0) ? '' : String(r.celdas[i]);
+      });
+      msgError.className = 'mc-error info';
+      msgError.textContent = 'Números cargados. Revisa que coincidan con tu cartón y guarda.';
+      revisarEditor(false);
+    });
+
+    $('mcGuardar').addEventListener('click', () => {
+      const d = leerEditor();
+      const v = revisarEditor(true);
+      if(v.errores.length) return;
+      if(v.avisos.length && !confirm('Hay ' + v.avisos.length + ' número(s) que no corresponden a su columna (por ejemplo, un 40 en la B). ¿Guardar igual?')) return;
+      const nombre = inpNombre.value.trim() || ('Cartón ' + (editandoId ? (cartones.findIndex(c => c.id === editandoId) + 1) : (cartones.length + 1)));
+      if(editandoId){
+        const c = cartones.find(x => x.id === editandoId);
+        if(c){ c.nombre = nombre; c.libre = d.libre; c.celdas = d.celdas; }
+      } else {
+        const id = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        cartones.push({ id: id, nombre: nombre, libre: d.libre, celdas: d.celdas });
+        abiertos[id] = true;
+      }
+      guardadoOk = guardarCartonesLocal(CLAVE, cartones);
+      cerrarEditor();
+      sincronizarSinAvisos();
+      pintar();
+      ajustarPantalla();
+    });
+
+    // ---------- sonido, vibración y pantalla ----------
+    function desbloquearAudio(){
+      try{
+        if(!ctxAudio){ const AC = window.AudioContext || window.webkitAudioContext; if(AC) ctxAudio = new AC(); }
+        if(ctxAudio && ctxAudio.state === 'suspended') ctxAudio.resume();
+      } catch(e){}
+    }
+    ['pointerdown', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, desbloquearAudio, { passive: true }));
+
+    function sonar(tipo){
+      if(!prefs.sonido) return;
+      try{ if(navigator.vibrate) navigator.vibrate(tipo === 'bingo' ? [300, 120, 300, 120, 600] : [250, 100, 250]); } catch(e){}
+      try{
+        desbloquearAudio();
+        if(!ctxAudio) return;
+        const notas = tipo === 'bingo' ? [523, 659, 784, 1047, 784, 1047] : [660, 880];
+        let t = ctxAudio.currentTime;
+        notas.forEach((f) => {
+          const o = ctxAudio.createOscillator();
+          const g = ctxAudio.createGain();
+          o.type = 'triangle';
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(0.4, t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+          o.connect(g);
+          g.connect(ctxAudio.destination);
+          o.start(t);
+          o.stop(t + 0.24);
+          t += 0.2;
+        });
+      } catch(e){}
+    }
+
+    async function ajustarPantalla(){
+      try{
+        const quiere = prefs.pantalla && cartones.length > 0 && document.visibilityState === 'visible' && 'wakeLock' in navigator;
+        if(quiere && !wakeLock){
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => { wakeLock = null; });
+        } else if(!quiere && wakeLock){
+          await wakeLock.release();
+          wakeLock = null;
+        }
+      } catch(e){ wakeLock = null; }
+    }
+    document.addEventListener('visibilitychange', ajustarPantalla);
+
+    chkSonido.addEventListener('change', () => {
+      prefs.sonido = chkSonido.checked;
+      try{ localStorage.setItem(CLAVE_PREFS, JSON.stringify(prefs)); } catch(e){}
+      if(prefs.sonido) sonar('binguito');
+    });
+    chkPantalla.addEventListener('change', () => {
+      prefs.pantalla = chkPantalla.checked;
+      try{ localStorage.setItem(CLAVE_PREFS, JSON.stringify(prefs)); } catch(e){}
+      ajustarPantalla();
+    });
+
+    // ---------- aviso en pantalla ----------
+    function mostrarAlerta(nuevos){
+      const hayBingo = nuevos.some(n => n.tipo === 'bingo');
+      const tipo = hayBingo ? 'bingo' : 'binguito';
+      const dellos = nuevos.filter(n => n.tipo === tipo);
+      const nombres = dellos.map(n => n.carton.nombre).join(', ');
+      $('mcAlTit').textContent = hayBingo ? '🏆 ¡BINGO!' : '🎉 ¡BINGUITO!';
+      $('mcAlTxt').textContent = hayBingo
+        ? nombres + (dellos.length > 1 ? ' están llenos' : ' está lleno') + '. ¡Avisa a la organización ahora!'
+        : nombres + ' completó la letra ' + dellos[0].letra + '. ¡Avisa a la organización!';
+      alerta.classList.add('visible');
+      sonar(tipo);
+      clearTimeout(temporizadorAlerta);
+      temporizadorAlerta = setTimeout(() => alerta.classList.remove('visible'), 20000);
+    }
+    $('mcAlOk').addEventListener('click', () => { alerta.classList.remove('visible'); clearTimeout(temporizadorAlerta); });
+
+    // ---------- evaluación ----------
+    function llaveAviso(c, tipo){ return estado.clave + '|' + c.id + '|' + tipo; }
+
+    // marca como "ya avisado" lo que ya está cumplido (cartón recién agregado, primer vistazo, cambio de ronda)
+    function sincronizarSinAvisos(){
+      cartones.forEach(c => {
+        const ev = evaluarCarton(c, estado.llamados, estado.letra);
+        if(ev.binguito) alertados[llaveAviso(c, 'binguito')] = true;
+        if(ev.bingo) alertados[llaveAviso(c, 'bingo')] = true;
+      });
+    }
+
+    function actualizar(est){
+      const llamados = new Set(aLista(est && est.historial));
+      const letra = est && formaValida(est.binguito) ? est.binguito : null;
+      const clave = String((est && est.ronda) || '') + '|' + (letra || '');
+      if(llamados.size === 0) alertados = {};
+      const reinicio = primeraVez || clave !== estado.clave || llamados.size < estado.llamados.size;
+      estado = { llamados: llamados, letra: letra, clave: clave };
+      primeraVez = false;
+
+      const nuevos = [];
+      cartones.forEach(c => {
+        const ev = evaluarCarton(c, llamados, letra);
+        [['binguito', ev.binguito], ['bingo', ev.bingo]].forEach(par => {
+          const tipo = par[0];
+          if(!par[1]) return;
+          const llave = llaveAviso(c, tipo);
+          if(!alertados[llave]){
+            alertados[llave] = true;
+            if(!reinicio) nuevos.push({ tipo: tipo, carton: c, letra: letra });
+          }
+        });
+      });
+      pintar();
+      if(nuevos.length) mostrarAlerta(nuevos);
+    }
+
+    // ---------- lista de cartones ----------
+    function pintar(){
+      lista.innerHTML = '';
+      ayuda.style.display = cartones.length ? 'none' : 'block';
+      const total = cartones.length;
+      let ganados = 0;
+
+      cartones.forEach((c, idx) => {
+        const ev = evaluarCarton(c, estado.llamados, estado.letra);
+        const gano = ev.bingo || ev.binguito;
+        if(gano) ganados++;
+        const det = document.createElement('details');
+        det.className = 'mc-carton' + (gano ? ' gano' : '');
+        const abierto = abiertos[c.id] !== undefined ? abiertos[c.id] : total <= 3;
+        if(abierto) det.open = true;
+        det.addEventListener('toggle', () => { abiertos[c.id] = det.open; });
+
+        const sum = document.createElement('summary');
+        const nom = document.createElement('span');
+        nom.className = 'mc-nombre';
+        nom.textContent = c.nombre;
+        sum.appendChild(nom);
+        const chip = document.createElement('span');
+        if(ev.bingo){ chip.className = 'mc-chip ok'; chip.textContent = '¡Bingo!'; }
+        else if(ev.binguito){ chip.className = 'mc-chip ok'; chip.textContent = '¡Binguito!'; }
+        else if(ev.faltanBinguito !== null){
+          chip.className = 'mc-chip' + (ev.faltanBinguito <= 2 ? ' cerca' : '');
+          chip.textContent = 'Binguito: ' + (ev.faltanBinguito === 1 ? 'falta 1' : 'faltan ' + ev.faltanBinguito);
+        }
+        else { chip.className = 'mc-chip'; chip.textContent = 'Bingo: ' + (ev.faltanBingo === 1 ? 'falta 1' : 'faltan ' + ev.faltanBingo); }
+        sum.appendChild(chip);
+        det.appendChild(sum);
+
+        const cuerpo = document.createElement('div');
+        cuerpo.className = 'mc-cuerpo';
+        const celdas = document.createElement('div');
+        celdas.className = 'mc-celdas';
+        const patron = {};
+        ev.patron.forEach(i => { patron[i] = true; });
+        for(let i = 0; i < 25; i++){
+          const cel = document.createElement('div');
+          const esLibre = c.libre && i === CENTRO;
+          cel.className = 'mc-c' + (ev.marcadas[i] ? ' on' : '') + (patron[i] ? ' pat' : '') + (esLibre ? ' libre' : '');
+          cel.textContent = esLibre ? 'LIBRE' : c.celdas[i];
+          celdas.appendChild(cel);
+        }
+        cuerpo.appendChild(celdas);
+
+        const est = document.createElement('div');
+        est.className = 'mc-estado';
+        const lineas = [];
+        if(estado.letra){
+          lineas.push(ev.binguito
+            ? '<strong>Binguito ' + estado.letra + ' completo</strong>'
+            : 'Binguito ' + estado.letra + ': faltan <strong>' + ev.faltanBinguito + '</strong>');
+        } else {
+          lineas.push('Esta ronda no tiene binguito');
+        }
+        lineas.push(ev.bingo ? '<strong>Cartón lleno: ¡bingo!</strong>' : 'Bingo (cartón lleno): faltan <strong>' + ev.faltanBingo + '</strong>');
+        est.innerHTML = lineas.join('<br>');
+        cuerpo.appendChild(est);
+
+        const acc = document.createElement('div');
+        acc.className = 'mc-acciones';
+        const bEd = document.createElement('button');
+        bEd.type = 'button';
+        bEd.textContent = 'Editar';
+        bEd.addEventListener('click', () => abrirEditor(c));
+        const bBo = document.createElement('button');
+        bBo.type = 'button';
+        bBo.className = 'borrar';
+        bBo.textContent = 'Borrar';
+        bBo.addEventListener('click', () => {
+          if(!confirm('¿Borrar "' + c.nombre + '"?')) return;
+          cartones = cartones.filter(x => x.id !== c.id);
+          guardadoOk = guardarCartonesLocal(CLAVE, cartones);
+          pintar();
+          ajustarPantalla();
+        });
+        acc.appendChild(bEd);
+        acc.appendChild(bBo);
+        cuerpo.appendChild(acc);
+
+        det.appendChild(cuerpo);
+        lista.appendChild(det);
+      });
+
+      resumen.textContent = total ? (total + (total === 1 ? ' cartón' : ' cartones')) + (ganados ? ' · 🎉' : '') : '';
+      if(!guardadoOk && total){
+        const aviso = document.createElement('p');
+        aviso.className = 'mc-aviso';
+        aviso.textContent = 'No pude guardar tus cartones en este teléfono (¿modo privado?). Se perderán al cerrar la página.';
+        lista.appendChild(aviso);
+      }
+    }
+
+    pintar();
+    ajustarPantalla();
+    return { actualizar: actualizar };
   }
 
   // Se suscribe al estado compartido: así todos los dispositivos admin
@@ -1681,6 +2294,7 @@
     const mPatron = $('mPatron');
     const mBinLetra = $('mBinLetra');
     let letraBinEsp = null;
+    const misCartones = crearMisCartones();
     const elsLlamadas = { bola: $('mBolaActual'), anterior: $('mNumAnterior'), historial: $('mHistoryBalls') };
 
     const celdasMobile = {};
@@ -1722,6 +2336,7 @@
           mBinLetra.textContent = letra;
         }
       }
+      misCartones.actualizar(estado);
     }
 
     function renderLogos(logos){
