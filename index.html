@@ -743,11 +743,10 @@
   .sel-ronda option{ background:#0c231b; color:#fff; }
 
   /* espectador */
-  .m-binguito .prize-label{ display:block; text-align:center; margin-bottom: 10px; }
-  .m-bin-fila{ display:flex; align-items:center; justify-content:center; gap: 18px; }
-  .m-binguito .patron{ --pc: 22px; --pg: 4px; }
-  .m-bin-texto{ font-size: 0.95rem; color: var(--gris-texto); line-height: 1.3; text-align:left; }
-  .m-bin-texto strong{ display:block; font-family:'Archivo Black', sans-serif; font-weight:400; font-size: 2.4rem; color: var(--dorado); line-height: 1.05; }
+  .m-binguito{ padding: 10px 14px; }
+  .m-bin-fila{ display:flex; align-items:center; justify-content:center; gap: 14px; }
+  .m-binguito .prize-label{ margin: 0; }
+  .m-binguito .patron{ --pc: 11px; --pg: 2px; }
 
   /* control (celular) */
   .c-rondas{ display:flex; flex-direction:column; gap: 8px; margin-bottom: 14px; }
@@ -862,17 +861,6 @@
   .mc-al-txt{ font-size: 0.95rem; font-weight: 600; margin: 6px 0 12px; line-height: 1.35; }
   .mc-al-btn{ background:#2a2205; color:#f4e3a8; border:none; border-radius: 999px; padding: 10px 26px; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size: 0.9rem; cursor:pointer; }
 
-  /* lector de foto del cartón */
-  .mc-modal-foto{ z-index: 110; }
-  .mc-foto-caja{ display:flex; justify-content:center; margin: 8px 0 10px; }
-  #mcFotoCanvas{ touch-action: none; border-radius: 10px; background:#000; max-width:100%; }
-  .mc-foto-acc{ display:flex; gap: 8px; margin-bottom: 6px; }
-  .mc-foto-acc .mc-btn{ flex:1; padding: 10px; font-size: 0.85rem; }
-  .mc-privado{ font-size: 0.7rem; color: var(--gris-suave); margin: 2px 0 0; line-height: 1.4; }
-  .mc-in.dudoso{ background:#3d3300; border-color: var(--dorado); box-shadow: 0 0 0 2px rgba(203,161,53,0.35); }
-  .mc-btn-foto{ margin-bottom: 12px; }
-  #mcVistaFoto{ display:block; width:100%; max-width:320px; margin: 4px auto 6px; border-radius: 10px; background:#000; }
-  .mc-btn:disabled{ opacity: 0.45; cursor: default; }
 </style>
 </head>
 <body class="cargando">
@@ -975,10 +963,9 @@
     </div>
 
     <div class="m-card m-binguito" id="mBinguitoCard" style="display:none;">
-      <span class="prize-label">Binguito</span>
       <div class="m-bin-fila">
+        <span class="prize-label">Binguito</span>
         <div id="mPatron"></div>
-        <div class="m-bin-texto">Forma la letra<strong id="mBinLetra">B</strong>en tu cartón</div>
       </div>
     </div>
 
@@ -997,7 +984,7 @@
         <span class="mc-resumen" id="mcResumen"></span>
       </summary>
       <div class="mc-seccion">
-        <p class="mc-ayuda" id="mcAyuda">Agrega tus cartones (también puedes subir una foto) y esta página te avisa cuando completes el binguito o el bingo.</p>
+        <p class="mc-ayuda" id="mcAyuda">Agrega tus cartones y esta página te avisa cuando completes el binguito o el bingo.</p>
         <div id="mcLista"></div>
         <button class="mc-btn" id="mcAgregar" type="button">+ Agregar cartón</button>
         <div class="mc-opciones">
@@ -1088,12 +1075,6 @@
     <div class="mc-hoja">
       <div class="mc-hoja-cab"><strong id="mcTituloEditor">Nuevo cartón</strong><button class="mc-x" id="mcCerrar" type="button" aria-label="Cerrar">✕</button></div>
       <input class="mc-texto" id="mcNombre" type="text" maxlength="24" placeholder="Nombre (opcional), ej. Cartón 1" autocomplete="off">
-      <button class="mc-btn mc-btn-foto" id="mcFoto" type="button">📷 Llenar desde una foto del cartón</button>
-      <input type="file" id="mcFotoArchivo" accept="image/*" style="display:none">
-      <div id="mcVistaCaja" style="display:none">
-        <canvas id="mcVistaFoto"></canvas>
-        <p class="mc-privado" style="text-align:center">Tu foto enderezada: compárala con los números de abajo.</p>
-      </div>
       <div class="mc-cols"><span class="m-letra L-B">B</span><span class="m-letra L-I">I</span><span class="m-letra L-N">N</span><span class="m-letra L-G">G</span><span class="m-letra L-O">O</span></div>
       <div class="mc-grid" id="mcGrid"></div>
       <label class="mc-libre-fila"><input type="checkbox" id="mcLibre" checked> El centro es casilla libre</label>
@@ -1106,23 +1087,6 @@
       <div class="mc-pie">
         <button class="mc-btn sec" id="mcCancelar" type="button">Cancelar</button>
         <button class="mc-btn prim" id="mcGuardar" type="button">Guardar cartón</button>
-      </div>
-    </div>
-  </div>
-  <div class="mc-modal mc-modal-foto" id="mcFotoModal">
-    <div class="mc-hoja">
-      <div class="mc-hoja-cab"><strong>Alinea tu cartón</strong><button class="mc-x" id="mcFotoCerrar" type="button" aria-label="Cerrar">✕</button></div>
-      <p class="mc-ayuda" style="margin-top:0">Arrastra las 4 esquinas amarillas hasta que la grilla cubra <b>solo los 25 números</b> (sin las letras B-I-N-G-O). Si la foto sale de lado, usa "Girar".</p>
-      <div class="mc-foto-caja" id="mcFotoCaja"><canvas id="mcFotoCanvas"></canvas></div>
-      <div class="mc-foto-acc">
-        <button class="mc-btn sec" id="mcFotoGirar" type="button">↻ Girar</button>
-        <button class="mc-btn sec" id="mcFotoOtra" type="button">Otra foto</button>
-      </div>
-      <div class="mc-error info" id="mcFotoMsg"></div>
-      <p class="mc-privado">🔒 La foto se lee en tu teléfono y no se sube a ningún lado.</p>
-      <div class="mc-pie">
-        <button class="mc-btn sec" id="mcFotoCancelar" type="button">Cancelar</button>
-        <button class="mc-btn prim" id="mcFotoLeer" type="button">Leer números</button>
       </div>
     </div>
   </div>
@@ -1522,16 +1486,6 @@
   }
 
 
-  // Ordena 4 puntos como [arriba-izq, arriba-der, abajo-der, abajo-izq]
-  function ordenarCuadrilatero(p){
-    const suma = p.map(q => q.x + q.y), dif = p.map(q => q.x - q.y);
-    const tl = suma.indexOf(Math.min.apply(null, suma)), br = suma.indexOf(Math.max.apply(null, suma));
-    const tr = dif.indexOf(Math.max.apply(null, dif)), bl = dif.indexOf(Math.min.apply(null, dif));
-    const idx = [tl, tr, br, bl];
-    if(new Set(idx).size !== 4) return p;   // puntos amontonados: se deja como está
-    return idx.map(i => p[i]);
-  }
-
   // Genera un sonido de aviso (formato WAV, en memoria) con las notas dadas.
   function generarWavURI(notas, opc){
     opc = opc || {};
@@ -1567,597 +1521,6 @@
     let bin = '';
     for(let i = 0; i < bytes.length; i += 8192) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
     return 'data:audio/wav;base64,' + btoa(bin);
-  }
-
-  // ---------------------------------------------------------------------
-  // LECTOR DE CARTÓN POR FOTO
-  // Todo ocurre en el teléfono: la foto NO se sube a ningún servidor.
-  // Usa Tesseract.js (OCR) que se descarga solo si alguien usa esta opción.
-  // ---------------------------------------------------------------------
-  const OCR_VERSION = '5.1.1';
-  const OCR_SCRIPT = 'https://cdn.jsdelivr.net/npm/tesseract.js@' + OCR_VERSION + '/dist/tesseract.min.js';
-  const OCR_WORKER = 'https://cdn.jsdelivr.net/npm/tesseract.js@' + OCR_VERSION + '/dist/worker.min.js';
-  const OCR_CORE = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@' + OCR_VERSION;
-  const OCR_LANG = 'https://tessdata.projectnaptha.com/4.0.0_fast';
-
-  let ocrWorkerPromise = null;
-  let ocrAvance = null;
-
-  function cargarScriptOCR(){
-    return new Promise((resolve, reject) => {
-      if(window.Tesseract) return resolve();
-      const s = document.createElement('script');
-      s.src = OCR_SCRIPT;
-      s.onload = () => resolve();
-      s.onerror = () => reject(new Error('No se pudo descargar el lector de fotos.'));
-      document.head.appendChild(s);
-    });
-  }
-
-  function obtenerWorkerOCR(){
-    if(!ocrWorkerPromise){
-      ocrWorkerPromise = (async () => {
-        await cargarScriptOCR();
-        const w = await Tesseract.createWorker('eng', 1, {
-          workerPath: OCR_WORKER, corePath: OCR_CORE, langPath: OCR_LANG,
-          logger: (m) => { if(ocrAvance) ocrAvance(m); }
-        });
-        await w.setParameters({
-          tessedit_char_whitelist: '0123456789',
-          tessedit_pageseg_mode: '7',
-          user_defined_dpi: '300'
-        });
-        return w;
-      })().catch((e) => { ocrWorkerPromise = null; throw e; });
-    }
-    return ocrWorkerPromise;
-  }
-
-  function cerrarWorkerOCR(){
-    if(!ocrWorkerPromise) return;
-    const p = ocrWorkerPromise;
-    ocrWorkerPromise = null;
-    p.then(w => w.terminate()).catch(() => {});
-  }
-
-  // punto dentro del cuadrilátero [arriba-izq, arriba-der, abajo-der, abajo-izq]
-  function puntoEnCuadrilatero(q, u, v){
-    const ax = q[0].x + (q[1].x - q[0].x) * u, ay = q[0].y + (q[1].y - q[0].y) * u;
-    const bx = q[3].x + (q[2].x - q[3].x) * u, by = q[3].y + (q[2].y - q[3].y) * u;
-    return { x: ax + (bx - ax) * v, y: ay + (by - ay) * v };
-  }
-
-  // recorta una casilla (sin los bordes) a un rectángulo de OW x OH, en grises.
-  // El tamaño respeta la proporción real de la casilla (muchos cartones no son cuadrados).
-  // Muestreo bicúbico: los números chicos se ven más nítidos al ampliarlos.
-  function recortarCasilla(img, quad, fila, col, OW, OH, margen){
-    const gris = img.__gris || (img.__gris = (() => {
-      const a = new Float32Array(img.width * img.height), d = img.data;
-      for(let i = 0, j = 0; i < a.length; i++, j += 4) a[i] = 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
-      return a;
-    })());
-    const W = img.width, H = img.height;
-    const out = new Float32Array(OW * OH);
-    const u0 = (col + margen) / 5, u1 = (col + 1 - margen) / 5;
-    const v0 = (fila + margen) / 5, v1 = (fila + 1 - margen) / 5;
-    const cub = (t) => { const a = Math.abs(t); return a < 1 ? 1.5 * a * a * a - 2.5 * a * a + 1 : (a < 2 ? -0.5 * a * a * a + 2.5 * a * a - 4 * a + 2 : 0); };
-    const wx = [0, 0, 0, 0], wy = [0, 0, 0, 0];
-    for(let j = 0; j < OH; j++){
-      const v = v0 + (v1 - v0) * (j + 0.5) / OH;
-      for(let i = 0; i < OW; i++){
-        const u = u0 + (u1 - u0) * (i + 0.5) / OW;
-        const p = puntoEnCuadrilatero(quad, u, v);
-        const x = p.x - 0.5, y = p.y - 0.5;
-        const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi;
-        for(let k = 0; k < 4; k++){ wx[k] = cub(fx - (k - 1)); wy[k] = cub(fy - (k - 1)); }
-        let acc = 0, wsum = 0;
-        for(let m = 0; m < 4; m++){
-          let yy = yi + m - 1; yy = yy < 0 ? 0 : (yy > H - 1 ? H - 1 : yy);
-          for(let n = 0; n < 4; n++){
-            let xx = xi + n - 1; xx = xx < 0 ? 0 : (xx > W - 1 ? W - 1 : xx);
-            const w = wx[n] * wy[m];
-            acc += gris[yy * W + xx] * w; wsum += w;
-          }
-        }
-        const val = acc / (wsum || 1);
-        out[j * OW + i] = val < 0 ? 0 : (val > 255 ? 255 : val);
-      }
-    }
-    return out;
-  }
-
-  // máximo / mínimo deslizante (cuadrado de radio r), separable
-  function filtroExtremo(src, W, H, r, maximo){
-    const tmp = new Float32Array(W * H), out = new Float32Array(W * H);
-    for(let y = 0; y < H; y++){
-      const o = y * W;
-      for(let x = 0; x < W; x++){
-        let m = maximo ? -1e9 : 1e9;
-        const a = Math.max(0, x - r), b = Math.min(W - 1, x + r);
-        for(let k = a; k <= b; k++){ const v = src[o + k]; if(maximo ? v > m : v < m) m = v; }
-        tmp[o + x] = m;
-      }
-    }
-    for(let x = 0; x < W; x++){
-      for(let y = 0; y < H; y++){
-        let m = maximo ? -1e9 : 1e9;
-        const a = Math.max(0, y - r), b = Math.min(H - 1, y + r);
-        for(let k = a; k <= b; k++){ const v = tmp[k * W + x]; if(maximo ? v > m : v < m) m = v; }
-        out[y * W + x] = m;
-      }
-    }
-    return out;
-  }
-
-  function percentil(arr, p){
-    const c = Array.from(arr).sort((a, b) => a - b);
-    return c[Math.min(c.length - 1, Math.max(0, Math.floor(c.length * p)))];
-  }
-
-  // Mide qué trazos contrastan con su entorno (oscuros sobre claro o claros sobre oscuro).
-  // No depende de un umbral global, así que sirve con círculos claros sobre madera,
-  // casillas de colores, sombras, etc.
-  function analizarContraste(g, W, H, polaridad){
-    const r = Math.max(3, Math.round(H * 0.09));
-    const cierre = filtroExtremo(filtroExtremo(g, W, H, r, true), W, H, r, false);
-    const apertura = filtroExtremo(filtroExtremo(g, W, H, r, false), W, H, r, true);
-    const bh = new Float32Array(W * H), th = new Float32Array(W * H);
-    for(let i = 0; i < bh.length; i++){ bh[i] = Math.max(0, cierre[i] - g[i]); th[i] = Math.max(0, g[i] - apertura[i]); }
-    const oscuro = polaridad ? polaridad === 'oscuro' : percentil(bh, 0.985) >= percentil(th, 0.985);
-    const resp = oscuro ? bh : th;
-    return { resp: resp, oscuro: oscuro, pico: percentil(resp, 0.995) };
-  }
-
-  // Elige los dígitos de la casilla con una sensibilidad dada (fracción del contraste máximo).
-  function seleccionarDigitos(an, g, W, H, frac){
-    if(an.pico < 18) return { vacio: true };
-    const umbral = Math.max(14, an.pico * frac);
-    const mask = new Uint8Array(W * H);
-    for(let i = 0; i < mask.length; i++) mask[i] = an.resp[i] >= umbral ? 1 : 0;
-
-    const etiqueta = new Int32Array(W * H).fill(-1);
-    const comps = [];
-    for(let k0 = 0; k0 < mask.length; k0++){
-      if(!mask[k0] || etiqueta[k0] >= 0) continue;
-      const id = comps.length, pila = [k0];
-      etiqueta[k0] = id;
-      let x0 = W, y0 = H, x1 = -1, y1 = -1, area = 0, toca = false;
-      while(pila.length){
-        const k = pila.pop(), x = k % W, y = (k / W) | 0;
-        area++;
-        if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y;
-        if(x === 0 || y === 0 || x === W - 1 || y === H - 1) toca = true;
-        for(let dy = -1; dy <= 1; dy++) for(let dx = -1; dx <= 1; dx++){
-          if(!dx && !dy) continue;
-          const nx = x + dx, ny = y + dy;
-          if(nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
-          const nk = ny * W + nx;
-          if(mask[nk] && etiqueta[nk] < 0){ etiqueta[nk] = id; pila.push(nk); }
-        }
-      }
-      comps.push({ id: id, x0: x0, y0: y0, x1: x1, y1: y1, area: area, toca: toca });
-    }
-    let utiles = comps.filter(c => {
-      const bw = c.x1 - c.x0 + 1, bh2 = c.y1 - c.y0 + 1;
-      if(c.area < W * H * 0.0022) return false;
-      if(bh2 > H * 0.80 || bw > W * 0.80) return false;
-      if(c.toca && (bh2 > H * 0.45 || bw > W * 0.45)) return false;
-      if(bh2 < H * 0.14) return false;
-      if(bw < bh2 * 0.17) return false;                           // demasiado delgado para ser un dígito (borde, veta)
-      return true;
-    });
-    // quitar contornos que rodean a otros trazos (el borde del círculo, marcos)
-    utiles = utiles.filter(a => {
-      const bwA = a.x1 - a.x0 + 1, bhA = a.y1 - a.y0 + 1;
-      const rodea = utiles.some(b => b !== a &&
-        b.x0 >= a.x0 - 1 && b.x1 <= a.x1 + 1 && b.y0 >= a.y0 - 1 && b.y1 <= a.y1 + 1 &&
-        (b.y1 - b.y0 + 1) < bhA * 0.85);
-      return !(rodea && a.area / (bwA * bhA) < 0.55);
-    });
-    if(!utiles.length) return { vacio: true };
-    let mejor = null, mejorPuntaje = -1;
-    utiles.forEach(base => {
-      const hb = base.y1 - base.y0 + 1, cyb = (base.y0 + base.y1) / 2;
-      const grupo = utiles.filter(c => {
-        const hc = c.y1 - c.y0 + 1, cyc = (c.y0 + c.y1) / 2;
-        return hc >= hb * 0.55 && hc <= hb * 1.8 && Math.abs(cyc - cyb) <= hb * 0.55;
-      });
-      let area = 0, gx0 = W, gx1 = -1, gy0 = H, gy1 = -1;
-      grupo.forEach(c => { area += c.area; gx0 = Math.min(gx0, c.x0); gx1 = Math.max(gx1, c.x1); gy0 = Math.min(gy0, c.y0); gy1 = Math.max(gy1, c.y1); });
-      if(gx1 - gx0 + 1 > W * 0.9) return;
-      const cx = (gx0 + gx1) / 2, centralidad = 1 - Math.min(1, Math.abs(cx - W / 2) / (W / 2));
-      const puntaje = area * (0.35 + centralidad) * (grupo.length <= 3 ? 1 : 0.7);
-      if(puntaje > mejorPuntaje){ mejorPuntaje = puntaje; mejor = { grupo: grupo, x0: gx0, x1: gx1, y0: gy0, y1: gy1 }; }
-    });
-    if(!mejor) return { vacio: true };
-    const ids = new Set(mejor.grupo.map(c => c.id));
-    const sel = new Uint8Array(W * H);
-    for(let i = 0; i < sel.length; i++) if(etiqueta[i] >= 0 && ids.has(etiqueta[i])) sel[i] = 1;
-    return { vacio: false, g: g, sel: sel, oscuro: an.oscuro, caja: { x0: mejor.x0, y0: mejor.y0, x1: mejor.x1, y1: mejor.y1 }, W: W, H: H };
-  }
-
-  // dilatación simple de una máscara
-  function dilatar(m, W, H, r){
-    const out = new Uint8Array(W * H);
-    for(let y = 0; y < H; y++) for(let x = 0; x < W; x++){
-      if(!m[y * W + x]) continue;
-      for(let dy = -r; dy <= r; dy++) for(let dx = -r; dx <= r; dx++){
-        const nx = x + dx, ny = y + dy;
-        if(nx >= 0 && ny >= 0 && nx < W && ny < H) out[ny * W + nx] = 1;
-      }
-    }
-    return out;
-  }
-
-  // imagen final para el OCR: texto negro, fondo blanco, altura fija, con margen.
-  //  modo 'masc': solo la forma del dígito (blanco/negro).  modo 'gris': el dígito con sus bordes suaves.
-  function canvasParaOCR(prep, modo){
-    const { g, sel, oscuro, caja, W, H } = prep;
-    const pad = modo === 'zona' ? 6 : 3;
-    const x0 = Math.max(0, caja.x0 - pad), y0 = Math.max(0, caja.y0 - pad);
-    const x1 = Math.min(W - 1, caja.x1 + pad), y1 = Math.min(H - 1, caja.y1 + pad);
-    const w = x1 - x0 + 1, h = y1 - y0 + 1;
-    const zona = modo === 'zona' ? null : dilatar(sel, W, H, modo === 'masc' ? 1 : 2);
-    // contraste local dentro de la caja
-    let lo = 255, hi = 0;
-    for(let y = y0; y <= y1; y++) for(let x = x0; x <= x1; x++){ const v = g[y * W + x]; if(v < lo) lo = v; if(v > hi) hi = v; }
-    const rango = Math.max(25, hi - lo);
-    const src = document.createElement('canvas');
-    src.width = w; src.height = h;
-    const cx = src.getContext('2d'), im = cx.createImageData(w, h);
-    for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
-      const k = (y + y0) * W + (x + x0);
-      let v = 255;
-      if(modo === 'zona' || zona[k]){
-        if(modo === 'masc') v = sel[k] ? 0 : 255;
-        else { const n = (g[k] - lo) / rango; v = (oscuro ? n : 1 - n) * 255; if(v < 0) v = 0; if(v > 255) v = 255; }
-      }
-      const o = (y * w + x) * 4;
-      im.data[o] = im.data[o + 1] = im.data[o + 2] = v; im.data[o + 3] = 255;
-    }
-    cx.putImageData(im, 0, 0);
-    const alto = 56, padOut = 22, escala = alto / h;
-    const dst = document.createElement('canvas');
-    dst.width = Math.round(w * escala) + padOut * 2;
-    dst.height = alto + padOut * 2;
-    const dx = dst.getContext('2d');
-    dx.fillStyle = '#fff';
-    dx.fillRect(0, 0, dst.width, dst.height);
-    dx.imageSmoothingEnabled = true;
-    dx.imageSmoothingQuality = 'high';
-    dx.drawImage(src, padOut, padOut, Math.round(w * escala), alto);
-    return dst;
-  }
-
-  // ===== Método A: umbral global por casilla (muy bueno con cartones de papel) =====
-  // recorta una casilla (sin los bordes) y la endereza a un cuadrado de TAM x TAM, en grises
-  function recortarCasillaCuadrada(img, quad, fila, col, TAM, margen){
-    const out = new Float32Array(TAM * TAM);
-    const u0 = (col + margen) / 5, u1 = (col + 1 - margen) / 5;
-    const v0 = (fila + margen) / 5, v1 = (fila + 1 - margen) / 5;
-    const W = img.width, H = img.height, d = img.data;
-    for(let j = 0; j < TAM; j++){
-      const v = v0 + (v1 - v0) * (j + 0.5) / TAM;
-      for(let i = 0; i < TAM; i++){
-        const u = u0 + (u1 - u0) * (i + 0.5) / TAM;
-        const p = puntoEnCuadrilatero(quad, u, v);
-        let x = p.x - 0.5, y = p.y - 0.5;
-        if(x < 0) x = 0; if(y < 0) y = 0;
-        if(x > W - 1.001) x = W - 1.001; if(y > H - 1.001) y = H - 1.001;
-        const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0;
-        const i00 = (y0 * W + x0) * 4, i10 = i00 + 4, i01 = i00 + W * 4, i11 = i01 + 4;
-        const g00 = 0.299 * d[i00] + 0.587 * d[i00 + 1] + 0.114 * d[i00 + 2];
-        const g10 = 0.299 * d[i10] + 0.587 * d[i10 + 1] + 0.114 * d[i10 + 2];
-        const g01 = 0.299 * d[i01] + 0.587 * d[i01 + 1] + 0.114 * d[i01 + 2];
-        const g11 = 0.299 * d[i11] + 0.587 * d[i11 + 1] + 0.114 * d[i11 + 2];
-        out[j * TAM + i] = (g00 * (1 - fx) + g10 * fx) * (1 - fy) + (g01 * (1 - fx) + g11 * fx) * fy;
-      }
-    }
-    return out;
-  }
-
-  // umbral de Otsu sobre valores 0..255
-  function umbralOtsu(g){
-    const h = new Array(256).fill(0);
-    for(let i = 0; i < g.length; i++) h[Math.max(0, Math.min(255, Math.round(g[i])))]++;
-    const total = g.length;
-    let suma = 0;
-    for(let t = 0; t < 256; t++) suma += t * h[t];
-    let sumB = 0, wB = 0, mejor = 0, umbral = 128;
-    for(let t = 0; t < 256; t++){
-      wB += h[t];
-      if(!wB) continue;
-      const wF = total - wB;
-      if(!wF) break;
-      sumB += t * h[t];
-      const mB = sumB / wB, mF = (suma - sumB) / wF;
-      const varEntre = wB * wF * (mB - mF) * (mB - mF);
-      if(varEntre > mejor){ mejor = varEntre; umbral = t; }
-    }
-    return umbral;
-  }
-
-  // deja negro el texto sobre fondo blanco, quita líneas de la grilla y centra el número
-  function prepararCasillaOtsu(g, TAM){
-    // estirar contraste
-    const orden = Array.from(g).sort((a, b) => a - b);
-    const lo = orden[Math.floor(orden.length * 0.02)], hi = orden[Math.floor(orden.length * 0.98)];
-    const rango = Math.max(20, hi - lo);
-    const s = new Float32Array(g.length);
-    for(let i = 0; i < g.length; i++) s[i] = Math.max(0, Math.min(255, (g[i] - lo) * 255 / rango));
-    const t = umbralOtsu(s);
-    let oscuros = 0;
-    for(let i = 0; i < s.length; i++) if(s[i] <= t) oscuros++;
-    const invertir = oscuros > s.length * 0.5;       // el texto es la minoría
-    const bin = new Uint8Array(s.length);              // 1 = tinta
-    for(let i = 0; i < s.length; i++){ const oscuro = s[i] <= t; bin[i] = (invertir ? !oscuro : oscuro) ? 1 : 0; }
-
-    // quitar las líneas de la grilla: componentes largos y finos (o en "L") que tocan el borde.
-    // OJO: un número ancho también puede tocar el borde, por eso se mira la FORMA, no solo el borde.
-    const etiqueta = new Int32Array(s.length).fill(-1);
-    const comps = [];
-    for(let k0 = 0; k0 < bin.length; k0++){
-      if(!bin[k0] || etiqueta[k0] >= 0) continue;
-      const id = comps.length;
-      const pila = [k0];
-      etiqueta[k0] = id;
-      let cx0 = TAM, cy0 = TAM, cx1 = -1, cy1 = -1, area = 0, toca = false;
-      while(pila.length){
-        const k = pila.pop();
-        const x = k % TAM, y = (k / TAM) | 0;
-        area++;
-        if(x < cx0) cx0 = x; if(x > cx1) cx1 = x; if(y < cy0) cy0 = y; if(y > cy1) cy1 = y;
-        if(x === 0 || y === 0 || x === TAM - 1 || y === TAM - 1) toca = true;
-        for(let dy = -1; dy <= 1; dy++) for(let dx = -1; dx <= 1; dx++){
-          if(!dx && !dy) continue;
-          const nx = x + dx, ny = y + dy;
-          if(nx < 0 || ny < 0 || nx >= TAM || ny >= TAM) continue;
-          const nk = ny * TAM + nx;
-          if(bin[nk] && etiqueta[nk] < 0){ etiqueta[nk] = id; pila.push(nk); }
-        }
-      }
-      comps.push({ x0: cx0, y0: cy0, x1: cx1, y1: cy1, area: area, toca: toca });
-    }
-    const quitar = new Uint8Array(comps.length);
-    comps.forEach((c, id) => {
-      const bw = c.x1 - c.x0 + 1, bh = c.y1 - c.y0 + 1;
-      const largo = Math.max(bw, bh), fino = Math.min(bw, bh);
-      const relleno = c.area / (bw * bh);
-      const manchita = c.area < TAM * TAM * 0.004;
-      const linea = c.toca && ((largo >= TAM * 0.6 && fino <= TAM * 0.22) || (bw >= TAM * 0.7 && bh >= TAM * 0.7 && relleno <= 0.22));
-      if(manchita || linea) quitar[id] = 1;
-    });
-    for(let k = 0; k < bin.length; k++) if(bin[k] && quitar[etiqueta[k]]) bin[k] = 0;
-    // caja del texto restante
-    let x0 = TAM, y0 = TAM, x1 = -1, y1 = -1, n = 0;
-    for(let y = 0; y < TAM; y++) for(let x = 0; x < TAM; x++){
-      if(bin[y * TAM + x]){ n++; if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
-    }
-    if(n < TAM * TAM * 0.012 || x1 < 0) return { vacio: true };
-    return { vacio: false, bin: bin, s: s, invertir: invertir, caja: { x0: x0, y0: y0, x1: x1, y1: y1 } };
-  }
-
-  // imagen final para el OCR: texto negro, fondo blanco, altura fija, con margen
-  function canvasParaOCROtsu(prep, TAM, modo){
-    const { bin, s, invertir, caja } = prep;
-    const w = caja.x1 - caja.x0 + 1, h = caja.y1 - caja.y0 + 1;
-    const src = document.createElement('canvas');
-    src.width = w; src.height = h;
-    const cx = src.getContext('2d');
-    const im = cx.createImageData(w, h);
-    for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
-      const k = (y + caja.y0) * TAM + (x + caja.x0);
-      let v;
-      if(modo === 'bin') v = bin[k] ? 0 : 255;
-      else { v = invertir ? 255 - s[k] : s[k]; }
-      const o = (y * w + x) * 4;
-      im.data[o] = im.data[o + 1] = im.data[o + 2] = v; im.data[o + 3] = 255;
-    }
-    cx.putImageData(im, 0, 0);
-    const alto = 56, pad = 22;
-    const escala = alto / h;
-    const dst = document.createElement('canvas');
-    dst.width = Math.round(w * escala) + pad * 2;
-    dst.height = alto + pad * 2;
-    const dx = dst.getContext('2d');
-    dx.fillStyle = '#fff';
-    dx.fillRect(0, 0, dst.width, dst.height);
-    dx.imageSmoothingEnabled = true;
-    dx.imageSmoothingQuality = 'high';
-    dx.drawImage(src, pad, pad, Math.round(w * escala), alto);
-    return dst;
-  }
-
-  function distanciaEdicion(a, b){
-    const m = a.length, n = b.length;
-    const d = [];
-    for(let i = 0; i <= m; i++){ d[i] = [i]; }
-    for(let j = 1; j <= n; j++) d[0][j] = j;
-    for(let i = 1; i <= m; i++) for(let j = 1; j <= n; j++){
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-    }
-    return d[m][n];
-  }
-
-  // elige el número válido de la columna que más se parece a lo que leyó el OCR
-  function corregirConColumna(texto, col){
-    const a = RANGOS_COLUMNA[col][0], b = RANGOS_COLUMNA[col][1];
-    if(texto && /^\d+$/.test(texto) && Number(texto) >= a && Number(texto) <= b && String(Number(texto)) === texto){
-      return { valor: Number(texto), exacto: true, dist: 0 };
-    }
-    if(!texto) return { valor: NaN, exacto: false, dist: 9 };
-    let mejor = null, mejorDist = 99, empate = false;
-    for(let n = a; n <= b; n++){
-      const dd = distanciaEdicion(texto, String(n));
-      if(dd < mejorDist){ mejorDist = dd; mejor = n; empate = false; }
-      else if(dd === mejorDist) empate = true;
-    }
-    return { valor: mejor, exacto: false, dist: mejorDist, empate: empate };
-  }
-
-  // Qué tan nítido y grande es el número recortado.
-  //  ancho: grosor del borde de los trazos respecto al alto del número (borroso si es grande).
-  //  alto: alto del número en píxeles de la foto original (muy chico si es poco).
-  function medirNitidez(g, W, H, caja, pxPorCasillaAlto){
-    const x0 = Math.max(1, caja.x0 - 2), x1 = Math.min(W - 2, caja.x1 + 2), y0 = Math.max(1, caja.y0 - 2), y1 = Math.min(H - 2, caja.y1 + 2);
-    const grad = [], vals = [];
-    for(let y = y0; y <= y1; y++) for(let x = x0; x <= x1; x++){
-      const i = y * W + x;
-      const gx = (g[i - W + 1] + 2 * g[i + 1] + g[i + W + 1] - g[i - W - 1] - 2 * g[i - 1] - g[i + W - 1]) / 8;
-      const gy = (g[i + W - 1] + 2 * g[i + W] + g[i + W + 1] - g[i - W - 1] - 2 * g[i - W] - g[i - W + 1]) / 8;
-      grad.push(Math.sqrt(gx * gx + gy * gy)); vals.push(g[i]);
-    }
-    if(grad.length < 20) return null;
-    const gmax = percentil(grad, 0.98);
-    const contraste = percentil(vals, 0.97) - percentil(vals, 0.03);
-    if(gmax < 1 || contraste < 25) return null;
-    const alto = caja.y1 - caja.y0 + 1;
-    return { ancho: (contraste / gmax) / alto, alto: alto * pxPorCasillaAlto };
-  }
-
-  // ¿el texto leído es coherente con la forma de lo recortado? Si el recorte es ancho (dos cifras)
-  // pero solo se leyó una cifra, seguramente se perdió una (p. ej. "13" leído como "1").
-  function coherenteConForma(texto, caja){
-    if(!caja || !texto) return true;
-    const w = caja.x1 - caja.x0 + 1, h = caja.y1 - caja.y0 + 1;
-    return !(w / h >= 0.95 && texto.length === 1);
-  }
-
-  // lee los 25 números del cartón. quad = 4 esquinas de la grilla de números (sin las letras BINGO)
-  async function leerCartonDeImagen(canvas, quad, alProgreso){
-    const img = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
-    const worker = await obtenerWorkerOCR();
-    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-    const celdaW = (dist(quad[0], quad[1]) + dist(quad[3], quad[2])) / 10;
-    const celdaH = (dist(quad[0], quad[3]) + dist(quad[1], quad[2])) / 10;
-    // tamaño de trabajo del método B: se amplía lo chico y se respeta la proporción de la casilla
-    const OH = Math.max(96, Math.min(200, Math.round(celdaH * 3.2)));
-    const OW = Math.max(60, Math.min(320, Math.round(OH * celdaW / celdaH)));
-    const TAM = 128;
-    const celdas = new Array(25).fill(NaN);
-    const dudosas = [];
-    const detalle = [];
-    const calidades = {};
-    let libre = true;
-
-    const leerImagen = async (cv, col) => {
-      const r = await worker.recognize(cv);
-      const texto = (r.data.text || '').replace(/\D/g, '');
-      const cor = corregirConColumna(texto, col);
-      return { valor: cor.valor, exacto: cor.exacto, dist: cor.dist, empate: cor.empate, conf: r.data.confidence || 0, texto: texto };
-    };
-    const vacioCand = () => ({ valor: NaN, exacto: false, dist: 9, conf: 0, texto: '', seguro: false, desacuerdo: false });
-    const mejoraA = (cand, mejor) => (cand.exacto && !mejor.exacto) ||
-      (cand.exacto === mejor.exacto && (cand.dist < mejor.dist || (cand.dist === mejor.dist && cand.conf > mejor.conf)));
-
-    for(let k = 0; k < 25; k++){
-      const fila = (k / 5) | 0, col = k % 5;
-      if(alProgreso) alProgreso(k, 25);
-
-      // ---------- Método A ----------
-      let candA = vacioCand();
-      const gA = recortarCasillaCuadrada(img, quad, fila, col, TAM, 0.06);
-      const prepA = prepararCasillaOtsu(gA, TAM);
-      if(!prepA.vacio){
-        const lect = [];
-        for(const modo of ['bin', 'gris']) lect.push(await leerImagen(canvasParaOCROtsu(prepA, TAM, modo), col));
-        lect.forEach(c => { if(mejoraA(c, candA)) candA = Object.assign(vacioCand(), c); });
-        candA.desacuerdo = lect[0].valor !== lect[1].valor;
-        candA.seguro = candA.exacto && candA.conf >= 65 && !candA.empate && !candA.desacuerdo && coherenteConForma(candA.texto, prepA.caja);
-        // tercera opinión: otro margen y otra escala. Confusiones típicas (5 con 3, 1 con 7) suelen cambiar de resultado.
-        if(candA.seguro){
-          const gA2 = recortarCasillaCuadrada(img, quad, fila, col, 160, 0.11);
-          const prepA2 = prepararCasillaOtsu(gA2, 160);
-          if(!prepA2.vacio){
-            const t = await leerImagen(canvasParaOCROtsu(prepA2, 160, 'gris'), col);
-            if(t.valor !== candA.valor){ candA.seguro = false; candA.desacuerdo = true; }
-          }
-        }
-      }
-
-      // calidad de la foto en esta casilla
-      {
-        const gQ = recortarCasilla(img, quad, fila, col, OW, OH, 0.04);
-        const pQ = seleccionarDigitos(analizarContraste(gQ, OW, OH, 'oscuro'), gQ, OW, OH, 0.38);
-        if(!pQ.vacio){ const q = medirNitidez(gQ, OW, OH, pQ.caja, celdaH / OH); if(q) calidades[k] = q; }
-      }
-
-      let mejor = candA;
-      // ---------- Método B (solo si A no quedó seguro): contraste local, para fichas, madera, fondos con dibujo ----------
-      if(!candA.seguro){
-        const gB = recortarCasilla(img, quad, fila, col, OW, OH, 0.04);
-        let candB = vacioCand();
-        let desacuerdo = false;
-        const mejoraB = (cand) => mejoraA(cand, candB);
-        for(const pol of ['oscuro', 'claro']){
-          const an = analizarContraste(gB, OW, OH, pol);
-          for(const frac of [0.38, 0.52, 0.30, 0.66]){
-            const prep = seleccionarDigitos(an, gB, OW, OH, frac);
-            if(prep.vacio) continue;
-            const a = await leerImagen(canvasParaOCR(prep, 'gris'), col);
-            if(mejoraB(a)) candB = Object.assign(vacioCand(), a);
-            if(a.exacto && a.conf >= 75 && coherenteConForma(a.texto, prep.caja)){
-              const b = await leerImagen(canvasParaOCR(prep, 'masc'), col);
-              if(b.exacto && b.valor === a.valor){ candB = Object.assign(vacioCand(), a.conf >= b.conf ? a : b); candB.seguro = true; break; }
-              if(mejoraB(b)) candB = Object.assign(vacioCand(), b);
-            } else {
-              const b = await leerImagen(canvasParaOCR(prep, 'masc'), col);
-              if(mejoraB(b)) candB = Object.assign(vacioCand(), b);
-              if(b.exacto && a.exacto && b.valor !== a.valor) desacuerdo = true;
-              if(!(b.exacto && b.conf >= 75)){
-                const z = await leerImagen(canvasParaOCR(prep, 'zona'), col);
-                if(mejoraB(z)) candB = Object.assign(vacioCand(), z);
-              }
-            }
-          }
-          if(candB.seguro) break;
-        }
-        candB.desacuerdo = desacuerdo && !candB.seguro;
-        if(candB.seguro) mejor = candB;
-        else {
-          mejor = mejoraA(candB, candA) ? candB : candA;
-          mejor.seguro = false;
-          mejor.desacuerdo = mejor.desacuerdo || (candA.exacto && candB.exacto && candA.valor !== candB.valor);
-        }
-      }
-      detalle.push(mejor);
-      if(fila === 2 && col === 2){
-        if(mejor.exacto && mejor.conf >= 70){ libre = false; celdas[k] = mejor.valor; }
-        else { libre = true; celdas[k] = 0; }
-        continue;
-      }
-      celdas[k] = mejor.valor;
-      if(!mejor.seguro || !mejor.exacto || mejor.conf < 65 || mejor.empate || mejor.desacuerdo) dudosas.push(k);
-    }
-    // un "1" suelto en la columna B puede ser un "13" al que se le perdió una cifra
-    detalle.forEach((d, i) => {
-      if(i % 5 === 0 && d.valor === 1 && d.texto && d.texto.length === 1 && dudosas.indexOf(i) < 0) dudosas.push(i);
-    });
-    // calidad de la foto en general: si es borrosa o está muy lejos no se puede confiar en ninguna casilla
-    const anchos = Object.values(calidades).map(q => q.ancho).sort((a, b) => a - b);
-    const altos = Object.values(calidades).map(q => q.alto).sort((a, b) => a - b);
-    const mediana = (a) => a.length ? a[Math.floor(a.length / 2)] : NaN;
-    const nitidez = mediana(anchos), altoNum = mediana(altos);
-    const sinMedida = !(nitidez >= 0) || !(altoNum >= 0);   // no se pudo medir: no se confía
-    const borrosa = sinMedida || nitidez > 0.17;
-    const chica = sinMedida || altoNum < 10;
-    if(borrosa || chica){
-      for(let i = 0; i < 25; i++) if(!(i === CENTRO && libre) && dudosas.indexOf(i) < 0) dudosas.push(i);
-    } else {
-      // casillas individuales muy borrosas
-      Object.keys(calidades).forEach(key => { const i = Number(key); if(calidades[i].ancho > 0.30 && dudosas.indexOf(i) < 0 && !(i === CENTRO && libre)) dudosas.push(i); });
-    }
-    const vistos = {};
-    celdas.forEach((n, i) => {
-      if(!(n > 0) || (libre && i === CENTRO)) return;
-      if(vistos[n] !== undefined){
-        if(dudosas.indexOf(i) < 0) dudosas.push(i);
-        if(dudosas.indexOf(vistos[n]) < 0) dudosas.push(vistos[n]);
-      } else vistos[n] = i;
-    });
-    if(alProgreso) alProgreso(25, 25);
-    return { celdas: celdas.map(n => (n > 0 ? n : 0)), libre: libre, dudosas: dudosas, detalle: detalle,
-      calidad: { nitidez: nitidez, altoNumero: altoNum, borrosa: borrosa, chica: chica } };
   }
 
   function crearMisCartones(){
@@ -2206,7 +1569,6 @@
       inp.autocomplete = 'off';
       inp.className = 'mc-in';
       inp.addEventListener('input', () => {
-        inp.classList.remove('dudoso');
         inp.value = inp.value.replace(/\D/g, '').slice(0, 2);
         revisarEditor(false);
         if(debeAvanzar(i, inp.value)) enfocarSiguiente(i);
@@ -2282,11 +1644,9 @@
       aplicarLibre();
       inputs.forEach((inp, i) => {
         inp.value = '';
-        inp.classList.remove('dudoso');
         if(carton && !(carton.libre && i === CENTRO) && carton.celdas[i] > 0) inp.value = String(carton.celdas[i]);
       });
       txtPegar.value = '';
-      $('mcVistaCaja').style.display = 'none';
       msgError.className = 'mc-error info';
       msgError.textContent = 'Escribe los números tal como están en tu cartón, de izquierda a derecha y de arriba hacia abajo.';
       revisarEditor(false);
@@ -2296,7 +1656,6 @@
       if(!carton){ const primero = inputs[0]; setTimeout(() => primero.focus(), 60); }
     }
     function cerrarEditor(){
-      cerrarFoto();
       modal.classList.remove('abierto');
       document.body.style.overflow = '';
       editandoId = null;
@@ -2635,245 +1994,6 @@
       if(e.target !== seccion) return;
       try{ localStorage.setItem('bingoCartonesAbierto', seccion.open ? '1' : '0'); } catch(err){}
     });
-
-    // ---------- llenar el cartón desde una foto ----------
-    const modalFoto = $('mcFotoModal');
-    const fotoCanvas = $('mcFotoCanvas');
-    const fotoMsg = $('mcFotoMsg');
-    const fotoArchivo = $('mcFotoArchivo');
-    let fotoOrig = null;      // foto a resolución de trabajo
-    let fotoQuad = null;      // 4 esquinas, en coordenadas de la foto
-    let fotoK = 1;            // píxeles de pantalla por píxel de foto
-    let arrastrando = -1;
-    let leyendo = false;
-    let temporizadorOCR = null;
-
-    function cuadrilateroInicial(w, h){
-      const lado = 0.6 * Math.min(w, h), cx = w / 2, cy = h * 0.52;
-      return [
-        { x: cx - lado / 2, y: cy - lado / 2 }, { x: cx + lado / 2, y: cy - lado / 2 },
-        { x: cx + lado / 2, y: cy + lado / 2 }, { x: cx - lado / 2, y: cy + lado / 2 }
-      ];
-    }
-
-    async function cargarFoto(file){
-      let bmp;
-      try{ bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
-      catch(e){
-        bmp = await new Promise((ok, mal) => { const im = new Image(); im.onload = () => ok(im); im.onerror = mal; im.src = URL.createObjectURL(file); });
-      }
-      const w0 = bmp.width, h0 = bmp.height;
-      const esc = Math.min(1, 1800 / Math.max(w0, h0));
-      const c = document.createElement('canvas');
-      c.width = Math.round(w0 * esc);
-      c.height = Math.round(h0 * esc);
-      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
-      if(bmp.close) bmp.close();
-      fotoOrig = c;
-      fotoQuad = cuadrilateroInicial(c.width, c.height);
-      fotoMsg.className = 'mc-error info';
-      fotoMsg.textContent = '';
-      modalFoto.classList.add('abierto');
-      dibujarFoto();
-    }
-
-    function dibujarFoto(){
-      if(!fotoOrig) return;
-      const caja = $('mcFotoCaja');
-      const maxW = Math.min(caja.clientWidth || 340, 440);
-      const maxH = Math.max(220, window.innerHeight * 0.5);
-      fotoK = Math.min(maxW / fotoOrig.width, maxH / fotoOrig.height);
-      const w = Math.round(fotoOrig.width * fotoK), h = Math.round(fotoOrig.height * fotoK);
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      fotoCanvas.width = Math.round(w * dpr);
-      fotoCanvas.height = Math.round(h * dpr);
-      fotoCanvas.style.width = w + 'px';
-      fotoCanvas.style.height = h + 'px';
-      const ctx = fotoCanvas.getContext('2d');
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.drawImage(fotoOrig, 0, 0, w, h);
-      const q = fotoQuad.map(p => ({ x: p.x * fotoK, y: p.y * fotoK }));
-      const o = ordenarCuadrilatero(q);
-      ctx.beginPath();
-      ctx.moveTo(o[0].x, o[0].y);
-      for(let i = 1; i < 4; i++) ctx.lineTo(o[i].x, o[i].y);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(203,161,53,0.10)';
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#cba135';
-      ctx.stroke();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-      for(let i = 1; i < 5; i++){
-        const a = puntoEnCuadrilatero(o, i / 5, 0), b = puntoEnCuadrilatero(o, i / 5, 1);
-        const c = puntoEnCuadrilatero(o, 0, i / 5), d = puntoEnCuadrilatero(o, 1, i / 5);
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.stroke();
-      }
-      q.forEach((p, i) => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 13, 0, Math.PI * 2);
-        ctx.fillStyle = i === arrastrando ? '#ffffff' : '#cba135';
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = '#2a2205';
-        ctx.stroke();
-      });
-      // lupa para ver bien la esquina que se está moviendo
-      if(arrastrando >= 0){
-        const hp = fotoQuad[arrastrando];
-        const R = 52;
-        const lx = (q[arrastrando].x < R * 3 && q[arrastrando].y < R * 3) ? w - R - 8 : R + 8;
-        const ly = R + 8;
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(lx, ly, R, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(fotoOrig, hp.x - 36, hp.y - 36, 72, 72, lx - R, ly - R, R * 2, R * 2);
-        ctx.restore();
-        ctx.beginPath(); ctx.arc(lx, ly, R, 0, Math.PI * 2);
-        ctx.lineWidth = 3; ctx.strokeStyle = '#cba135'; ctx.stroke();
-        ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-        ctx.beginPath(); ctx.moveTo(lx - 10, ly); ctx.lineTo(lx + 10, ly); ctx.moveTo(lx, ly - 10); ctx.lineTo(lx, ly + 10); ctx.stroke();
-      }
-    }
-
-    function puntoDelToque(e){
-      const r = fotoCanvas.getBoundingClientRect();
-      return { x: (e.clientX - r.left) * (parseFloat(fotoCanvas.style.width) / r.width), y: (e.clientY - r.top) * (parseFloat(fotoCanvas.style.height) / r.height) };
-    }
-    function moverEsquina(p){
-      if(arrastrando < 0) return;
-      const w = parseFloat(fotoCanvas.style.width), h = parseFloat(fotoCanvas.style.height);
-      fotoQuad[arrastrando] = { x: Math.max(0, Math.min(w, p.x)) / fotoK, y: Math.max(0, Math.min(h, p.y)) / fotoK };
-      dibujarFoto();
-    }
-    fotoCanvas.addEventListener('pointerdown', (e) => {
-      if(leyendo || !fotoOrig) return;
-      const p = puntoDelToque(e);
-      let mejor = -1, dMin = 1e9;
-      fotoQuad.forEach((q, i) => { const d = Math.hypot(q.x * fotoK - p.x, q.y * fotoK - p.y); if(d < dMin){ dMin = d; mejor = i; } });
-      if(dMin <= 44){
-        arrastrando = mejor;
-        try{ fotoCanvas.setPointerCapture(e.pointerId); } catch(err){}
-        moverEsquina(p);
-        e.preventDefault();
-      }
-    });
-    fotoCanvas.addEventListener('pointermove', (e) => { if(arrastrando >= 0){ moverEsquina(puntoDelToque(e)); e.preventDefault(); } });
-    const soltar = () => { if(arrastrando >= 0){ arrastrando = -1; dibujarFoto(); } };
-    fotoCanvas.addEventListener('pointerup', soltar);
-    fotoCanvas.addEventListener('pointercancel', soltar);
-    window.addEventListener('resize', () => { if(modalFoto.classList.contains('abierto')) dibujarFoto(); });
-
-    function girarFoto(){
-      if(!fotoOrig || leyendo) return;
-      const W = fotoOrig.width, H = fotoOrig.height;
-      const c = document.createElement('canvas');
-      c.width = H; c.height = W;
-      const x = c.getContext('2d');
-      x.translate(H, 0);
-      x.rotate(Math.PI / 2);
-      x.drawImage(fotoOrig, 0, 0);
-      fotoOrig = c;
-      fotoQuad = cuadrilateroInicial(c.width, c.height);
-      dibujarFoto();
-    }
-
-    function cerrarFoto(){
-      modalFoto.classList.remove('abierto');
-      fotoOrig = null;
-      arrastrando = -1;
-    }
-
-    function botonesFoto(activos){
-      ['mcFotoLeer', 'mcFotoGirar', 'mcFotoOtra', 'mcFotoCancelar'].forEach(id => { $(id).disabled = !activos; });
-    }
-
-    function dibujarVistaFoto(fuente, quad){
-      const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-      const cw = (dist(quad[0], quad[1]) + dist(quad[3], quad[2])) / 2, ch = (dist(quad[0], quad[3]) + dist(quad[1], quad[2])) / 2;
-      const W = 320, H = Math.max(120, Math.min(420, Math.round(W * ch / cw)));
-      const cv = $('mcVistaFoto');
-      cv.width = W; cv.height = H;
-      const img = fuente.getContext('2d').getImageData(0, 0, fuente.width, fuente.height);
-      const out = cv.getContext('2d').createImageData(W, H);
-      for(let y = 0; y < H; y++) for(let x = 0; x < W; x++){
-        const p = puntoEnCuadrilatero(quad, (x + 0.5) / W, (y + 0.5) / H);
-        const sx = Math.max(0, Math.min(img.width - 1, Math.round(p.x))), sy = Math.max(0, Math.min(img.height - 1, Math.round(p.y)));
-        const si = (sy * img.width + sx) * 4, di = (y * W + x) * 4;
-        out.data[di] = img.data[si]; out.data[di + 1] = img.data[si + 1]; out.data[di + 2] = img.data[si + 2]; out.data[di + 3] = 255;
-      }
-      cv.getContext('2d').putImageData(out, 0, 0);
-      $('mcVistaCaja').style.display = 'block';
-    }
-
-    function aplicarLectura(r){
-      chkLibre.checked = r.libre;
-      aplicarLibre();
-      inputs.forEach((inp, i) => {
-        inp.classList.remove('dudoso');
-        inp.value = (r.libre && i === CENTRO) || !(r.celdas[i] > 0) ? '' : String(r.celdas[i]);
-      });
-      r.dudosas.forEach(i => { if(!(r.libre && i === CENTRO)) inputs[i].classList.add('dudoso'); });
-      revisarEditor(false);
-      const nd = r.dudosas.length;
-      msgError.className = 'mc-error info';
-      if(r.calidad && (r.calidad.borrosa || r.calidad.chica)){
-        msgError.className = 'mc-error';
-        msgError.textContent = 'La foto está borrosa o muy lejos, así que no me fío de la lectura: revisa TODOS los números (o toma otra foto más cerca, con buena luz y sin movimiento).';
-      } else {
-        msgError.textContent = (nd ? 'Leí tu cartón. Revisa ' + (nd === 1 ? 'el número' : 'los ' + nd + ' números') + ' en amarillo' : 'Leí tu cartón') +
-          ' y confirma que TODOS coincidan con el tuyo antes de guardar.';
-      }
-    }
-
-    async function leerFotoActual(){
-      if(leyendo || !fotoOrig) return;
-      leyendo = true;
-      botonesFoto(false);
-      const quad = ordenarCuadrilatero(fotoQuad);
-      fotoMsg.className = 'mc-error info';
-      fotoMsg.textContent = 'Preparando el lector… (la primera vez descarga unos 6 MB)';
-      ocrAvance = (m) => {
-        if(m && /loading/i.test(m.status || '')) fotoMsg.textContent = 'Descargando el lector (solo la primera vez)… ' + Math.round((m.progress || 0) * 100) + '%';
-      };
-      try{
-        const r = await leerCartonDeImagen(fotoOrig, quad, (k, n) => {
-          if(k < n) fotoMsg.textContent = 'Leyendo casilla ' + (k + 1) + ' de ' + n + '…';
-        });
-        try{ dibujarVistaFoto(fotoOrig, quad); } catch(e){}
-        aplicarLectura(r);
-        cerrarFoto();
-      } catch(e){
-        fotoMsg.className = 'mc-error';
-        fotoMsg.textContent = 'No pude leer la foto' + (navigator.onLine === false ? ' (no hay internet)' : '') + '. Prueba de nuevo o escribe los números a mano.';
-      } finally {
-        ocrAvance = null;
-        leyendo = false;
-        botonesFoto(true);
-        clearTimeout(temporizadorOCR);
-        temporizadorOCR = setTimeout(cerrarWorkerOCR, 90000);   // libera memoria si no se usa más
-      }
-    }
-
-    $('mcFoto').addEventListener('click', () => fotoArchivo.click());
-    $('mcFotoOtra').addEventListener('click', () => fotoArchivo.click());
-    fotoArchivo.addEventListener('change', () => {
-      const f = fotoArchivo.files && fotoArchivo.files[0];
-      fotoArchivo.value = '';
-      if(!f) return;
-      cargarFoto(f).catch(() => {
-        modalFoto.classList.add('abierto');
-        fotoMsg.className = 'mc-error';
-        fotoMsg.textContent = 'No pude abrir esa imagen. Prueba con otra foto.';
-      });
-    });
-    $('mcFotoGirar').addEventListener('click', girarFoto);
-    $('mcFotoLeer').addEventListener('click', leerFotoActual);
-    $('mcFotoCancelar').addEventListener('click', cerrarFoto);
-    $('mcFotoCerrar').addEventListener('click', cerrarFoto);
 
     pintar();
     ajustarPantalla();
@@ -3304,7 +2424,6 @@
     const mSponsorRow = $('mSponsorRow');
     const mBinguitoCard = $('mBinguitoCard');
     const mPatron = $('mPatron');
-    const mBinLetra = $('mBinLetra');
     let letraBinEsp = null;
     const misCartones = crearMisCartones();
     const elsLlamadas = { bola: $('mBolaActual'), anterior: $('mNumAnterior'), historial: $('mHistoryBalls') };
@@ -3345,7 +2464,6 @@
         mPatron.innerHTML = '';
         if(letra){
           mPatron.appendChild(crearPatron(letra));
-          mBinLetra.textContent = letra;
         }
       }
       misCartones.actualizar(estado);
