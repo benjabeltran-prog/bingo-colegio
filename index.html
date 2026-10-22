@@ -861,6 +861,20 @@
   .mc-al-txt{ font-size: 0.95rem; font-weight: 600; margin: 6px 0 12px; line-height: 1.35; }
   .mc-al-btn{ background:#2a2205; color:#f4e3a8; border:none; border-radius: 999px; padding: 10px 26px; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size: 0.9rem; cursor:pointer; }
 
+
+  /* binguito ya entregado */
+  .bin-estado{ font-size: clamp(0.55rem, 1vh, 0.7rem); letter-spacing: 0.12em; text-transform: uppercase; color: var(--blanco); font-weight: 700; background: rgba(203,161,53,0.28); padding: 2px 8px; border-radius: 999px; }
+  .binguito-panel.entregado .patron{ opacity: 0.35; }
+  .btn-bin.activo{ border-color: var(--dorado); color: var(--dorado); }
+  .m-bin-txt{ display:flex; flex-direction:column; align-items:flex-end; gap: 4px; }
+  .m-bin-estado{ font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dorado); font-weight: 700; }
+  .m-binguito.entregado .patron{ opacity: 0.35; }
+  .c-binest{ display:flex; align-items:center; justify-content:space-between; gap: 12px; padding: 12px 14px; }
+  .c-binest.entregado{ border-color: var(--dorado); }
+  .c-binest-txt{ min-width: 0; }
+  .c-binest-txt strong{ display:block; font-size: 0.95rem; color: var(--blanco); font-weight: 600; margin-top: 2px; }
+  .c-binest .c-btn{ width:auto; flex-shrink:0; padding: 10px 14px; font-size: 0.85rem; }
+  .c-binest.entregado .c-btn{ border-color: var(--dorado); color: var(--dorado); }
 </style>
 </head>
 <body class="cargando">
@@ -928,6 +942,7 @@
     <div class="bottom-bar">
       <label class="sel-ronda">Ronda <select id="selRonda"></select></label>
       <span class="contador"><strong id="contadorNum">0</strong> números marcados</span>
+      <button class="btn-limpiar btn-bin" id="btnBinguito" style="display:none">Marcar binguito entregado</button>
       <button class="btn-limpiar" id="btnLimpiar">Limpiar selecciones</button>
     </div>
 
@@ -964,7 +979,10 @@
 
     <div class="m-card m-binguito" id="mBinguitoCard" style="display:none;">
       <div class="m-bin-fila">
-        <span class="prize-label">Binguito</span>
+        <div class="m-bin-txt">
+          <span class="prize-label">Binguito</span>
+          <span class="m-bin-estado" id="mBinEstado" style="display:none">Entregado ✓</span>
+        </div>
         <div id="mPatron"></div>
       </div>
     </div>
@@ -1010,6 +1028,11 @@
         <div class="c-estado" id="cEstado"></div>
       </div>
     </header>
+
+    <section class="m-card c-binest" id="cBinEstado" style="display:none">
+      <div class="c-binest-txt"><span class="c-etq">Binguito</span><strong id="cBinEstadoTxt">Letra B · en juego</strong></div>
+      <button class="c-btn" id="cBinEntregado" type="button">Marcar entregado</button>
+    </section>
 
     <section class="m-card c-hero">
       <div class="c-hero-top">
@@ -1300,7 +1323,14 @@
   }
 
   function limpiarTodo(){
-    rutaSala().child('historial').remove().catch(errorEscritura);
+    // al limpiar el tablero empieza un juego nuevo: el binguito vuelve a estar "en juego"
+    rutaSala().update({ historial: null, binguitoGanado: null }).catch(errorEscritura);
+  }
+
+  // El anfitrión avisa que el binguito ya se entregó: los celulares dejan de avisar de binguito
+  // (quienes completen la letra después ya no ganan nada; el juego sigue por el bingo).
+  function marcarBinguitoEntregado(valor){
+    rutaSala().update({ binguitoGanado: valor ? true : null }).catch(errorEscritura);
   }
 
   function guardarPremio(valor){
@@ -1379,13 +1409,13 @@
 
   // Al elegir una ronda se cambian de una vez el premio, el título y el binguito.
   function elegirRonda(r){
-    rutaSala().update({ ronda: r.id, premio: r.premio, premioLabel: r.nombre, binguito: r.binguito || null }).catch(errorEscritura);
+    rutaSala().update({ ronda: r.id, premio: r.premio, premioLabel: r.nombre, binguito: r.binguito || null, binguitoGanado: null }).catch(errorEscritura);
   }
   function quitarRonda(){
-    rutaSala().update({ ronda: null, binguito: null }).catch(errorEscritura);
+    rutaSala().update({ ronda: null, binguito: null, binguitoGanado: null }).catch(errorEscritura);
   }
   function guardarBinguito(letra){
-    rutaSala().update({ binguito: letra || null }).catch(errorEscritura);
+    rutaSala().update({ binguito: letra || null, binguitoGanado: null }).catch(errorEscritura);
   }
 
   // =======================================================================
@@ -1543,7 +1573,8 @@
     let cartones = leerCartonesGuardados(CLAVE);
     let abiertos = {};            // id -> true/false (cartón desplegado)
     let editandoId = null;
-    let estado = { llamados: new Set(), letra: null, clave: '' };
+    let estado = { llamados: new Set(), letra: null, clave: '', ganado: false };
+    let logradoAntes = {};         // cartones que completaron la letra ANTES de que se entregara el binguito
     let alertados = {};           // evita avisar dos veces lo mismo en el mismo juego
     let primeraVez = true;
     let guardadoOk = true;
@@ -1863,9 +1894,10 @@
       const llamados = new Set(aLista(est && est.historial));
       const letra = est && formaValida(est.binguito) ? est.binguito : null;
       const clave = String((est && est.ronda) || '') + '|' + (letra || '');
-      if(llamados.size === 0) alertados = {};
+      const ganado = !!(est && est.binguitoGanado) && !!letra;
+      if(llamados.size === 0){ alertados = {}; logradoAntes = {}; }
       const reinicio = primeraVez || clave !== estado.clave || llamados.size < estado.llamados.size;
-      estado = { llamados: llamados, letra: letra, clave: clave };
+      estado = { llamados: llamados, letra: letra, clave: clave, ganado: ganado };
       primeraVez = false;
 
       const nuevos = [];
@@ -1874,10 +1906,13 @@
         [['binguito', ev.binguito], ['bingo', ev.bingo]].forEach(par => {
           const tipo = par[0];
           if(!par[1]) return;
+          if(tipo === 'binguito' && !ganado) logradoAntes[clave + '|' + c.id] = true;
           const llave = llaveAviso(c, tipo);
           if(!alertados[llave]){
             alertados[llave] = true;
-            if(!reinicio) nuevos.push({ tipo: tipo, carton: c, letra: letra });
+            // si el binguito ya se entregó, completar la letra ya no da aviso (el juego sigue por el bingo)
+            const silenciar = tipo === 'binguito' && ganado;
+            if(!reinicio && !silenciar) nuevos.push({ tipo: tipo, carton: c, letra: letra });
           }
         });
       });
@@ -1894,7 +1929,10 @@
 
       cartones.forEach((c, idx) => {
         const ev = evaluarCarton(c, estado.llamados, estado.letra);
-        const gano = ev.bingo || ev.binguito;
+        // un binguito completado DESPUÉS de que se entregó ya no cuenta como "ganado"
+        const binguitoVigente = ev.binguito && (!estado.ganado || logradoAntes[estado.clave + '|' + c.id]);
+        const binguitoTarde = ev.binguito && !binguitoVigente;
+        const gano = ev.bingo || binguitoVigente;
         if(gano) ganados++;
         const det = document.createElement('details');
         det.className = 'mc-carton' + (gano ? ' gano' : '');
@@ -1909,8 +1947,9 @@
         sum.appendChild(nom);
         const chip = document.createElement('span');
         if(ev.bingo){ chip.className = 'mc-chip ok'; chip.textContent = '¡Bingo!'; }
-        else if(ev.binguito){ chip.className = 'mc-chip ok'; chip.textContent = '¡Binguito!'; }
-        else if(ev.faltanBinguito !== null){
+        else if(binguitoVigente){ chip.className = 'mc-chip ok'; chip.textContent = '¡Binguito!'; }
+        else if(binguitoTarde){ chip.className = 'mc-chip'; chip.textContent = 'Letra completa'; }
+        else if(ev.faltanBinguito !== null && !estado.ganado){
           chip.className = 'mc-chip' + (ev.faltanBinguito <= 2 ? ' cerca' : '');
           chip.textContent = 'Binguito: ' + (ev.faltanBinguito === 1 ? 'falta 1' : 'faltan ' + ev.faltanBinguito);
         }
@@ -1937,9 +1976,10 @@
         est.className = 'mc-estado';
         const lineas = [];
         if(estado.letra){
-          lineas.push(ev.binguito
+          lineas.push(binguitoVigente
             ? '<strong>Binguito ' + estado.letra + ' completo</strong>'
-            : 'Binguito ' + estado.letra + ': faltan <strong>' + ev.faltanBinguito + '</strong>');
+            : (estado.ganado ? 'Binguito ' + estado.letra + ': ya fue entregado'
+                             : 'Binguito ' + estado.letra + ': faltan <strong>' + ev.faltanBinguito + '</strong>'));
         } else {
           lineas.push('Esta ronda no tiene binguito');
         }
@@ -2066,6 +2106,7 @@
     const selRonda = $('selRonda');
     const celdas = {};
     let letraBinActual = null;
+    let binguitoEntregado = false;
 
     rangos.forEach(({letra, inicio, fin}) => {
       const fila = document.createElement('div');
@@ -2111,6 +2152,15 @@
         }
       }
       if(document.activeElement !== selRonda) selRonda.value = estado.ronda ? String(estado.ronda) : '';
+
+      // binguito ya entregado
+      binguitoEntregado = !!estado.binguitoGanado && !!letra;
+      if(letra) binLetra.textContent = binguitoEntregado ? 'Entregado ✓' : 'Letra ' + letra;   // misma línea: el encabezado no cambia de alto
+      panelBin.classList.toggle('entregado', binguitoEntregado);
+      const btnBin = $('btnBinguito');
+      btnBin.style.display = letra ? '' : 'none';
+      btnBin.textContent = binguitoEntregado ? 'Binguito entregado ✓ (deshacer)' : 'Marcar binguito entregado';
+      btnBin.classList.toggle('activo', binguitoEntregado);
     }
 
     // selector de ronda (barra inferior)
@@ -2121,6 +2171,8 @@
       if(r) elegirRonda(r); else quitarRonda();
       selRonda.blur();
     });
+
+    $('btnBinguito').addEventListener('click', () => marcarBinguitoEntregado(!binguitoEntregado));
 
     $('btnLimpiar').addEventListener('click', () => {
       if(confirm('¿Limpiar todos los números marcados? Esto también se verá en los celulares.')) limpiarTodo();
@@ -2374,6 +2426,22 @@
         : (letra ? 'Letra ' + letra : 'Sin ronda');
     }
 
+    // ---- binguito entregado ----
+    let binguitoEntregadoCtl = false;
+    function pintarBinEstado(estado){
+      const letra = formaValida(estado.binguito) ? estado.binguito : null;
+      binguitoEntregadoCtl = !!estado.binguitoGanado && !!letra;
+      const caja = $('cBinEstado');
+      caja.style.display = letra ? '' : 'none';
+      caja.classList.toggle('entregado', binguitoEntregadoCtl);
+      $('cBinEstadoTxt').textContent = letra ? 'Letra ' + letra + (binguitoEntregadoCtl ? ' · ¡entregado!' : ' · en juego') : '';
+      $('cBinEntregado').textContent = binguitoEntregadoCtl ? 'Deshacer' : 'Marcar entregado';
+    }
+    $('cBinEntregado').addEventListener('click', () => {
+      if(!binguitoEntregadoCtl && !confirm('¿Marcar el binguito como entregado? Los celulares dejarán de avisar de binguito.')) return;
+      marcarBinguitoEntregado(!binguitoEntregadoCtl);
+    });
+
     function renderControl(estado){
       historialActual = aLista(estado.historial);
       pintarLlamadas(historialActual, elsLlamadas);
@@ -2386,6 +2454,7 @@
       pintarGrid();
       pintarHistorial();
       pintarRondas(estado);
+      pintarBinEstado(estado);
       if(typeof estado.premio === 'string') cPremioResumen.textContent = estado.premio;
       if(document.activeElement !== cPremioLabel && typeof estado.premioLabel === 'string') cPremioLabel.value = estado.premioLabel;
       if(document.activeElement !== cPremioValor && typeof estado.premio === 'string') cPremioValor.value = estado.premio;
@@ -2466,6 +2535,9 @@
           mPatron.appendChild(crearPatron(letra));
         }
       }
+      const entregado = !!(estado && estado.binguitoGanado) && !!letra;
+      $('mBinEstado').style.display = entregado ? 'inline' : 'none';
+      mBinguitoCard.classList.toggle('entregado', entregado);
       misCartones.actualizar(estado);
     }
 
