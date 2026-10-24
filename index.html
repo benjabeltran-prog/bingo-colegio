@@ -881,6 +881,40 @@
   .c-binest .c-btn{ width:auto; flex-shrink:0; padding: 10px 14px; font-size: 0.85rem; }
   .c-binest.entregado .c-btn{ border-color: var(--dorado); color: var(--dorado); }
 
+
+  /* ================= MODO CLARO (proyector) =================
+     Pensado para proyectores de poco contraste o con mucha luz ambiente: fondo blanco,
+     números oscuros y casillas marcadas en verde intenso con texto blanco. */
+  html.claro{
+    --verde-fondo: #ffffff; --verde-panel: #e3efe7;
+    --gris-celda: #ffffff; --gris-celda-hover: #eef5f0;
+    --gris-texto: #0c1f16; --gris-suave: #33473c; --blanco: #0c1f16;
+    --sombra: rgba(20,50,35,0.18);
+    --verde-acento: #0c6b3a; --verde-acento-oscuro: #073d22;
+    --gris-claro: #aab8b0; --gris-oscuro: #55635b;
+  }
+  html.claro, html.claro body{ background: #ffffff; background-image: none; }
+  html.claro .panel, html.claro .board-wrap{ border: 1px solid #55725f; box-shadow: 0 2px 8px rgba(20,50,35,0.28); }
+  html.claro .celda{ border-color: #9db3a6; }
+  html.claro .celda.marcada{ background: #0a5a31; color: #ffffff; border-color: #073d22; box-shadow: 0 3px 8px rgba(7,61,34,0.4); }
+  html.claro .letra-label.L-B{ color: #ffffff; }
+  html.claro .letra-label.L-G, html.claro .letra-label.L-O{ color: #ffffff; }
+  html.claro .bola-B{ color: #ffffff; }
+  html.claro .bola-G, html.claro .bola-O{ color: #ffffff !important; }
+  html.claro .digital-box{ background: #12382a; border-color: #0a2318; }
+  html.claro .digital-label{ color: #c5d6cb; }
+  html.claro .digital-num{ color: #7dffb0; }
+  html.claro .prize-value, html.claro .bin-letra{ color: #6a4200; }
+  html.claro .prize-value:hover, html.claro .prize-value:focus{ border-color: #6a4200; }
+  html.claro .pat-celda{ background: #c3d4c9; }
+  html.claro .pat-celda.on{ background: #e8a800; box-shadow: inset 0 0 0 1.5px #7a4f00; }
+  html.claro .pat-cab{ color: #3a4d43; }
+  html.claro .pat-cab.on{ color: #7a4f00; }
+  html.claro .btn-bin.activo{ border-color: #7a4f00; color: #7a4f00; }
+  html.claro .btn-limpiar, html.claro .sel-ronda select{ background: #ffffff; border-color: #3e5247; }
+  html.claro .btn-limpiar:hover{ background: #e3efe7; }
+  html.claro .sel-ronda option{ background: #ffffff; color: #0c1f16; }
+  html.claro .logo-box{ background: rgba(0,0,0,0.04); }
 </style>
 </head>
 <body class="cargando">
@@ -946,6 +980,7 @@
     </div>
 
     <div class="bottom-bar">
+      <button class="btn-limpiar" id="btnTema" type="button">☀ Modo claro</button>
       <label class="sel-ronda">Ronda <select id="selRonda"></select></label>
       <span class="contador"><strong id="contadorNum">0</strong> números marcados</span>
       <button class="btn-limpiar btn-bin" id="btnBinguito" style="display:none">Marcar binguito entregado</button>
@@ -2165,6 +2200,26 @@
       btnBin.textContent = binguitoEntregado ? 'Binguito entregado ✓ (deshacer)' : 'Marcar binguito entregado';
       btnBin.classList.toggle('activo', binguitoEntregado);
     }
+
+    // ---- modo claro / oscuro (se recuerda en este computador) ----
+    function aplicarTema(claro, guardar){
+      document.documentElement.classList.toggle('claro', claro);
+      $('btnTema').textContent = claro ? '🌙 Modo oscuro' : '☀ Modo claro';
+      if(guardar){ try{ localStorage.setItem('bingoTema', claro ? 'claro' : 'oscuro'); } catch(e){} }
+    }
+    let temaGuardado = null;
+    try{ temaGuardado = localStorage.getItem('bingoTema'); } catch(e){}
+    const temaUrl = params.get('tema');
+    aplicarTema(temaUrl ? temaUrl === 'claro' : temaGuardado === 'claro', !!temaUrl);
+    $('btnTema').addEventListener('click', () => aplicarTema(!document.documentElement.classList.contains('claro'), true));
+    document.addEventListener('keydown', (e) => {
+      if(e.key.toLowerCase() === 'l' && !e.ctrlKey && !e.metaKey && !e.altKey){
+        const activo = document.activeElement;
+        if(!(activo && (activo.tagName === 'INPUT' || activo.tagName === 'TEXTAREA' || activo.isContentEditable))){
+          aplicarTema(!document.documentElement.classList.contains('claro'), true);
+        }
+      }
+    });
 
     // selector de ronda (barra inferior)
     selRonda.innerHTML = '<option value="">Sin ronda</option>' +
