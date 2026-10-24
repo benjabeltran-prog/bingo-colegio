@@ -935,6 +935,55 @@
   html.claro .btn-limpiar:hover{ background: #e3efe7; }
   html.claro .sel-ronda option{ background: #ffffff; color: #0c1f16; }
   html.claro .logo-box{ background: rgba(0,0,0,0.04); }
+
+  /* ================= PANTALLA DE ESPERA (pausa del bingo) ================= */
+  .pausa-pantalla{
+    position: fixed; inset: 0; z-index: 80; display: none; align-items: center; justify-content: space-around; gap: 3vw;
+    padding: 4vh 4vw; color: var(--blanco);
+    background: radial-gradient(circle at 15% 10%, rgba(63,174,114,0.18), transparent 45%), radial-gradient(circle at 90% 95%, rgba(203,161,53,0.14), transparent 45%), var(--verde-fondo);
+  }
+  .pausa-reloj{ position:absolute; top: 3vh; right: 3vw; font-family:'Archivo Black', sans-serif; font-size: clamp(1.4rem, 3.2vh, 2.4rem); color: var(--gris-suave); }
+  .pausa-centro{ flex: 1 1 55%; min-width: 0; display:flex; flex-direction:column; align-items:center; text-align:center; gap: 2.2vh; }
+  .pausa-logo{ display:none; max-height: 22vh; max-width: 30vw; object-fit: contain; background:#fff; border-radius: 16px; padding: 10px; }
+  .pausa-marca{ font-family:'Archivo Black', sans-serif; font-size: clamp(1rem, 2.6vh, 1.9rem); letter-spacing: 0.06em; color: var(--gris-suave); text-transform: uppercase; }
+  .pausa-titulo{ font-family:'Archivo Black', sans-serif; font-size: clamp(2.8rem, 10.5vh, 8rem); line-height: 1.04; color: var(--blanco); overflow-wrap: anywhere; }
+  .pausa-detalle{ font-size: clamp(1.2rem, 3.6vh, 2.6rem); color: var(--gris-texto); font-weight: 600; }
+  .pausa-proxima{ font-size: clamp(1.1rem, 3.1vh, 2.3rem); font-weight: 700; color: var(--dorado); background: rgba(203,161,53,0.14); border: 2px solid var(--dorado); padding: 1.4vh 2.2vw; border-radius: 999px; }
+  .pausa-lado{ flex: 0 1 36%; display:flex; flex-direction:column; align-items:center; gap: 2vh; }
+  .pausa-aus-tit{ font-size: clamp(0.8rem, 1.8vh, 1.2rem); letter-spacing: 0.2em; text-transform: uppercase; color: var(--gris-suave); }
+  .pausa-aus{ width: min(32vw, 560px); height: min(24vh, 250px); }
+  .pausa-qr{ display:flex; flex-direction:column; align-items:center; gap: 1vh; font-size: clamp(0.8rem, 1.8vh, 1.2rem); color: var(--gris-suave); text-align:center; }
+  .pausa-qr > div{ background:#fff; padding: 10px; border-radius: 12px; line-height: 0; }
+  .pausa-volver{
+    position:absolute; bottom: 2.5vh; left: 50%; transform: translateX(-50%); font-family:'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.9rem;
+    color: var(--blanco); background: transparent; border: 2px solid var(--gris-suave); padding: 0.55em 1.6em; border-radius: 999px; cursor:pointer; opacity: 0; transition: opacity 0.2s ease;
+  }
+  .pausa-volver.visible, .pausa-volver:focus{ opacity: 1; }
+  .btn-pausa.activo{ border-color: var(--dorado); color: var(--dorado); }
+  html.claro .btn-pausa.activo{ border-color: #6a4200; color: #6a4200; }
+  html.claro .pausa-pantalla{ background: #ffffff; }
+  html.claro .pausa-proxima{ color: #6a4200; border-color: #6a4200; background: rgba(106,66,0,0.08); }
+  html.claro .pausa-detalle{ color: #1c2f26; }
+  html.claro .pausa-volver{ border-color: #3e5247; background: #fff; }
+  html.claro .aus-item, html.claro .pausa-logo{ box-shadow: inset 0 0 0 1.5px #9db3a6; }
+  html.claro .pausa-qr > div{ box-shadow: 0 0 0 1.5px #9db3a6; }
+
+  /* ventana para elegir el motivo de la pausa */
+  .pausa-etq{ display:block; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gris-suave); margin: 10px 0 4px; }
+  .pausa-chips{ display:flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
+  .pausa-chip{ border: 1.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); color: var(--gris-texto); border-radius: 999px; padding: 8px 14px; font-family:'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.85rem; cursor:pointer; }
+  .pausa-chip:hover{ border-color: var(--dorado); }
+  html.claro .mc-hoja{ background: #e3efe7; color: #0c1f16; }
+  html.claro .mc-hoja-cab strong{ color: #0c1f16; }
+  html.claro .mc-texto{ background: #fff; color: #0c1f16; border-color: #55725f; }
+  html.claro .mc-btn.sec{ color: #0c1f16; border-color: #55725f; }
+  html.claro .mc-btn.prim{ color: #fff; background: #0a5a31; border-color: #0a5a31; }
+  html.claro .pausa-chip{ color: #0c1f16; border-color: #55725f; background: #fff; }
+
+  /* control (teléfono): botón de pausa en la barra inferior */
+  .c-bar .c-btn{ padding: 14px 6px; font-size: 0.88rem; }
+  .c-btn-pausa{ flex: 1.3; border-color: var(--dorado); color: var(--dorado); }
+  .c-btn-pausa.activo{ background: var(--dorado); color: #2a2205; }
 </style>
 </head>
 <body class="cargando">
@@ -1006,6 +1055,7 @@
       <button class="btn-limpiar" id="btnTema" type="button">☀ Modo claro</button>
       <label class="sel-ronda">Ronda <select id="selRonda"></select></label>
       <span class="contador"><strong id="contadorNum">0</strong> números marcados</span>
+      <button class="btn-limpiar btn-pausa" id="btnPausa" type="button">⏸ Pausa</button>
       <button class="btn-limpiar btn-bin" id="btnBinguito" style="display:none">Marcar binguito entregado</button>
       <button class="btn-limpiar" id="btnLimpiar">Limpiar selecciones</button>
     </div>
@@ -1151,7 +1201,8 @@
 
     <div class="c-bar">
       <div class="c-bar-in">
-        <button class="c-btn c-btn-prim" id="cDeshacer" type="button">↩ Deshacer último</button>
+        <button class="c-btn c-btn-prim" id="cDeshacer" type="button">↩ Deshacer</button>
+        <button class="c-btn c-btn-pausa" id="cPausa" type="button">⏸ Pausa</button>
         <button class="c-btn c-btn-peligro" id="cLimpiar" type="button">Limpiar</button>
       </div>
     </div>
@@ -1159,6 +1210,46 @@
   </div>
 
   <!-- ======================= EDITOR DE CARTÓN Y AVISO (espectador) ======================= -->
+  <!-- ======================= PANTALLA DE ESPERA (proyector) Y VENTANA DE PAUSA ======================= -->
+  <div class="pausa-pantalla" id="pausaPantalla">
+    <div class="pausa-reloj" id="pausaReloj"></div>
+    <div class="pausa-centro">
+      <img class="pausa-logo" id="pausaLogo" alt="Logo del colegio">
+      <div class="pausa-marca">Bingo Oxford School 2026</div>
+      <div class="pausa-titulo" id="pausaTituloGrande">Pausa</div>
+      <div class="pausa-detalle" id="pausaDetalleGrande"></div>
+      <div class="pausa-proxima" id="pausaProximaTxt"></div>
+    </div>
+    <div class="pausa-lado">
+      <div id="pausaAusCaja" style="display:none; width:100%; display:none; flex-direction:column; align-items:center; gap: 1.2vh;">
+        <div class="pausa-aus-tit">Auspiciadores</div>
+        <div class="aus-carrusel pausa-aus" id="pausaAus"></div>
+        <div class="aus-puntos" id="pausaAusPuntos"></div>
+      </div>
+      <div class="pausa-qr" id="pausaQrCaja" style="display:none">
+        <div id="pausaQr"></div>
+        <span>Sigue los números en tu celular</span>
+      </div>
+    </div>
+    <button class="pausa-volver" id="pausaVolver" type="button">▶ Volver al bingo</button>
+  </div>
+
+  <div class="mc-modal" id="pausaModal">
+    <div class="mc-hoja">
+      <div class="mc-hoja-cab"><strong>Pausa del bingo</strong><button class="mc-x" id="pausaCerrar" type="button" aria-label="Cerrar">✕</button></div>
+      <span class="pausa-etq">¿Qué está pasando?</span>
+      <div class="pausa-chips" id="pausaChips"></div>
+      <input class="mc-texto" id="pausaTitulo" type="text" maxlength="40" placeholder="Pausa" autocomplete="off">
+      <input class="mc-texto" id="pausaDetalle" type="text" maxlength="70" placeholder="Mensaje (opcional), ej. Volvemos en unos minutos" autocomplete="off">
+      <span class="pausa-etq">Próximo bingo</span>
+      <select class="mc-texto" id="pausaProxima"></select>
+      <div class="mc-pie">
+        <button class="mc-btn sec" id="pausaCancelar" type="button">Cancelar</button>
+        <button class="mc-btn prim" id="pausaPoner" type="button">Poner pausa</button>
+      </div>
+    </div>
+  </div>
+
   <div class="mc-modal" id="mcModal">
     <div class="mc-hoja">
       <div class="mc-hoja-cab"><strong id="mcTituloEditor">Nuevo cartón</strong><button class="mc-x" id="mcCerrar" type="button" aria-label="Cerrar">✕</button></div>
@@ -1514,6 +1605,64 @@
       arrancar();
     }
     return { actualizar: actualizar };
+  }
+
+  // ---------------------------------------------------------------------
+  // PAUSA DEL BINGO: pantalla de espera en el proyector mientras hay un descanso
+  // ---------------------------------------------------------------------
+  let ultimoEstadoAdmin = {};
+  const PAUSA_PRESETS = ['Pausa', 'Torneo de Bandas', 'Desfile de Ropa Reciclada'];
+
+  // el bingo que sigue después de la ronda actual (o el primero si aún no empieza)
+  function rondaSiguiente(rondaId){
+    const i = RONDAS.findIndex(r => r.id === Number(rondaId));
+    if(i < 0) return RONDAS[0];
+    return i < RONDAS.length - 1 ? RONDAS[i + 1] : null;
+  }
+  function textoProximaRonda(id){
+    const r = RONDAS.find(x => x.id === Number(id));
+    return r ? 'Próximo bingo · ' + r.hora + ' · ' + r.nombre + ' ' + r.premio + (r.binguito ? ' · Binguito letra ' + r.binguito : '') : '';
+  }
+  function ponerPausa(p){
+    rutaSala().update({ pausa: { titulo: p.titulo || 'Pausa', detalle: p.detalle || '', proxima: p.proxima || null } }).catch(errorEscritura);
+  }
+  function quitarPausa(){
+    rutaSala().update({ pausa: null }).catch(errorEscritura);
+  }
+
+  // ventana para elegir el motivo de la pausa (la usan el proyector y el teléfono)
+  function iniciarModalPausa(){
+    const modal = $('pausaModal'), chips = $('pausaChips'), tit = $('pausaTitulo'), det = $('pausaDetalle'), prox = $('pausaProxima');
+    chips.innerHTML = '';
+    PAUSA_PRESETS.forEach(t => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pausa-chip';
+      b.textContent = t;
+      b.addEventListener('click', () => { tit.value = t; });
+      chips.appendChild(b);
+    });
+    prox.innerHTML = '<option value="">Sin indicar</option>' + RONDAS.map(r =>
+      '<option value="' + r.id + '">' + r.hora + ' · ' + r.nombre + ' ' + r.premio + (r.binguito ? ' · Binguito ' + r.binguito : '') + '</option>').join('');
+    function cerrar(){ modal.classList.remove('abierto'); }
+    function poner(){
+      ponerPausa({ titulo: tit.value.trim(), detalle: det.value.trim(), proxima: prox.value ? Number(prox.value) : null });
+      cerrar();
+    }
+    $('pausaCancelar').addEventListener('click', cerrar);
+    $('pausaCerrar').addEventListener('click', cerrar);
+    $('pausaPoner').addEventListener('click', poner);
+    [tit, det].forEach(el => el.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); poner(); } }));
+    return {
+      abrir: function(){
+        const r = rondaSiguiente(ultimoEstadoAdmin.ronda);
+        tit.value = 'Pausa';
+        det.value = '';
+        prox.value = r ? String(r.id) : '';
+        modal.classList.add('abierto');
+        setTimeout(() => tit.focus(), 60);
+      }
+    };
   }
 
   function descripcionRonda(r){
@@ -2225,6 +2374,7 @@
     const selRonda = $('selRonda');
     const celdas = {};
     let letraBinActual = null;
+    let logoColegioSrc = null;
     let binguitoEntregado = false;
 
     rangos.forEach(({letra, inicio, fin}) => {
@@ -2250,6 +2400,7 @@
     const elsLlamadas = { bola: $('bolaActual'), anterior: $('numAnterior'), historial: $('historyBalls') };
 
     function renderProyector(estado){
+      ultimoEstadoAdmin = estado;
       const historial = aLista(estado.historial);
       const marcados = new Set(historial);
       Object.keys(celdas).forEach(k => celdas[k].classList.toggle('marcada', marcados.has(Number(k))));
@@ -2280,6 +2431,8 @@
       btnBin.style.display = letra ? '' : 'none';
       btnBin.textContent = binguitoEntregado ? 'Binguito entregado ✓ (deshacer)' : 'Marcar binguito entregado';
       btnBin.classList.toggle('activo', binguitoEntregado);
+
+      aplicarPausa(estado.pausa);
     }
 
     // ---- modo claro / oscuro (se recuerda en este computador) ----
@@ -2426,6 +2579,7 @@
     });
 
     function renderLogosProyector(logos){
+      logoColegioSrc = logos.colegio || null;
       pintarLogoEnCaja(cajaColegio, logos.colegio);
       const aus = logos.auspiciadores || {};
       logosAus = {};
@@ -2433,6 +2587,7 @@
       dibujarAuspiciadores();
       carruselProy.actualizar(Object.keys(logosAus).map(Number).sort((a, b) => a - b).map(k => logosAus[k]));
       vistaAuspiciadores();
+      actualizarContenidoPausa();
     }
 
     // ---- abrir página imprimible del QR, ya enlazada a esta sala ----
@@ -2451,6 +2606,93 @@
         const activo = document.activeElement;
         const escribiendo = activo && (activo.tagName === 'INPUT' || activo.tagName === 'TEXTAREA' || activo.isContentEditable);
         if(!escribiendo) $('qrPanel').classList.toggle('visible');
+      }
+    });
+
+    // ---- pantalla de espera (pausa) ----
+    const modalPausa = iniciarModalPausa();
+    const carruselPausa = crearCarruselAuspiciadores($('pausaAus'), $('pausaAusPuntos'), TIEMPO_AUSPICIADOR);
+    let pausaActiva = false;
+    let relojPausa = null;
+    let qrIniciado = false;
+
+    function actualizarRelojPausa(){
+      $('pausaReloj').textContent = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+    }
+    // código QR para que el público siga los números desde el celular
+    function cargarQR(){
+      if(qrIniciado) return;
+      qrIniciado = true;
+      const url = new URL(location.href);
+      url.search = ''; url.hash = '';
+      url.searchParams.set('sala', room);
+      url.searchParams.set('vista', 'movil');
+      const montar = () => {
+        try{
+          const caja = $('pausaQr');
+          caja.innerHTML = '';
+          new QRCode(caja, { text: url.toString(), width: 200, height: 200, colorDark: '#0c231b', colorLight: '#ffffff' });
+          $('pausaQrCaja').style.display = '';
+        } catch(e){}
+      };
+      if(window.QRCode){ montar(); return; }
+      const sc = document.createElement('script');
+      sc.src = 'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js';
+      sc.onload = montar;
+      sc.onerror = () => { qrIniciado = false; };
+      document.head.appendChild(sc);
+    }
+    function actualizarContenidoPausa(){
+      const logo = $('pausaLogo');
+      if(logoColegioSrc){ logo.src = logoColegioSrc; logo.style.display = 'block'; } else { logo.style.display = 'none'; }
+      const lista = Object.keys(logosAus).map(Number).sort((a, b) => a - b).map(k => logosAus[k]);
+      $('pausaAusCaja').style.display = lista.length ? 'flex' : 'none';
+      carruselPausa.actualizar(lista);
+    }
+    function aplicarPausa(p){
+      const activa = !!p;
+      if(activa){
+        $('pausaTituloGrande').textContent = p.titulo || 'Pausa';
+        const d = $('pausaDetalleGrande');
+        d.textContent = p.detalle || '';
+        d.style.display = p.detalle ? '' : 'none';
+        const tp = p.proxima ? textoProximaRonda(p.proxima) : '';
+        const pp = $('pausaProximaTxt');
+        pp.textContent = tp;
+        pp.style.display = tp ? '' : 'none';
+      }
+      if(activa !== pausaActiva){
+        pausaActiva = activa;
+        $('pausaPantalla').style.display = activa ? 'flex' : 'none';
+        if(activa){
+          actualizarContenidoPausa();
+          actualizarRelojPausa();
+          relojPausa = setInterval(actualizarRelojPausa, 15000);
+          cargarQR();
+        } else {
+          clearInterval(relojPausa);
+          relojPausa = null;
+        }
+      }
+      const btn = $('btnPausa');
+      btn.textContent = pausaActiva ? '▶ Reanudar' : '⏸ Pausa';
+      btn.classList.toggle('activo', pausaActiva);
+    }
+    function alternarPausa(){ if(pausaActiva) quitarPausa(); else modalPausa.abrir(); }
+    $('btnPausa').addEventListener('click', alternarPausa);
+    $('pausaVolver').addEventListener('click', quitarPausa);
+    // el botón "Volver al bingo" solo se ve cuando se mueve el mouse (y se esconde a los 2,5 s)
+    let temporizadorVolver = null;
+    $('pausaPantalla').addEventListener('mousemove', () => {
+      const bv = $('pausaVolver');
+      bv.classList.add('visible');
+      clearTimeout(temporizadorVolver);
+      temporizadorVolver = setTimeout(() => bv.classList.remove('visible'), 2500);
+    });
+    document.addEventListener('keydown', (e) => {
+      if(e.key.toLowerCase() === 'p' && !e.ctrlKey && !e.metaKey && !e.altKey){
+        const activo = document.activeElement;
+        if(!(activo && (activo.tagName === 'INPUT' || activo.tagName === 'TEXTAREA' || activo.tagName === 'SELECT' || activo.isContentEditable))) alternarPausa();
       }
     });
 
@@ -2591,6 +2833,14 @@
         : (letra ? 'Letra ' + letra : 'Sin ronda');
     }
 
+    // ---- pausa ----
+    const modalPausaCtl = iniciarModalPausa();
+    let pausaActivaCtl = false;
+    $('cPausa').addEventListener('click', () => {
+      if(pausaActivaCtl){ quitarPausa(); mostrarToast('▶ Bingo reanudado'); }
+      else modalPausaCtl.abrir();
+    });
+
     // ---- binguito entregado ----
     let binguitoEntregadoCtl = false;
     function pintarBinEstado(estado){
@@ -2608,6 +2858,7 @@
     });
 
     function renderControl(estado){
+      ultimoEstadoAdmin = estado;
       historialActual = aLista(estado.historial);
       pintarLlamadas(historialActual, elsLlamadas);
       const total = historialActual.length;
@@ -2620,6 +2871,9 @@
       pintarHistorial();
       pintarRondas(estado);
       pintarBinEstado(estado);
+      pausaActivaCtl = !!estado.pausa;
+      $('cPausa').textContent = pausaActivaCtl ? '▶ Reanudar' : '⏸ Pausa';
+      $('cPausa').classList.toggle('activo', pausaActivaCtl);
       if(typeof estado.premio === 'string') cPremioResumen.textContent = estado.premio;
       if(document.activeElement !== cPremioLabel && typeof estado.premioLabel === 'string') cPremioLabel.value = estado.premioLabel;
       if(document.activeElement !== cPremioValor && typeof estado.premio === 'string') cPremioValor.value = estado.premio;
