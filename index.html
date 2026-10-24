@@ -475,20 +475,26 @@
 
   .m-sponsors-card{ text-align:center; }
   .m-sponsors-card .sponsors-label{ display:block; margin-bottom: 8px; }
+  /* Los logos se agrandan según cuántos haya: 1, 2 o 3 auspiciadores ocupan todo el ancho. */
   .m-sponsor-row{
-    display:flex;
+    display:grid;
+    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
     gap: 10px;
-    justify-content:center;
-    flex-wrap: wrap;
+    margin: 0 auto;
   }
+  .m-sponsor-row[data-tam="1"]{ max-width: 240px; }
   .m-sponsor-logo{
-    width: 54px;
-    height: 54px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     object-fit: contain;
     background: #fff;
-    border-radius: 8px;
-    padding: 4px;
+    border-radius: 12px;
+    padding: 8px;
+    box-sizing: border-box;
   }
+  .m-sponsor-row[data-tam="1"] .m-sponsor-logo{ aspect-ratio: 3 / 2; }
+  .m-sponsor-row[data-tam="2"] .m-sponsor-logo{ aspect-ratio: 4 / 3; }
+  .m-sponsor-row[data-tam="mas"] .m-sponsor-logo{ padding: 5px; border-radius: 9px; }
 
   .m-card{
     background: var(--verde-panel);
@@ -2100,7 +2106,7 @@
     lector.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
-        const maxDim = 240;
+        const maxDim = 400;
         let w = img.width, h = img.height;
         if(w > maxDim || h > maxDim){
           if(w > h){ h = Math.round(h * maxDim / w); w = maxDim; }
@@ -2613,6 +2619,9 @@
       if(auspiciadores.length){
         mSponsorsCard.style.display = 'block';
         mSponsorRow.innerHTML = '';
+        const n = auspiciadores.length;
+        mSponsorRow.style.setProperty('--cols', n <= 3 ? n : (n === 4 ? 4 : (n <= 6 ? 3 : 4)));
+        mSponsorRow.dataset.tam = n <= 2 ? String(n) : (n === 3 ? '3' : 'mas');
         auspiciadores.forEach(src => {
           const img = document.createElement('img');
           img.className = 'm-sponsor-logo';
