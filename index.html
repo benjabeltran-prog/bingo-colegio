@@ -475,26 +475,40 @@
 
   .m-sponsors-card{ text-align:center; }
   .m-sponsors-card .sponsors-label{ display:block; margin-bottom: 8px; }
-  /* Los logos se agrandan según cuántos haya: 1, 2 o 3 auspiciadores ocupan todo el ancho. */
-  .m-sponsor-row{
-    display:grid;
-    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
-    gap: 10px;
-    margin: 0 auto;
+  /* ===== Auspiciadores: un logo a la vez, grande, con animación ===== */
+  .aus-carrusel{ position: relative; overflow: hidden; border-radius: 14px; }   /* recorta el deslizamiento para que nada sobresalga de la pantalla */
+  .aus-item{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:#fff; border-radius: 14px; padding: 8px; box-sizing: border-box;
+    opacity:0; transform: translateX(34px) scale(0.93); pointer-events:none;
+    transition: opacity 0.7s ease, transform 0.7s ease;
   }
-  .m-sponsor-row[data-tam="1"]{ max-width: 240px; }
-  .m-sponsor-logo{
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 12px;
-    padding: 8px;
-    box-sizing: border-box;
+  .aus-item.activo{ opacity:1; transform: none; }
+  .aus-item.saliendo{ opacity:0; transform: translateX(-34px) scale(0.93); }
+  .aus-item img{ width:100%; height:100%; object-fit: contain; }
+  .aus-puntos{ display:flex; gap: 5px; justify-content:center; flex-wrap: wrap; min-height: 6px; }
+  .aus-punto{ width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.28); transition: background 0.3s ease, transform 0.3s ease; }
+  .aus-punto.on{ background: var(--dorado); transform: scale(1.3); }
+  html.claro .aus-punto{ background: rgba(0,0,0,0.25); }
+  html.claro .aus-punto.on{ background: #6a4200; }
+  @media (prefers-reduced-motion: reduce){
+    .aus-item, .aus-item.saliendo{ transform: none; transition: opacity 0.4s ease; }
   }
-  .m-sponsor-row[data-tam="1"] .m-sponsor-logo{ aspect-ratio: 3 / 2; }
-  .m-sponsor-row[data-tam="2"] .m-sponsor-logo{ aspect-ratio: 4 / 3; }
-  .m-sponsor-row[data-tam="mas"] .m-sponsor-logo{ padding: 5px; border-radius: 9px; }
+  /* proyector */
+  .p-aus{ width: clamp(170px, 14vw, 280px); height: clamp(84px, 11.5vh, 140px); }
+  .sponsors{ position: relative; }
+  .aus-editar{
+    position:absolute; top: 5px; right: 7px; font-family:'Space Grotesk', sans-serif; font-size: 0.58rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 999px; border: 1px solid var(--gris-suave); background: transparent; color: var(--gris-suave);
+    cursor:pointer; opacity: 0; transition: opacity 0.2s ease;
+  }
+  .sponsors:hover .aus-editar, .aus-editar:focus, .aus-editar.activo{ opacity: 1; }
+  .aus-editar.activo{ border-color: var(--dorado); color: var(--dorado); }
+  html.claro .aus-editar.activo{ border-color: #6a4200; color: #6a4200; }
+  /* celular del público */
+  .m-aus{ width: 100%; height: clamp(120px, 40vw, 170px); }
+  .m-sponsors-card .aus-puntos{ margin-top: 10px; }
+
 
   .m-card{
     background: var(--verde-panel);
@@ -976,8 +990,11 @@
 
       <div class="panel sponsors">
         <span class="sponsors-label">Auspiciadores</span>
+        <div class="aus-carrusel p-aus" id="ausCarrusel" style="display:none"></div>
+        <div class="aus-puntos" id="ausPuntos" style="display:none"></div>
         <div class="sponsor-slots" id="sponsorSlots">
         </div>
+        <button class="aus-editar" id="ausEditar" type="button" style="display:none">✎ Editar</button>
       </div>
     </div>
 
@@ -1036,7 +1053,8 @@
 
     <div class="m-card m-sponsors-card" id="mSponsorsCard" style="display:none;">
       <span class="sponsors-label">Auspiciadores</span>
-      <div class="m-sponsor-row" id="mSponsorRow"></div>
+      <div class="aus-carrusel m-aus" id="mSponsorRow"></div>
+      <div class="aus-puntos" id="mAusPuntos"></div>
     </div>
 
     <div class="m-card">
@@ -1439,6 +1457,63 @@
       });
     });
     return cont;
+  }
+
+  // Carrusel de auspiciadores: muestra un logo a la vez, grande, con animación, y los va rotando.
+  const TIEMPO_AUSPICIADOR = 4000;   // milisegundos que se muestra cada logo
+  function crearCarruselAuspiciadores(cont, puntosEl, tiempo){
+    let items = [], actual = 0, timer = null, firma = null;
+    function pintarPuntos(){
+      puntosEl.innerHTML = '';
+      if(items.length < 2) return;
+      items.forEach((_, i) => {
+        const p = document.createElement('span');
+        p.className = 'aus-punto' + (i === actual ? ' on' : '');
+        puntosEl.appendChild(p);
+      });
+    }
+    function mostrar(nuevo, previo){
+      items.forEach((el, k) => {
+        if(k === nuevo){ el.classList.remove('saliendo'); el.classList.add('activo'); }
+        else if(k === previo){
+          el.classList.remove('activo'); el.classList.add('saliendo');
+          setTimeout(() => el.classList.remove('saliendo'), 800);
+        }
+      });
+      Array.from(puntosEl.children).forEach((p, k) => p.classList.toggle('on', k === nuevo));
+    }
+    function arrancar(){
+      if(timer) clearInterval(timer);
+      timer = null;
+      if(items.length > 1){
+        timer = setInterval(() => {
+          const previo = actual;
+          actual = (actual + 1) % items.length;
+          mostrar(actual, previo);
+        }, tiempo);
+      }
+    }
+    function actualizar(srcs){
+      const f = srcs.length + '|' + srcs.map(x => x.length + ':' + x.slice(-24)).join(',');
+      if(f === firma) return;          // los mismos logos: no se reinicia la rotación
+      firma = f;
+      cont.innerHTML = '';
+      items = srcs.map(src => {
+        const d = document.createElement('div');
+        d.className = 'aus-item';
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = 'Auspiciador';
+        d.appendChild(img);
+        cont.appendChild(d);
+        return d;
+      });
+      if(actual >= items.length) actual = 0;
+      if(items.length) items[actual].classList.add('activo');
+      pintarPuntos();
+      arrancar();
+    }
+    return { actualizar: actualizar };
   }
 
   function descripcionRonda(r){
@@ -2262,6 +2337,7 @@
           const file = e.target.files[0];
           if(!file) return;
           procesarImagenLogo(file, (dataUrl) => {
+            if(ruta.indexOf('auspiciadores') === 0) editandoAus = true;   // al subir un auspiciador se sigue en modo edición hasta tocar "Listo"
             rutaLogos().child(ruta).set(dataUrl).catch(errorEscritura);
           });
         });
@@ -2326,12 +2402,37 @@
       el.dataset.src = src;
     }
 
+    // Los auspiciadores rotan de a uno. "Editar" muestra la grilla para subir o quitar logos.
+    const carruselProy = crearCarruselAuspiciadores($('ausCarrusel'), $('ausPuntos'), TIEMPO_AUSPICIADOR);
+    let editandoAus = false;
+    function vistaAuspiciadores(){
+      const hay = Object.keys(logosAus).length > 0;
+      const grilla = editandoAus || !hay;
+      $('sponsorSlots').style.display = grilla ? '' : 'none';
+      $('ausCarrusel').style.display = grilla ? 'none' : '';
+      $('ausPuntos').style.display = grilla ? 'none' : '';
+      const btn = $('ausEditar');
+      btn.style.display = hay ? '' : 'none';
+      btn.textContent = editandoAus ? '✓ Listo' : '✎ Editar';
+      btn.classList.toggle('activo', editandoAus);
+    }
+    function alternarEdicionAus(){ editandoAus = !editandoAus; vistaAuspiciadores(); }
+    $('ausEditar').addEventListener('click', alternarEdicionAus);
+    document.addEventListener('keydown', (e) => {
+      if(e.key.toLowerCase() === 'a' && !e.ctrlKey && !e.metaKey && !e.altKey){
+        const activo = document.activeElement;
+        if(!(activo && (activo.tagName === 'INPUT' || activo.tagName === 'TEXTAREA' || activo.isContentEditable)) && Object.keys(logosAus).length) alternarEdicionAus();
+      }
+    });
+
     function renderLogosProyector(logos){
       pintarLogoEnCaja(cajaColegio, logos.colegio);
       const aus = logos.auspiciadores || {};
       logosAus = {};
       Object.keys(aus).forEach(k => { if(aus[k]) logosAus[Number(k)] = aus[k]; });
       dibujarAuspiciadores();
+      carruselProy.actualizar(Object.keys(logosAus).map(Number).sort((a, b) => a - b).map(k => logosAus[k]));
+      vistaAuspiciadores();
     }
 
     // ---- abrir página imprimible del QR, ya enlazada a esta sala ----
@@ -2555,6 +2656,7 @@
     const mLogoColegio = $('mLogoColegio');
     const mSponsorsCard = $('mSponsorsCard');
     const mSponsorRow = $('mSponsorRow');
+    const carruselAus = crearCarruselAuspiciadores(mSponsorRow, $('mAusPuntos'), TIEMPO_AUSPICIADOR);
     const mBinguitoCard = $('mBinguitoCard');
     const mPatron = $('mPatron');
     let letraBinEsp = null;
@@ -2616,21 +2718,8 @@
       }
 
       const auspiciadores = aLista(logos.auspiciadores);
-      if(auspiciadores.length){
-        mSponsorsCard.style.display = 'block';
-        mSponsorRow.innerHTML = '';
-        const n = auspiciadores.length;
-        mSponsorRow.style.setProperty('--cols', n <= 3 ? n : (n === 4 ? 4 : (n <= 6 ? 3 : 4)));
-        mSponsorRow.dataset.tam = n <= 2 ? String(n) : (n === 3 ? '3' : 'mas');
-        auspiciadores.forEach(src => {
-          const img = document.createElement('img');
-          img.className = 'm-sponsor-logo';
-          img.src = src;
-          mSponsorRow.appendChild(img);
-        });
-      } else {
-        mSponsorsCard.style.display = 'none';
-      }
+      mSponsorsCard.style.display = auspiciadores.length ? 'block' : 'none';
+      carruselAus.actualizar(auspiciadores);
     }
 
     if(firebaseConfigurado && window.__fbDb){
